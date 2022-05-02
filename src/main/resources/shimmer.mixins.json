@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.lowdragmc.shimmer.core.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "shimmer.refmap.json",
+  "minVersion": "0.8",
+  "client": [
+    "GameRendererMixin",
+    "LevelRendererAccessor",
+    "LevelRendererMixin",
+    "RenderTypeMixin"
+  ],
+  "mixins": [
+ ]
+}

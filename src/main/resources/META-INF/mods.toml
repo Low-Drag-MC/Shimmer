@@ -1,0 +1,34 @@
+modLoader="javafml" #mandatory
+loaderVersion="[40,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+license="All rights reserved"
+# A URL to refer people to when problems occur with this mod
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
+
+[[mods]] #mandatory
+modId="shimmer" #mandatory
+version="${file.jarVersion}" #mandatory
+ # A display name for the mod
+displayName="Shimmer" #mandatory
+logoFile="examplemod.png" #optional
+# A text field displayed in the mod UI
+credits="Thanks for this example mod goes to Java" #optional
+# A text field displayed in the mod UI
+authors="KilaBash" #optional
+description='''
+Shimemr
+'''
+# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
+[[dependencies.shimmer]] #optional
+    modId="forge" #mandatory
+    mandatory=true #mandatory
+    versionRange="[40,)" #mandatory
+    ordering="NONE"
+    side="BOTH"
+# Here's another dependency
+[[dependencies.shimmer]]
+    modId="shimmer"
+    mandatory=true
+# This version range declares a minimum of the current minecraft version up to but not including the next major version
+    versionRange="[1.18.2,1.19)"
+    ordering="NONE"
+    side="BOTH"
