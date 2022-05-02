@@ -8,6 +8,8 @@
     "GameRendererMixin",
     "LevelRendererAccessor",
     "LevelRendererMixin",
+    "MainTargetMixin",
+    "PostChainMixin",
     "RenderTypeMixin"
   ],
   "mixins": [
