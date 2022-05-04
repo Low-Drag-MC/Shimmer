@@ -33,8 +33,8 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
     public void clear(boolean pClearError) {
         super.clear(pClearError);
         if (colorBloomTextureId > -1) {
-            GL30.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT1);
             this.bindWrite(true);
+            GL30.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT1);
             GlStateManager._clearColor(0, 0, 0, 0);
             int i = 16384;
             if (this.useDepth) {
@@ -42,8 +42,8 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
                 i |= 256;
             }
             GlStateManager._clear(i, pClearError);
-            this.unbindWrite();
             GL30.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT0);
+            this.unbindWrite();
         }
     }
 
@@ -77,7 +77,7 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
                 GlStateManager._texParameter(3553, 10242, 33071);
                 GlStateManager._texParameter(3553, 10243, 33071);
                 if (!isStencilEnabled())
-                    GlStateManager._texImage2D(3553, 0, 6402, this.width, this.height, 0, 6402, 5126, (IntBuffer)null);
+                    GlStateManager._texImage2D(3553, 0, 6402, this.width, this.height, 0, 6402, 5126, null);
                 else
                     GlStateManager._texImage2D(3553, 0, org.lwjgl.opengl.GL30.GL_DEPTH32F_STENCIL8, this.width, this.height, 0, org.lwjgl.opengl.GL30.GL_DEPTH_STENCIL, org.lwjgl.opengl.GL30.GL_FLOAT_32_UNSIGNED_INT_24_8_REV, null);
             }
@@ -86,14 +86,14 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
             GlStateManager._bindTexture(this.colorTextureId);
             GlStateManager._texParameter(3553, 10242, 33071);
             GlStateManager._texParameter(3553, 10243, 33071);
-            GlStateManager._texImage2D(3553, 0, 32856, this.width, this.height, 0, 6408, 5121, (IntBuffer)null);
+            GlStateManager._texImage2D(3553, 0, 32856, this.width, this.height, 0, 6408, 5121, null);
             GlStateManager._glBindFramebuffer(36160, this.frameBufferId);
             GlStateManager._glFramebufferTexture2D(36160, 36064, 3553, this.colorTextureId, 0);
 
             GlStateManager._bindTexture(this.colorBloomTextureId);
             GlStateManager._texParameter(3553, 10242, 33071);
             GlStateManager._texParameter(3553, 10243, 33071);
-            GlStateManager._texImage2D(3553, 0, 32856, this.width, this.height, 0, 6408, 5121, (IntBuffer)null);
+            GlStateManager._texImage2D(3553, 0, 32856, this.width, this.height, 0, 6408, 5121, null);
             GlStateManager._glBindFramebuffer(36160, this.frameBufferId);
             GlStateManager._glFramebufferTexture2D(36160, 36065, 3553, this.colorBloomTextureId, 0);
 

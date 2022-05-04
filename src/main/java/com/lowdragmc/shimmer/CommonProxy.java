@@ -18,6 +18,7 @@ import net.minecraftforge.registries.IForgeRegistry;
  */
 public class CommonProxy {
     public static TestBlock TEST_BLOCK;
+    public static PistonBlock PISTON_BLOCK;
     public CommonProxy() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.register(this);
@@ -27,6 +28,8 @@ public class CommonProxy {
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         IForgeRegistry<Block> registry = event.getRegistry();
         TEST_BLOCK = new TestBlock(new ResourceLocation(ShimmerMod.MODID, "test_block"));
+        PISTON_BLOCK = new PistonBlock(new ResourceLocation(ShimmerMod.MODID, "piston_block"));
+        registry.register(PISTON_BLOCK);
         registry.register(TEST_BLOCK);
     }
 
@@ -35,5 +38,7 @@ public class CommonProxy {
         IForgeRegistry<Item> registry = event.getRegistry();
         registry.register(new BlockItem(TEST_BLOCK, new Item.Properties().tab(CreativeModeTab.TAB_REDSTONE))
                 .setRegistryName(TEST_BLOCK.getRegistryName()));
+        registry.register(new BlockItem(PISTON_BLOCK, new Item.Properties().tab(CreativeModeTab.TAB_REDSTONE))
+                .setRegistryName(PISTON_BLOCK.getRegistryName()));
     }
 }

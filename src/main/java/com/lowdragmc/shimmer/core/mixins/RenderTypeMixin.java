@@ -1,7 +1,7 @@
 package com.lowdragmc.shimmer.core.mixins;
 
 import com.google.common.collect.ImmutableList;
-import com.lowdragmc.shimmer.client.rendertype.ShimmerRenderTypes;
+import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

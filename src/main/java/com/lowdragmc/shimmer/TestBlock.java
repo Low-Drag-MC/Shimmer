@@ -16,8 +16,7 @@ public class TestBlock extends Block {
         super(BlockBehaviour.Properties
                 .of(Material.METAL)
                 .sound(SoundType.STONE)
-                .strength(1)
-                .noOcclusion());
+                .strength(1));
         this.setRegistryName(registryName);
     }
 

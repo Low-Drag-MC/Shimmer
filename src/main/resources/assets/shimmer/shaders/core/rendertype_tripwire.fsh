@@ -15,13 +15,11 @@ in vec2 texCoord0;
 in vec4 normal;
 
 out vec4 fragColor;
-out vec4 bloomColor;
 
 void main() {
     vec4 color = texture(Sampler0, texCoord0) * vertexColor * ColorModulator;
-    if (color.a < 0.5) {
+    if (color.a < 0.1) {
         discard;
     }
     fragColor = linear_fog(color, vertexDistance, FogStart, FogEnd, FogColor);
-    bloomColor = fragColor;
 }

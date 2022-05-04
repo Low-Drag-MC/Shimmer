@@ -4,8 +4,8 @@
         "srcrgb": "srcalpha",
         "dstrgb": "1-srcalpha"
     },
-    "vertex": "shimmer:rendertype_bloom",
-    "fragment": "shimmer:rendertype_bloom",
+    "vertex": "shimmer:rendertype_tripwire",
+    "fragment": "shimmer:rendertype_tripwire",
     "attributes": [
         "Position",
         "Color",

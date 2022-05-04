@@ -1,18 +1,11 @@
-package com.lowdragmc.shimmer.client;
+package com.lowdragmc.shimmer.client.bloom;
 
 import com.lowdragmc.shimmer.ShimmerMod;
-import com.lowdragmc.shimmer.client.rendertype.ShimmerRenderTypes;
-import com.lowdragmc.shimmer.core.mixins.LevelRendererAccessor;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.PostChain;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -51,7 +44,7 @@ public class Bloom implements ResourceManagerReloadListener {
         try {
             if (postChain == null) {
                 postChain =new PostChain(mc.getTextureManager(), mc.getResourceManager(), mc.getMainRenderTarget(),
-                        new ResourceLocation(ShimmerMod.MODID, "shaders/post/blur.json"));
+                        new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unreal.json"));
                 postChain.resize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
             }
         } catch (IOException e) {
@@ -60,16 +53,14 @@ public class Bloom implements ResourceManagerReloadListener {
         return postChain;
     }
 
-    public void renderLayer(LevelRenderer instance, RenderType cutoutMipped, PoseStack poseStack, double camX, double camY, double camZ, Matrix4f projectionMatrix) {
-        ((LevelRendererAccessor)instance).callRenderChunkLayer(cutoutMipped, poseStack, camX, camY, camZ, projectionMatrix);
-        ((LevelRendererAccessor)instance).callRenderChunkLayer(ShimmerRenderTypes.bloom(), poseStack, camX, camY, camZ, projectionMatrix);
+    public void renderBloom() {
         PostChain postChain = getPostChain();
         if (postChain != null) {
-            RenderSystem.disableBlend();
+            RenderSystem.depthMask(false);
             RenderSystem.disableDepthTest();
-            RenderSystem.enableTexture();
-            RenderSystem.resetTextureMatrix();
-            postChain.process(mc.getDeltaFrameTime());
+            postChain.process(mc.getFrameTime());
+            RenderSystem.depthMask(true);
+            RenderSystem.enableDepthTest();
         }
     }
 

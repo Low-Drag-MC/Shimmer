@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 
 @Mod(ShimmerMod.MODID)
 public class ShimmerMod {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
     public static final String MODID = "shimmer";
 
     public ShimmerMod() {

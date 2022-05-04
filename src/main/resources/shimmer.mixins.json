@@ -6,10 +6,12 @@
   "minVersion": "0.8",
   "client": [
     "GameRendererMixin",
+    "HumanoidArmorLayerMixin",
     "LevelRendererAccessor",
     "LevelRendererMixin",
     "MainTargetMixin",
     "PostChainMixin",
+    "RenderTargetMixin",
     "RenderTypeMixin"
   ],
   "mixins": [

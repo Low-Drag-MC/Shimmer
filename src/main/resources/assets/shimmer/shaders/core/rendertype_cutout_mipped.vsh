@@ -24,7 +24,7 @@ out vec4 normal;
 #moj_import <shimmer.glsl>
 
 void main() {
-    vec3 pos = Position + ChunkOffset; // cam to obj
+    vec3 pos = Position + ChunkOffset;
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
 
     vertexDistance = fog_distance(ModelViewMat, pos, FogShape);
@@ -32,5 +32,5 @@ void main() {
     texCoord0 = UV0;
     normal = ProjMat * ModelViewMat * vec4(Normal, 0.0);
 
-    vertexColor = color_light(pos, vec4(1.,1.,1.,1.));
+    vertexColor = color_light(pos, vertexColor);
 }
