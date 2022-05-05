@@ -1,4 +1,4 @@
-package com.lowdragmc.shimmer;
+package com.lowdragmc.shimmer.test;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;

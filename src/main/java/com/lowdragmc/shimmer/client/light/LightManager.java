@@ -3,6 +3,7 @@ package com.lowdragmc.shimmer.client.light;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.client.shader.ShaderUBO;
 import com.lowdragmc.shimmer.core.IRenderChunk;
+import com.lowdragmc.shimmer.test.ColoredFireBlock;
 import com.mojang.math.Vector3f;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
@@ -140,13 +141,15 @@ public enum LightManager {
 
     public boolean isBlockHasLight(BlockState blockState) {
         Block block = blockState.getBlock();
-        return block == Blocks.REDSTONE_BLOCK || block == Blocks.SLIME_BLOCK || block == Blocks.SPONGE || block == Blocks.SEA_LANTERN;
+        return block == Blocks.REDSTONE_BLOCK || block == Blocks.SLIME_BLOCK || block == Blocks.SPONGE || block == Blocks.SEA_LANTERN || block instanceof ColoredFireBlock;
     }
 
     public ColorPointLight getBlockLight(BlockPos blockpos, BlockState blockstate) {
         Block block = blockstate.getBlock();
         int color = 0xffffffff;
-        if (block == Blocks.REDSTONE_BLOCK) {
+        if (block instanceof ColoredFireBlock) {
+            color = ((ColoredFireBlock) block).color;
+        } else if (block == Blocks.REDSTONE_BLOCK) {
             color = 0xffff0000;
         } else if (block == Blocks.SLIME_BLOCK) {
             color = 0xff00ff00;
