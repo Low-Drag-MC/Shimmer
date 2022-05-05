@@ -18,13 +18,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class GameRendererMixin {
 
     @Inject(method = "resize", at = @At(value = "HEAD"))
-    private void injectResize(int widget, int height, CallbackInfo ci) {
-        Bloom.INSTANCE.resize(widget, height);
+    private void injectResize(int width, int height, CallbackInfo ci) {
+        for (Bloom bloom : Bloom.values()) {
+            bloom.resize(width, height);
+        }
     }
 
     @Inject(method = "reloadShaders", at = @At(value = "RETURN"))
     private void injectReloadShaders(ResourceManager pResourceManager, CallbackInfo ci) {
-        LightManager.INSTANCE.init();
+        LightManager.INSTANCE.reloadShaders();
     }
 
 }

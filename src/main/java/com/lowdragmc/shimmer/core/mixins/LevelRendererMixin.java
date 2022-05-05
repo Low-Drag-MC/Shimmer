@@ -5,13 +5,22 @@ import com.lowdragmc.shimmer.client.bloom.Bloom;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.phys.Vec3;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import javax.annotation.Nullable;
 
 /**
  * @author KilaBash
@@ -21,30 +30,36 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin {
 
-    @Redirect(method = "renderLevel",
+    @Shadow protected abstract void renderChunkLayer(RenderType pRenderType, PoseStack pPoseStack, double pCamX, double pCamY, double pCamZ, Matrix4f pProjectionMatrix);
+
+    @Shadow @Nullable private ClientLevel level;
+
+    @Shadow @Final private ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum;
+
+    @Inject(method = "renderLevel",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/LevelRenderer;renderChunkLayer(Lnet/minecraft/client/renderer/RenderType;Lcom/mojang/blaze3d/vertex/PoseStack;DDDLcom/mojang/math/Matrix4f;)V",
-                    ordinal = 2))
-    private void injectRenderLevel(LevelRenderer instance, RenderType cutout, PoseStack poseStack, double camX, double camY, double camZ, Matrix4f projectionMatrix) {
-        ((LevelRendererAccessor)instance).callRenderChunkLayer(cutout, poseStack, camX, camY, camZ, projectionMatrix);
-        ((LevelRendererAccessor)instance).callRenderChunkLayer(ShimmerRenderTypes.bloom(), poseStack, camX, camY, camZ, projectionMatrix);
-        Bloom.INSTANCE.renderBloom();
+                    target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;constantAmbientLight()Z"))
+    private void injectRenderLevel(PoseStack poseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera camera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
+        Vec3 camPos = camera.getPosition();
+        this.renderChunkLayer(ShimmerRenderTypes.bloom(), poseStack, camPos.x, camPos.y, camPos.z, projectionMatrix);
+        this.level.getProfiler().popPush("block_bloom");
+        Bloom.BLOCK_BLOOM.renderBloom();
     }
-
-    @Inject(method = "renderChunkLayer",
+    @Inject(method = "renderLevel",
             at = @At(
                     value = "INVOKE",
-                    target = "Lcom/mojang/blaze3d/systems/RenderSystem;setupShaderLights(Lnet/minecraft/client/renderer/ShaderInstance;)V"))
-    private void injectRenderChunkLayer(RenderType renderType, PoseStack poseStack, double camX, double camY, double camZ, Matrix4f projectionMatrix, CallbackInfo ci) {
-        LightManager.INSTANCE.setupUniform(camX, camY, camZ);
+                    target = "Lnet/minecraft/client/renderer/LevelRenderer;checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V",
+                    ordinal = 1))
+    private void injectRenderLevelBloom(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
+        this.level.getProfiler().popPush("entity_last_bloom");
+        Bloom.Entity_LAST_BLOOM.renderBloom();
     }
 
-//    Vec3 vec3 = pCamera.getPosition();
-//    double camX = vec3.x();
-//    double camY = vec3.y();
-//    double camZ = vec3.z();
-//    RenderSystem.depthMask(false);
-//    this.callRenderChunkLayer(ShimmerRenderTypes.bloom(), poseStack, camX, camY, camZ, projectionMatrix);
-//    RenderSystem.depthMask(true);
+    @Inject(method = "renderLevel", at = @At(value = "HEAD"))
+    private void injectRenderLevelLight(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
+        Vec3 position = pCamera.getPosition();
+        LightManager.INSTANCE.setupChunkLights(renderChunksInFrustum, (float)position.x,(float) position.y, (float)position.z);
+    }
+
 }

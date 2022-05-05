@@ -11,8 +11,10 @@ layout (std140) uniform Lights {
     Light lights[2048];     //  16  8 * 2048
 };
 
-uniform vec3 CamPos;
-uniform int LightCount;
+layout (std140) uniform Env {
+    int lightCount;
+    vec3 camPos;
+};
 
 vec4 color_light(vec3 pos, vec4 vertex_color) {
     float sumR = 0;
@@ -21,8 +23,8 @@ vec4 color_light(vec3 pos, vec4 vertex_color) {
     float count = 0;
     float maxIntens = 0;
     float totalIntens = 0;
-    vec3 fragPos = pos + CamPos;
-    for (int i = 0; i < LightCount; i++) {
+    vec3 fragPos = pos + camPos;
+    for (int i = 0; i < lightCount; i++) {
         Light l = lights[i];
         float radius = pow(l.radius, 2);
         vec3 poss = vec3(0.,0.,0.);
@@ -30,7 +32,7 @@ vec4 color_light(vec3 pos, vec4 vertex_color) {
         totalIntens += intensity;
         maxIntens = max(maxIntens, intensity);
     }
-    for (int i = 0; i < LightCount; i++) {
+    for (int i = 0; i < lightCount; i++) {
         Light l = lights[i];
         float radius = pow(l.radius, 2);
         float intensity = pow(max(0, 1.0f - distance(l.position, fragPos) / l.radius), 2);

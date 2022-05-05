@@ -1,7 +1,5 @@
 package com.lowdragmc.shimmer;
 
-import com.lowdragmc.shimmer.client.light.LightManager;
-import com.mojang.math.Vector3f;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,8 +32,5 @@ public class PistonBlock extends Block {
     @ParametersAreNonnullByDefault
     public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
-        if (pLevel.isClientSide) {
-            LightManager.INSTANCE.addLight(new Vector3f(pPos.getX() + 0.5f, pPos.getY() + 0.5f, pPos.getZ() + 0.5f), 0xffff0000, 5);
-        }
     }
 }

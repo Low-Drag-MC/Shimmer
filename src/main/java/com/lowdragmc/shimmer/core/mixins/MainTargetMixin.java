@@ -30,18 +30,12 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
     }
 
     @Override
-    public void clear(boolean pClearError) {
-        super.clear(pClearError);
+    public void clearBloomTexture(boolean pClearError) {
         if (colorBloomTextureId > -1) {
             this.bindWrite(true);
             GL30.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT1);
             GlStateManager._clearColor(0, 0, 0, 0);
-            int i = 16384;
-            if (this.useDepth) {
-                GlStateManager._clearDepth(1.0D);
-                i |= 256;
-            }
-            GlStateManager._clear(i, pClearError);
+            GlStateManager._clear(16384, pClearError);
             GL30.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT0);
             this.unbindWrite();
         }

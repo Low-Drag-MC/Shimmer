@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "name": "swap",
+      "name": "output",
       "bilinear": true
     },
     {
@@ -193,7 +193,7 @@
     {
       "name": "shimmer:unreal_composite",
       "intarget": "minecraft:main",
-      "outtarget": "swap",
+      "outtarget": "output",
       "auxtargets": [
         {"id":"swap2b", "name":"BlurTexture1"},
         {"id":"swap4b", "name":"BlurTexture2"},
@@ -206,11 +206,6 @@
           "values": [1.0]
         }
       ]
-    },
-    {
-      "name": "shimmer:blit",
-      "intarget": "swap",
-      "outtarget": "minecraft:main"
     }
   ]
 }

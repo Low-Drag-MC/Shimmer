@@ -7,12 +7,15 @@
   "client": [
     "GameRendererMixin",
     "HumanoidArmorLayerMixin",
-    "LevelRendererAccessor",
     "LevelRendererMixin",
     "MainTargetMixin",
     "PostChainMixin",
+    "ProgramMixin",
+    "RebuildTaskMixin",
+    "RenderChunkMixin",
     "RenderTargetMixin",
-    "RenderTypeMixin"
+    "RenderTypeMixin",
+    "ShaderInstanceMixin"
   ],
   "mixins": [
  ]

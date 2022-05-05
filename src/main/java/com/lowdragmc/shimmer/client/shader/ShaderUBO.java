@@ -37,15 +37,15 @@ public class ShaderUBO {
         GL30.glBindBuffer(GL31.GL_UNIFORM_BUFFER, 0);
     }
 
-    public void createBufferData(long size) {
+    public void createBufferData(long size, int mode) {
         bindBuffer();
-        GL30.glBufferData(GL31.GL_UNIFORM_BUFFER, size, GL30.GL_STATIC_DRAW);
+        GL30.glBufferData(GL31.GL_UNIFORM_BUFFER, size, mode);
         unBindBuffer();
     }
 
-    public void createBufferData(FloatBuffer data) {
+    public void createBufferData(FloatBuffer data, int mode) {
         bindBuffer();
-        GL30.glBufferData(GL31.GL_UNIFORM_BUFFER, data, GL30.GL_STATIC_DRAW);
+        GL30.glBufferData(GL31.GL_UNIFORM_BUFFER, data, mode);
         unBindBuffer();
     }
 

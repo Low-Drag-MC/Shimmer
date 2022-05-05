@@ -16,6 +16,7 @@ public class ShimmerMod {
     public static final String MODID = "shimmer";
 
     public ShimmerMod() {
+        Configuration.register();
         DistExecutor.unsafeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
     }
 

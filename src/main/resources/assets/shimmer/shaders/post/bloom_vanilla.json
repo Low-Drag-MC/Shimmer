@@ -1,0 +1,49 @@
+{
+  "targets": [
+    "swap",
+    {
+      "name": "output",
+      "bilinear": true
+    }
+  ],
+  "passes": [
+    {
+      "name": "blur",
+      "intarget": "minecraft:main:bloom",
+      "outtarget": "output",
+      "uniforms": [
+        {
+          "name": "BlurDir",
+          "values": [ 2.0, 0.0 ]
+        },
+        {
+          "name": "Radius",
+          "values": [ 5.0 ]
+        }
+      ]
+    },
+    {
+      "name": "blur",
+      "intarget": "output",
+      "outtarget": "swap",
+      "uniforms": [
+        {
+          "name": "BlurDir",
+          "values": [ 0.0, 2.0 ]
+        },
+        {
+          "name": "Radius",
+          "values": [ 5.0 ]
+        }
+      ]
+    },
+    {
+      "name": "shimmer:vanilla_composite",
+      "intarget": "minecraft:main",
+      "outtarget": "output",
+      "auxtargets": [
+        {"id":"swap", "name":"BlurTexture"}
+      ]
+    }
+  ]
+}
