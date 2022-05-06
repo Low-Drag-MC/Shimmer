@@ -57,9 +57,14 @@ public abstract class LevelRendererMixin {
     }
 
     @Inject(method = "renderLevel", at = @At(value = "HEAD"))
-    private void injectRenderLevelLight(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
+    private void injectRenderLevelPre(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
         Vec3 position = pCamera.getPosition();
-        LightManager.INSTANCE.setupChunkLights(renderChunksInFrustum, (float)position.x,(float) position.y, (float)position.z);
+        LightManager.INSTANCE.renderLevelPre(renderChunksInFrustum, (float)position.x,(float) position.y, (float)position.z);
+    }
+
+    @Inject(method = "renderLevel", at = @At(value = "RETURN"))
+    private void injectRenderLevelPost(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
+        LightManager.INSTANCE.renderLevelPost();
     }
 
 }

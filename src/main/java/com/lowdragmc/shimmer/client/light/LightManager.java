@@ -22,7 +22,6 @@ import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * @author KilaBash
@@ -36,39 +35,48 @@ public enum LightManager {
     private final FloatBuffer buffer = BufferUtils.createFloatBuffer(2048 * ColorPointLight.STRUCT_SIZE);
     ShaderUBO lightUBO;
     ShaderUBO envUBO;
-
-    public static void injectShaders() {
-        Function<String, String> chunkInjection = s -> s
-                .replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()")
-                .replace("texCoord0 = UV0;", "texCoord0 = UV0;\nvertexColor = color_light(pos, vertexColor);\n");
-
-        Function<String, String> entityInjection1 = s -> s
-                .replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()")
-                .replace("texCoord0 = UV0;", "texCoord0 = UV0;\nvertexColor = color_light(Position, vertexColor);\n");
-
-        Function<String, String> entityInjection2 = s -> s
-                .replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()")
-                .replace("texCoord0 = UV0;", "texCoord0 = UV0;\nvertexColor = color_light(IViewRotMat * Position, vertexColor);\n");
-
-        ShaderInjection.registerVSHInjection("rendertype_solid", chunkInjection);
-        ShaderInjection.registerVSHInjection("rendertype_cutout", chunkInjection);
-        ShaderInjection.registerVSHInjection("rendertype_cutout_mipped", chunkInjection);
-        ShaderInjection.registerVSHInjection("rendertype_translucent", chunkInjection);
-        ShaderInjection.registerVSHInjection("rendertype_armor_cutout_no_cull", entityInjection1);
-        ShaderInjection.registerVSHInjection("rendertype_entity_alpha", entityInjection1);
-        ShaderInjection.registerVSHInjection("rendertype_entity_cutout", entityInjection2);
-        ShaderInjection.registerVSHInjection("rendertype_entity_cutout_no_cull", entityInjection2);
-        ShaderInjection.registerVSHInjection("rendertype_entity_cutout_no_cull_z_offset", entityInjection2);
-        ShaderInjection.registerVSHInjection("rendertype_entity_decal", entityInjection2);
-        ShaderInjection.registerVSHInjection("rendertype_entity_no_outline", entityInjection2);
-        ShaderInjection.registerVSHInjection("rendertype_entity_shadow", entityInjection2);
-        ShaderInjection.registerVSHInjection("rendertype_entity_smooth_cutout", entityInjection2);
-        ShaderInjection.registerVSHInjection("rendertype_entity_solid", entityInjection2);
-        ShaderInjection.registerVSHInjection("rendertype_entity_translucent", entityInjection2);
-        ShaderInjection.registerVSHInjection("rendertype_entity_translucent_cull", entityInjection2);
+    
+    private static String ChunkInjection(String s) {
+        s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
+        return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light(pos, vertexColor);\n").toString();
     }
 
-    public void setupChunkLights(ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum, float camX, float camY, float camZ) {
+    private static String ArmorInjection(String s) {
+        //TODO fix armor lighting. what the hell!!!!!
+        s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
+        return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light(Position, vertexColor);\n").toString();
+    }
+
+    private static String EntityInjectionLightMapColor(String s) {
+        s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
+        return new StringBuffer(s).insert(s.lastIndexOf('}'), "lightMapColor = color_light(IViewRotMat * Position, lightMapColor);\n").toString();
+    }
+
+    private static String EntityInjectionVertexColor(String s) {
+        s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
+        return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light(IViewRotMat * Position, vertexColor);\n").toString();
+    }
+
+    public static void injectShaders() {
+
+        ShaderInjection.registerVSHInjection("rendertype_solid", LightManager::ChunkInjection);
+        ShaderInjection.registerVSHInjection("rendertype_cutout", LightManager::ChunkInjection);
+        ShaderInjection.registerVSHInjection("rendertype_cutout_mipped", LightManager::ChunkInjection);
+        ShaderInjection.registerVSHInjection("rendertype_translucent", LightManager::ChunkInjection);
+        ShaderInjection.registerVSHInjection("rendertype_armor_cutout_no_cull", LightManager::ArmorInjection);
+        ShaderInjection.registerVSHInjection("rendertype_entity_cutout", LightManager::EntityInjectionLightMapColor);
+        ShaderInjection.registerVSHInjection("rendertype_entity_cutout_no_cull", LightManager::EntityInjectionLightMapColor);
+        ShaderInjection.registerVSHInjection("rendertype_entity_cutout_no_cull_z_offset", LightManager::EntityInjectionLightMapColor);
+        ShaderInjection.registerVSHInjection("rendertype_entity_decal", LightManager::EntityInjectionVertexColor);
+        ShaderInjection.registerVSHInjection("rendertype_entity_no_outline", LightManager::EntityInjectionVertexColor);
+        ShaderInjection.registerVSHInjection("rendertype_entity_shadow", LightManager::EntityInjectionVertexColor);
+        ShaderInjection.registerVSHInjection("rendertype_entity_smooth_cutout", LightManager::EntityInjectionLightMapColor);
+        ShaderInjection.registerVSHInjection("rendertype_entity_solid", LightManager::EntityInjectionLightMapColor);
+        ShaderInjection.registerVSHInjection("rendertype_entity_translucent", LightManager::EntityInjectionLightMapColor);
+        ShaderInjection.registerVSHInjection("rendertype_entity_translucent_cull", LightManager::EntityInjectionVertexColor);
+    }
+
+    public void renderLevelPre(ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum, float camX, float camY, float camZ) {
         int blockLightSize = 0;
         buffer.clear();
         for (LevelRenderer.RenderChunkInfo chunkInfo : renderChunksInFrustum) {
@@ -86,6 +94,10 @@ public enum LightManager {
 
         envUBO.bufferSubData(0, new int[]{lights.size() + blockLightSize});
         envUBO.bufferSubData(16, new float[]{camX, camY, camZ});
+    }
+
+    public void renderLevelPost() {
+        envUBO.bufferSubData(0, new int[]{0});
     }
 
     public void reloadShaders() {
@@ -106,7 +118,6 @@ public enum LightManager {
         bindProgram("rendertype_cutout_mipped");
         bindProgram("rendertype_translucent");
         bindProgram("rendertype_armor_cutout_no_cull");
-        bindProgram("rendertype_entity_alpha");
         bindProgram("rendertype_entity_cutout");
         bindProgram("rendertype_entity_cutout_no_cull");
         bindProgram("rendertype_entity_cutout_no_cull_z_offset");
@@ -180,4 +191,5 @@ public enum LightManager {
             }
         }
     }
+
 }

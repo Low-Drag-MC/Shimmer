@@ -3,6 +3,7 @@ package com.lowdragmc.shimmer.client;
 import com.lowdragmc.shimmer.CommonProxy;
 import com.lowdragmc.shimmer.client.bloom.Bloom;
 import com.lowdragmc.shimmer.client.light.LightManager;
+import com.lowdragmc.shimmer.client.shader.ShaderUtils;
 import com.lowdragmc.shimmer.test.ColoredFireBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -28,6 +29,7 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
 
     @SubscribeEvent
     public void shaderRegistry(RegisterShadersEvent event) {
+        ShaderUtils.registerShaders(event);
         ShimmerRenderTypes.registerShaders(event);
     }
 

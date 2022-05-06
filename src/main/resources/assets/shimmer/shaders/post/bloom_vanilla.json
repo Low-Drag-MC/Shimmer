@@ -9,7 +9,7 @@
   "passes": [
     {
       "name": "blur",
-      "intarget": "minecraft:main:bloom",
+      "intarget": "shimmer:bloom",
       "outtarget": "output",
       "uniforms": [
         {

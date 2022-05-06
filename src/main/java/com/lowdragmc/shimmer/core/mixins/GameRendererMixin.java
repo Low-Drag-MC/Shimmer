@@ -17,11 +17,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
 
-    @Inject(method = "resize", at = @At(value = "HEAD"))
+    @Inject(method = "resize", at = @At(value = "RETURN"))
     private void injectResize(int width, int height, CallbackInfo ci) {
-        for (Bloom bloom : Bloom.values()) {
-            bloom.resize(width, height);
-        }
+        Bloom.resize(width, height);
     }
 
     @Inject(method = "reloadShaders", at = @At(value = "RETURN"))

@@ -2,7 +2,8 @@ package com.lowdragmc.shimmer.core.mixins;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.lowdragmc.shimmer.client.ScaleTextureTarget;
+import com.lowdragmc.shimmer.client.bloom.Bloom;
+import com.lowdragmc.shimmer.client.rendertarget.ScaleTextureTarget;
 import com.lowdragmc.shimmer.core.IMainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -112,6 +113,8 @@ public abstract class PostChainMixin {
             renderTarget.width = screenTarget.width;
             renderTarget.height = screenTarget.height;
             cir.setReturnValue(renderTarget);
+        } else if (pTarget != null && pTarget.equals("shimmer:bloom")) {
+            cir.setReturnValue(Bloom.getBloomTarget());
         }
     }
 

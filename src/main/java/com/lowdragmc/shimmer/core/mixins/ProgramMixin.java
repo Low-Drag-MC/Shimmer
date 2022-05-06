@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.core.mixins;
 
+import com.lowdragmc.shimmer.ShimmerMod;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.preprocessor.GlslPreprocessor;
@@ -11,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -31,7 +31,7 @@ public abstract class ProgramMixin {
                                      GlslPreprocessor pPreprocessor,
                                      CallbackInfoReturnable<Integer> cir,
                                      String shader,
-                                     int id) throws IOException {
+                                     int id) {
         boolean isVSH = pType.getName().equals("vertex");
         if (isVSH) {
             if (ShaderInjection.hasInjectVSH(shaderName)) {
@@ -41,7 +41,7 @@ public abstract class ProgramMixin {
                 GlStateManager.glCompileShader(id);
                 if (GlStateManager.glGetShaderi(id, 35713) == 0) {
                     String s1 = StringUtils.trim(GlStateManager.glGetShaderInfoLog(id, 32768));
-                    throw new IOException("Couldn't compile " + pType.getName() + " program (" + pSourceName + ", " + shaderName + ") : " + s1);
+                    ShimmerMod.LOGGER.error("Couldn't compile " + pType.getName() + " program (" + pSourceName + ", " + shaderName + ") : " + s1);
                 } else {
                     cir.setReturnValue(id);
                 }
@@ -53,7 +53,7 @@ public abstract class ProgramMixin {
                 GlStateManager.glCompileShader(id);
                 if (GlStateManager.glGetShaderi(id, 35713) == 0) {
                     String s1 = StringUtils.trim(GlStateManager.glGetShaderInfoLog(id, 32768));
-                    throw new IOException("Couldn't compile " + pType.getName() + " program (" + pSourceName + ", " + shaderName + ") : " + s1);
+                    ShimmerMod.LOGGER.error("Couldn't compile " + pType.getName() + " program (" + pSourceName + ", " + shaderName + ") : " + s1);
                 } else {
                     cir.setReturnValue(id);
                 }

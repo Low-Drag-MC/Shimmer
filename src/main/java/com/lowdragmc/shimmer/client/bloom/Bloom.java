@@ -2,13 +2,14 @@ package com.lowdragmc.shimmer.client.bloom;
 
 import com.google.common.collect.Maps;
 import com.lowdragmc.shimmer.ShimmerMod;
+import com.lowdragmc.shimmer.client.rendertarget.CopyDepthTarget;
+import com.lowdragmc.shimmer.client.shader.ShaderUtils;
 import com.lowdragmc.shimmer.core.IMainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
@@ -32,19 +33,26 @@ import java.util.function.Consumer;
  */
 @OnlyIn(Dist.CLIENT)
 public enum Bloom implements ResourceManagerReloadListener {
-    BLOCK_BLOOM(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unreal.json"), true),
-    Entity_LAST_BLOOM(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_vanilla.json"), false);
+    BLOCK_BLOOM(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unreal.json")),
+    Entity_LAST_BLOOM(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_vanilla.json"));
 
     private static final Minecraft mc = Minecraft.getInstance();
+    private static CopyDepthTarget bloomTarget;
     private PostChain postChain = null;
     private boolean loadFailed = false;
     private final ResourceLocation shader;
     private final Map<RenderType, List<Consumer<VertexConsumer>>> postDraw = Maps.newHashMap();
-    private final boolean alwaysRender;
 
-    Bloom(ResourceLocation shader, boolean alwaysRender) {
+    Bloom(ResourceLocation shader) {
         this.shader = shader;
-        this.alwaysRender = alwaysRender;
+    }
+
+    public static CopyDepthTarget getBloomTarget() {
+        if (bloomTarget == null) {
+            bloomTarget = new CopyDepthTarget(mc.getMainRenderTarget(), Minecraft.ON_OSX);
+            bloomTarget.setClearColor(0,0,0,0);
+        }
+        return bloomTarget;
     }
 
     private PostChain getPostChain() {
@@ -62,39 +70,47 @@ public enum Bloom implements ResourceManagerReloadListener {
     }
 
     public void renderBloom() {
-        if (postDraw.isEmpty() && !alwaysRender) return;
-        if (!postDraw.isEmpty()) {
-            postDraw.forEach((renderType, consumers) -> {
-                BufferBuilder buffer = Tesselator.getInstance().getBuilder();
-                buffer.begin(renderType.mode(), renderType.format());
-                consumers.forEach(consumer -> consumer.accept(buffer));
-                renderType.end(buffer, 0, 0, 0);
-            });
-            postDraw.clear();
-        }
+        if (postDraw.isEmpty() && this != BLOCK_BLOOM) return;
+//        if (this == Entity_LAST_BLOOM) return;
         PostChain postChain = getPostChain();
         if (postChain != null) {
+            RenderTarget mainTarget = mc.getMainRenderTarget();
+
+            if (!postDraw.isEmpty()) {
+                CopyDepthTarget bloom = getBloomTarget();
+                bloom.clear(Minecraft.ON_OSX);
+                bloom.bindWrite(true);
+
+                postDraw.forEach((renderType, consumers) -> {
+                    BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+                    buffer.begin(renderType.mode(), renderType.format());
+                    consumers.forEach(consumer -> consumer.accept(buffer));
+                    renderType.end(buffer, 0, 0, 0);
+                });
+
+                postDraw.clear();
+
+                ShaderUtils.fastBlit(bloom, mainTarget);
+            }
+
             RenderSystem.depthMask(false);
             RenderSystem.disableDepthTest();
             postChain.process(mc.getFrameTime());
-            RenderTarget mainTarget = mc.getMainRenderTarget();
-            mainTarget.bindWrite(false);
-            Matrix4f lastProj = RenderSystem.getProjectionMatrix();
-            postChain.getTempTarget("output").blitToScreen(mainTarget.width, mainTarget.height, false);
+
+            ShaderUtils.fastBlit(postChain.getTempTarget("output"), mainTarget);
 
             if (mainTarget instanceof IMainTarget) {
                 ((IMainTarget) mainTarget).clearBloomTexture(Minecraft.ON_OSX);
                 mainTarget.bindWrite(false);
             }
 
-            RenderSystem.setProjectionMatrix(lastProj);
-            RenderSystem.depthMask(true);
-            RenderSystem.enableDepthTest();
         }
     }
 
     public void postBloom(RenderType renderType, Consumer<VertexConsumer> consumer) {
-        postDraw.computeIfAbsent(renderType, x->new LinkedList<>()).add(consumer);
+        if (this != BLOCK_BLOOM) {
+            postDraw.computeIfAbsent(renderType, x->new LinkedList<>()).add(consumer);
+        }
     }
 
     @Override
@@ -106,9 +122,15 @@ public enum Bloom implements ResourceManagerReloadListener {
         loadFailed = false;
     }
 
-    public void resize(int width, int height) {
-        if (postChain != null) {
-            postChain.resize(width, height);
+    public static void resize(int width, int height) {
+        for (Bloom bloom : Bloom.values()) {
+            if (bloom.postChain != null) {
+                bloom.postChain.resize(width, height);
+            }
+        }
+
+        if (bloomTarget != null) {
+            bloomTarget.resize(mc.getMainRenderTarget(), Minecraft.ON_OSX);
         }
     }
 }

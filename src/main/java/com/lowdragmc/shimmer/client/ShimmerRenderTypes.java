@@ -30,8 +30,8 @@ public class ShimmerRenderTypes {
         return BLOOM == null ? BLOOM = BloomRenderType.create() : BLOOM;
     }
 
-    public static RenderType bloomArmor(ResourceLocation resourceLocation) {
-        return BloomArmorRenderType.BLOOM_ARMOR_CUTOUT_NO_CULL.apply(resourceLocation);
+    public static RenderType emissiveArmor(ResourceLocation resourceLocation) {
+        return EmissiveArmorRenderType.EMISSIVE_ARMOR_CUTOUT_NO_CULL.apply(resourceLocation);
     }
 
     public static void registerShaders(RegisterShadersEvent event) {
@@ -44,7 +44,7 @@ public class ShimmerRenderTypes {
         }
         try {
             event.registerShader(new ShaderInstance(resourceManager, new ResourceLocation(ShimmerMod.MODID, "rendertype_armor_cutout_no_cull"), DefaultVertexFormat.NEW_ENTITY),
-                    shaderInstance -> BloomArmorRenderType.bloomArmorGlintShader = shaderInstance);
+                    shaderInstance -> EmissiveArmorRenderType.emissiveArmorGlintShader = shaderInstance);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -82,29 +82,17 @@ public class ShimmerRenderTypes {
         }
     }
 
-    private static class BloomArmorRenderType extends RenderType {
-        public static ShaderInstance bloomArmorGlintShader;
-        private static final ShaderStateShard RENDERTYPE_BLOOM_SHADER = new ShaderStateShard(() -> bloomArmorGlintShader) {
-            @Override
-            public void setupRenderState() {
-                GL30.glDrawBuffers(new int[] {GL30.GL_COLOR_ATTACHMENT0, GL30.GL_COLOR_ATTACHMENT1});
-                super.setupRenderState();
-            }
-
-            @Override
-            public void clearRenderState() {
-                super.clearRenderState();
-                GL30.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT0);
-            }
-        };
+    private static class EmissiveArmorRenderType extends RenderType {
+        public static ShaderInstance emissiveArmorGlintShader;
+        private static final ShaderStateShard RENDERTYPE_BLOOM_SHADER = new ShaderStateShard(() -> emissiveArmorGlintShader);
 
         // Fxxk MOJ, have to use dummy constructor to make java happy
-        private BloomArmorRenderType(String s, VertexFormat v, VertexFormat.Mode m, int i, boolean b, boolean b2, Runnable r, Runnable r2) {
+        private EmissiveArmorRenderType(String s, VertexFormat v, VertexFormat.Mode m, int i, boolean b, boolean b2, Runnable r, Runnable r2) {
             super(s, v, m, i, b, b2, r, r2);
             throw new IllegalStateException("This class is not meant to be constructed!");
         }
 
-        private static final Function<ResourceLocation, RenderType> BLOOM_ARMOR_CUTOUT_NO_CULL = Util.memoize((p_173206_) -> {
+        private static final Function<ResourceLocation, RenderType> EMISSIVE_ARMOR_CUTOUT_NO_CULL = Util.memoize((p_173206_) -> {
             RenderType.CompositeState rendertype$compositestate = RenderType.CompositeState.builder()
                     .setShaderState(RENDERTYPE_BLOOM_SHADER)
                     .setTextureState(new RenderStateShard.TextureStateShard(p_173206_, false, false))
@@ -114,7 +102,7 @@ public class ShimmerRenderTypes {
                     .setOverlayState(OVERLAY)
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING)
                     .createCompositeState(true);
-            return create("bloom_armor_cutout_no_cull", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, true, false, rendertype$compositestate);
+            return create("emissive_armor_cutout_no_cull", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, true, false, rendertype$compositestate);
         });
 
     }

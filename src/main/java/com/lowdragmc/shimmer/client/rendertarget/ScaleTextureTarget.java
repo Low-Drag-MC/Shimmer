@@ -1,4 +1,4 @@
-package com.lowdragmc.shimmer.client;
+package com.lowdragmc.shimmer.client.rendertarget;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
