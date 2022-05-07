@@ -10,9 +10,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import org.jetbrains.annotations.Nullable;
-
 import javax.annotation.ParametersAreNonnullByDefault;
-
 /**
  * @author KilaBash
  * @date 2022/05/02

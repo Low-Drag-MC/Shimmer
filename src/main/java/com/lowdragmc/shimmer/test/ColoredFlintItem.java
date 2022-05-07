@@ -1,6 +1,5 @@
 package com.lowdragmc.shimmer.test;
 
-import com.lowdragmc.shimmer.CommonProxy;
 import com.lowdragmc.shimmer.ShimmerMod;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
