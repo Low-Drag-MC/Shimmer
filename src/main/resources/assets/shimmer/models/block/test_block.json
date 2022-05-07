@@ -1,6 +1,0 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "shimmer:blocks/test_block"
-  }
-}

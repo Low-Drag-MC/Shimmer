@@ -1,9 +1,9 @@
 package com.lowdragmc.shimmer.client.light;
 
+import com.google.common.collect.Maps;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.client.shader.ShaderUBO;
 import com.lowdragmc.shimmer.core.IRenderChunk;
-import com.lowdragmc.shimmer.test.ColoredFireBlock;
 import com.mojang.math.Vector3f;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author KilaBash
@@ -150,26 +151,24 @@ public enum LightManager {
         return (index * ColorPointLight.STRUCT_SIZE) << 2;
     }
 
+
+
+// *********************** block light *********************** //
+
+
+    private final Map<Block, ColorPointLight> BLOCK_MAP = Maps.newHashMap();
+    private final Map<BlockState, ColorPointLight> STATE_MAP = Maps.newHashMap();
+
     public boolean isBlockHasLight(BlockState blockState) {
-        Block block = blockState.getBlock();
-        return block == Blocks.REDSTONE_BLOCK || block == Blocks.SLIME_BLOCK || block == Blocks.SPONGE || block == Blocks.SEA_LANTERN || block instanceof ColoredFireBlock;
+        return STATE_MAP.containsKey(blockState) || BLOCK_MAP.containsKey(blockState.getBlock());
     }
 
     public ColorPointLight getBlockLight(BlockPos blockpos, BlockState blockstate) {
-        Block block = blockstate.getBlock();
-        int color = 0xffffffff;
-        if (block instanceof ColoredFireBlock) {
-            color = ((ColoredFireBlock) block).color;
-        } else if (block == Blocks.REDSTONE_BLOCK) {
-            color = 0xffff0000;
-        } else if (block == Blocks.SLIME_BLOCK) {
-            color = 0xff00ff00;
-        } else if (block == Blocks.SPONGE) {
-            color = 0xffffff00;
-        } else if (block == Blocks.SEA_LANTERN) {
-            color = 0xff00ffff;
+        ColorPointLight template = STATE_MAP.get(blockstate);
+        if (template == null) {
+            template = BLOCK_MAP.get(blockstate.getBlock());
         }
-        return new ColorPointLight(blockpos, color, 5);
+        return new ColorPointLight(blockpos, template);
     }
 
     void removeLight(ColorPointLight removed) {
@@ -192,4 +191,11 @@ public enum LightManager {
         }
     }
 
+    public void registerBlockLight(Block block, int color, int radius) {
+        BLOCK_MAP.put(block, new ColorPointLight(color, radius));
+    }
+
+    public void registerBlockStateLight(BlockState blockState, int color, int radius) {
+        STATE_MAP.put(blockState, new ColorPointLight(color, radius));
+    }
 }

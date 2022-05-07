@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/template_fire_up_alt",
-  "textures": {
-    "fire": "shimmer:blocks/fire/fire_0_orange"
-  }
-}

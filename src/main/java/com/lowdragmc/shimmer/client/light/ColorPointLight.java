@@ -22,12 +22,23 @@ public class ColorPointLight {
     LightManager lightManager;
     int offset;
 
-    protected ColorPointLight(BlockPos pos, int color, float radius) {
-        this(null, new Vector3f(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f), color, radius, 0);
+    protected ColorPointLight(BlockPos pos , ColorPointLight template) {
+        a = template.a;
+        r = template.r;
+        g = template.g;
+        b = template.b;
+        radius = template.radius;
+        x = pos.getX() + 0.5f;
+        y = pos.getY() + 0.5f;
+        z = pos.getZ() + 0.5f;
+    }
+
+    protected ColorPointLight(int color, float radius) {
+        this.radius = radius;
+        setColor(color);
     }
 
     protected ColorPointLight(LightManager lightManager, Vector3f pos, int color, float radius, int offset) {
-        this.lightManager = lightManager;
         x = pos.x();
         y = pos.y();
         z = pos.z();

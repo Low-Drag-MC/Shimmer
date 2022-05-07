@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 @OnlyIn(Dist.CLIENT)
 public enum Bloom implements ResourceManagerReloadListener {
     BLOCK_BLOOM(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unreal.json")),
-    Entity_LAST_BLOOM(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_vanilla.json"));
+    ENTITY_LAST_BLOOM(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_vanilla.json"));
 
     private static final Minecraft mc = Minecraft.getInstance();
     private static CopyDepthTarget bloomTarget;
@@ -71,7 +71,6 @@ public enum Bloom implements ResourceManagerReloadListener {
 
     public void renderBloom() {
         if (postDraw.isEmpty() && this != BLOCK_BLOOM) return;
-//        if (this == Entity_LAST_BLOOM) return;
         PostChain postChain = getPostChain();
         if (postChain != null) {
             RenderTarget mainTarget = mc.getMainRenderTarget();

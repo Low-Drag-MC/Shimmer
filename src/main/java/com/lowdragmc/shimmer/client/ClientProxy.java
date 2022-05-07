@@ -4,9 +4,7 @@ import com.lowdragmc.shimmer.CommonProxy;
 import com.lowdragmc.shimmer.client.bloom.Bloom;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.shader.ShaderUtils;
-import com.lowdragmc.shimmer.test.ColoredFireBlock;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -37,10 +35,6 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
     public void clientSetup(FMLClientSetupEvent e) {
         e.enqueueWork(()->{
             ((ReloadableResourceManager)Minecraft.getInstance().getResourceManager()).registerReloadListener(this);
-            ItemBlockRenderTypes.setRenderLayer(CommonProxy.PISTON_BLOCK, ShimmerRenderTypes.bloom());
-            for (ColoredFireBlock fireBlock : FIRE_BLOCKS) {
-                ItemBlockRenderTypes.setRenderLayer(fireBlock, ShimmerRenderTypes.bloom());
-            }
         });
     }
 

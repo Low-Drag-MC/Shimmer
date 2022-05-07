@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/template_fire_floor",
-  "textures": {
-    "fire": "shimmer:blocks/fire/fire_1_green"
-  }
-}
