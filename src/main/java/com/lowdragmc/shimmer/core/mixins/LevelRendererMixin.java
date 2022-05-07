@@ -53,7 +53,7 @@ public abstract class LevelRendererMixin {
                     ordinal = 1))
     private void injectRenderLevelBloom(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
         this.level.getProfiler().popPush("entity_last_bloom");
-        Bloom.Entity_LAST_BLOOM.renderBloom();
+        Bloom.ENTITY_LAST_BLOOM.renderBloom();
     }
 
     @Inject(method = "renderLevel", at = @At(value = "HEAD"))
