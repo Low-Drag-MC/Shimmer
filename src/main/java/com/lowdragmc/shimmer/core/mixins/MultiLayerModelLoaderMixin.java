@@ -20,7 +20,7 @@ public class MultiLayerModelLoaderMixin implements IMultiLayerModelLoader {
     @Final @Mutable @Shadow public static ImmutableBiMap<String, RenderType> BLOCK_LAYERS;
 
     public void update() {
-        ImmutableBiMap<String, RenderType> LAYERS = ImmutableBiMap.<String, RenderType>builder()
+        BLOCK_LAYERS = ImmutableBiMap.<String, RenderType>builder()
                 .put("solid", RenderType.solid())
                 .put("cutout", RenderType.cutout())
                 .put("cutout_mipped", RenderType.cutoutMipped())
@@ -28,6 +28,5 @@ public class MultiLayerModelLoaderMixin implements IMultiLayerModelLoader {
                 .put("translucent", RenderType.translucent())
                 .put("tripwire", RenderType.tripwire())
                 .build();
-        BLOCK_LAYERS = LAYERS;
     }
 }
