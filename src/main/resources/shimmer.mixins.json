@@ -18,5 +18,6 @@
     "ShaderInstanceMixin"
   ],
   "mixins": [
- ]
+    "MultiLayerModelLoaderMixin"
+  ]
 }

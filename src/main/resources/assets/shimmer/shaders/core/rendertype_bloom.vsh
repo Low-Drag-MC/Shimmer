@@ -9,8 +9,6 @@ in vec2 UV0;
 in ivec2 UV2;
 in vec3 Normal;
 
-uniform sampler2D Sampler2;
-
 uniform mat4 ModelViewMat;
 uniform mat4 ProjMat;
 uniform vec3 ChunkOffset;
@@ -28,9 +26,9 @@ void main() {
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
 
     vertexDistance = fog_distance(ModelViewMat, pos, FogShape);
-    vertexColor = Color * minecraft_sample_lightmap(Sampler2, UV2);
+    vertexColor = Color * vec4(1.,1.,1.,1.);
     texCoord0 = UV0;
     normal = ProjMat * ModelViewMat * vec4(Normal, 0.0);
 
-    vertexColor = color_light(pos, vec4(1.,1.,1.,1.));
+    vertexColor = color_light(pos, vertexColor);
 }
