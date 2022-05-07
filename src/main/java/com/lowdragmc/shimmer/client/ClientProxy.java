@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -33,14 +32,10 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
 
     @SubscribeEvent
     public void clientSetup(FMLClientSetupEvent e) {
-        e.enqueueWork(()->{
+        e.enqueueWork(() -> {
             ((ReloadableResourceManager)Minecraft.getInstance().getResourceManager()).registerReloadListener(this);
+            LightManager.INSTANCE.loadConfig();
         });
-    }
-
-    @SubscribeEvent
-    public void modelBaked(ModelBakeEvent event) {
-
     }
 
     @Override

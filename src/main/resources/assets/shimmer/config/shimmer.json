@@ -1,0 +1,12 @@
+{
+  "LightBlock": [
+    {
+      "block": "minecraft:sea_lantern",
+      "r": 34,
+      "g": 255,
+      "b": 200,
+      "a": 255,
+      "radius": 7
+    }
+  ]
+}

@@ -1,21 +1,31 @@
 package com.lowdragmc.shimmer.client.light;
 
 import com.google.common.collect.Maps;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.client.shader.ShaderUBO;
 import com.lowdragmc.shimmer.core.IRenderChunk;
 import com.mojang.math.Vector3f;
+import com.mojang.realmsclient.util.JsonUtils;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
@@ -191,11 +201,31 @@ public enum LightManager {
         }
     }
 
-    public void registerBlockLight(Block block, int color, int radius) {
+    public void registerBlockLight(Block block, int color, float radius) {
         BLOCK_MAP.put(block, new ColorPointLight(color, radius));
     }
 
-    public void registerBlockStateLight(BlockState blockState, int color, int radius) {
+    public void registerBlockStateLight(BlockState blockState, int color, float radius) {
         STATE_MAP.put(blockState, new ColorPointLight(color, radius));
+    }
+
+    public void loadConfig() {
+        JsonElement jsonElement = Configuration.config.get("LightBlock");
+        if (jsonElement.isJsonArray()) {
+            JsonArray blocks = jsonElement.getAsJsonArray();
+            for (JsonElement block : blocks) {
+                JsonObject jsonObj = block.getAsJsonObject();
+                if (jsonObj.has("block")) {
+                    Block bb = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(jsonObj.get("block").getAsString()));
+                    int a = JsonUtils.getIntOr("a", jsonObj, 0);
+                    int r = JsonUtils.getIntOr("r", jsonObj, 0);
+                    int g = JsonUtils.getIntOr("g", jsonObj, 0);
+                    int b = JsonUtils.getIntOr("b", jsonObj, 0);
+                    if (bb != null) {
+                        registerBlockLight(bb, (a << 24) | (r << 16) | (g << 8) | b, jsonObj.get("radius").getAsFloat());
+                    }
+                }
+            }
+        }
     }
 }

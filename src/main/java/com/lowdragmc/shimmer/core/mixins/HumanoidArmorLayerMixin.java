@@ -32,7 +32,7 @@ public class HumanoidArmorLayerMixin {
             PoseStack finalStack = new PoseStack();
             finalStack.setIdentity();
             finalStack.mulPoseMatrix(poseStack.last().pose());
-            Bloom.ENTITY_LAST_BLOOM.postBloom(renderType, vertexConsumer -> model.renderToBuffer(finalStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F));
+            Bloom.ENTITY_LAST_BLOOM.postBloom(renderType, vertexConsumer -> model.renderToBuffer(finalStack, vertexConsumer, 0xF000F0, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F));
         }
     }
 

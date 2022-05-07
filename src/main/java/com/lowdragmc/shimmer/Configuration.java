@@ -1,11 +1,10 @@
 package com.lowdragmc.shimmer;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.config.ModConfig;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
 
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
 
 /**
  * @author KilaBash
@@ -13,26 +12,15 @@ import java.util.List;
  * @implNote Configs
  */
 public class Configuration {
+    public static JsonObject config;
 
-    public static void register() {
-        registerClientConfigs();
-    }
-
-    private static void registerClientConfigs() {
-        ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
-        PowergenConfig.registerClientConfig(CLIENT_BUILDER);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_BUILDER.build());
-    }
-
-    public static class PowergenConfig {
-        public static ForgeConfigSpec.ConfigValue<List<? extends String>> RENDER_SCALE;
-
-        public static void registerClientConfig(ForgeConfigSpec.Builder CLIENT_BUILDER) {
-            CLIENT_BUILDER.comment("Client settings for the power generator").push("powergen");
-            RENDER_SCALE = CLIENT_BUILDER
-                    .comment("Scale of the renderer")
-                    .defineList("light", Arrays.asList("a", "b"), list-> true);
-            CLIENT_BUILDER.pop();
+    public static void load() {
+        File path = new File(Minecraft.getInstance().gameDirectory, "config/shimmer.json");
+        FileUtility.extractJarFiles(String.format("/assets/%s/%s", ShimmerMod.MODID, "config"), new File(Minecraft.getInstance().gameDirectory, "config"), false);
+        JsonElement jsonElement = FileUtility.loadJson(path);
+        if (jsonElement instanceof JsonObject) {
+            config = (JsonObject) jsonElement;
         }
     }
+
 }
