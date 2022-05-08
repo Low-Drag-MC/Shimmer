@@ -15,11 +15,14 @@ public class Configuration {
     public static JsonObject config;
 
     public static void load() {
-        File path = new File(Minecraft.getInstance().gameDirectory, "config/shimmer.json");
-        FileUtility.extractJarFiles(String.format("/assets/%s/%s", ShimmerMod.MODID, "config"), new File(Minecraft.getInstance().gameDirectory, "config"), false);
-        JsonElement jsonElement = FileUtility.loadJson(path);
-        if (jsonElement instanceof JsonObject) {
-            config = (JsonObject) jsonElement;
+        // compatible with runData
+        if (Minecraft.getInstance() != null && Minecraft.getInstance().gameDirectory != null) {
+            File path = new File(Minecraft.getInstance().gameDirectory, "config/shimmer.json");
+            FileUtility.extractJarFiles(String.format("/assets/%s/%s", ShimmerMod.MODID, "config"), new File(Minecraft.getInstance().gameDirectory, "config"), false);
+            JsonElement jsonElement = FileUtility.loadJson(path);
+            if (jsonElement instanceof JsonObject) {
+                config = (JsonObject) jsonElement;
+            }
         }
     }
 

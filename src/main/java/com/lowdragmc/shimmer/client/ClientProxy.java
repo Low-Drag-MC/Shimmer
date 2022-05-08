@@ -33,8 +33,12 @@ import org.jetbrains.annotations.NotNull;
 public class ClientProxy extends CommonProxy implements ResourceManagerReloadListener {
 
     public ClientProxy() {
+        Configuration.load();
         LightManager.injectShaders();
-        ((IMultiLayerModelLoader)(Object)(MultiLayerModel.Loader.INSTANCE)).update();
+        // compatible with runData
+        if (((Object)(MultiLayerModel.Loader.INSTANCE)) instanceof IMultiLayerModelLoader) {
+            ((IMultiLayerModelLoader)(Object)(MultiLayerModel.Loader.INSTANCE)).update();
+        }
     }
 
     @SubscribeEvent
