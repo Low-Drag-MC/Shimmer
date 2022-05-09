@@ -9,7 +9,7 @@
   "passes": [
     {
       "name": "blur",
-      "intarget": "shimmer:bloom",
+      "intarget": "shimmer:input",
       "outtarget": "output",
       "uniforms": [
         {

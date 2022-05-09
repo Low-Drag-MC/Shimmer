@@ -1,7 +1,7 @@
 package com.lowdragmc.shimmer.core.mixins;
 
 import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
-import com.lowdragmc.shimmer.client.bloom.Bloom;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
@@ -44,7 +44,7 @@ public abstract class LevelRendererMixin {
         Vec3 camPos = camera.getPosition();
         this.renderChunkLayer(ShimmerRenderTypes.bloom(), poseStack, camPos.x, camPos.y, camPos.z, projectionMatrix);
         this.level.getProfiler().popPush("block_bloom");
-        Bloom.BLOCK_BLOOM.renderBloom();
+        PostProcessing.BLOOM_UNREAL.renderBlockPost();
     }
     @Inject(method = "renderLevel",
             at = @At(
@@ -53,7 +53,9 @@ public abstract class LevelRendererMixin {
                     ordinal = 1))
     private void injectRenderLevelBloom(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
         this.level.getProfiler().popPush("entity_last_bloom");
-        Bloom.ENTITY_LAST_BLOOM.renderBloom();
+        for (PostProcessing postProcessing : PostProcessing.values()) {
+            postProcessing.renderEntityPost();
+        }
     }
 
     @Inject(method = "renderLevel", at = @At(value = "HEAD"))

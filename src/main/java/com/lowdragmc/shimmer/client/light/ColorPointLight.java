@@ -22,7 +22,7 @@ public class ColorPointLight {
     LightManager lightManager;
     int offset;
 
-    protected ColorPointLight(BlockPos pos , ColorPointLight template) {
+    protected ColorPointLight(BlockPos pos , Template template) {
         a = template.a;
         r = template.r;
         g = template.g;
@@ -31,11 +31,6 @@ public class ColorPointLight {
         x = pos.getX() + 0.5f;
         y = pos.getY() + 0.5f;
         z = pos.getZ() + 0.5f;
-    }
-
-    protected ColorPointLight(int color, float radius) {
-        this.radius = radius;
-        setColor(color);
     }
 
     protected ColorPointLight(LightManager lightManager, Vector3f pos, int color, float radius, int offset) {
@@ -86,6 +81,31 @@ public class ColorPointLight {
 
     protected void uploadBuffer(FloatBuffer buffer) {
         buffer.put(getData());
+    }
+
+    public static class Template {
+        public float r, g, b, a;
+        public float radius;
+
+        public Template(float radius, int color) {
+            setColor(color);
+            this.radius = radius;
+        }
+
+        public Template(float radius, float r, float g, float b, float a) {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+            this.radius = radius;
+        }
+
+        public void setColor(int color) {
+            a = (((color >> 24) & 0xff) / 255f);
+            r = (((color >> 16) & 0xff) / 255f);
+            g = (((color >> 8) & 0xff) / 255f);
+            b = (((color) & 0xff) / 255f);
+        }
     }
 
 }

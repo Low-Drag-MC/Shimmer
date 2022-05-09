@@ -19,8 +19,6 @@ out vec4 vertexColor;
 out vec2 texCoord0;
 out vec4 normal;
 
-#moj_import <shimmer.glsl>
-
 void main() {
     vec3 pos = Position + ChunkOffset; // cam to obj
     gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
@@ -29,6 +27,4 @@ void main() {
     vertexColor = Color * vec4(1.,1.,1.,1.);
     texCoord0 = UV0;
     normal = ProjMat * ModelViewMat * vec4(Normal, 0.0);
-
-    vertexColor = color_light(pos, vertexColor);
 }

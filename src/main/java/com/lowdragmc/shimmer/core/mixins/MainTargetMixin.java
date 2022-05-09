@@ -18,20 +18,20 @@ import java.nio.IntBuffer;
  */
 @Mixin(MainTarget.class)
 public abstract class MainTargetMixin extends RenderTarget implements IMainTarget {
-    private int colorBloomTextureId = -1;
+    private int colorTexture1Id = -1;
 
     public MainTargetMixin(boolean pUseDepth) {
         super(pUseDepth);
     }
 
     @Override
-    public int getColorBloomTextureId() {
-        return colorBloomTextureId;
+    public int getTexture1Id() {
+        return colorTexture1Id;
     }
 
     @Override
-    public void clearBloomTexture(boolean pClearError) {
-        if (colorBloomTextureId > -1) {
+    public void clearTexture1(boolean pClearError) {
+        if (colorTexture1Id > -1) {
             this.bindWrite(true);
             GL30.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT1);
             GlStateManager._clearColor(0, 0, 0, 0);
@@ -44,9 +44,9 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
     @Override
     public void destroyBuffers() {
         super.destroyBuffers();
-        if (this.colorBloomTextureId > -1) {
-            TextureUtil.releaseTextureId(this.colorBloomTextureId);
-            this.colorBloomTextureId = -1;
+        if (this.colorTexture1Id > -1) {
+            TextureUtil.releaseTextureId(this.colorTexture1Id);
+            this.colorTexture1Id = -1;
         }
     }
 
@@ -61,7 +61,7 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
             this.height = pHeight;
             this.frameBufferId = GlStateManager.glGenFramebuffers();
             this.colorTextureId = TextureUtil.generateTextureId();
-            this.colorBloomTextureId = TextureUtil.generateTextureId();
+            this.colorTexture1Id = TextureUtil.generateTextureId();
             if (this.useDepth) {
                 this.depthBufferId = TextureUtil.generateTextureId();
                 GlStateManager._bindTexture(this.depthBufferId);
@@ -84,12 +84,12 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
             GlStateManager._glBindFramebuffer(36160, this.frameBufferId);
             GlStateManager._glFramebufferTexture2D(36160, 36064, 3553, this.colorTextureId, 0);
 
-            GlStateManager._bindTexture(this.colorBloomTextureId);
+            GlStateManager._bindTexture(this.colorTexture1Id);
             GlStateManager._texParameter(3553, 10242, 33071);
             GlStateManager._texParameter(3553, 10243, 33071);
             GlStateManager._texImage2D(3553, 0, 32856, this.width, this.height, 0, 6408, 5121, null);
             GlStateManager._glBindFramebuffer(36160, this.frameBufferId);
-            GlStateManager._glFramebufferTexture2D(36160, 36065, 3553, this.colorBloomTextureId, 0);
+            GlStateManager._glFramebufferTexture2D(36160, 36065, 3553, this.colorTexture1Id, 0);
 
             if (this.useDepth) {
                 if(!isStencilEnabled())
@@ -119,7 +119,7 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
         GlStateManager._texParameter(3553, 10240, pFilterMode);
         GlStateManager._bindTexture(0);
 
-        GlStateManager._bindTexture(this.colorBloomTextureId);
+        GlStateManager._bindTexture(this.colorTexture1Id);
         GlStateManager._texParameter(3553, 10241, pFilterMode);
         GlStateManager._texParameter(3553, 10240, pFilterMode);
         GlStateManager._bindTexture(0);

@@ -72,7 +72,7 @@
   "passes": [
     {
       "name": "shimmer:seperable_blur",
-      "intarget": "minecraft:main:bloom",
+      "intarget": "shimmer:input",
       "outtarget": "swap2a",
       "uniforms": [
         {

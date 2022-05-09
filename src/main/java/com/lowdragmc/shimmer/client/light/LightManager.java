@@ -17,22 +17,20 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
+import javax.annotation.Nullable;
 import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * @author KilaBash
@@ -52,7 +50,7 @@ public enum LightManager {
         return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light(pos, vertexColor);\n").toString();
     }
 
-    private static String ArmorInjection(String s) {
+    private static String PositionInjection(String s) {
         //TODO fix armor lighting. what the hell!!!!!
         s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
         return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light(Position, vertexColor);\n").toString();
@@ -70,11 +68,12 @@ public enum LightManager {
 
     public static void injectShaders() {
 
+        ShaderInjection.registerVSHInjection("particle", LightManager::PositionInjection);
         ShaderInjection.registerVSHInjection("rendertype_solid", LightManager::ChunkInjection);
         ShaderInjection.registerVSHInjection("rendertype_cutout", LightManager::ChunkInjection);
         ShaderInjection.registerVSHInjection("rendertype_cutout_mipped", LightManager::ChunkInjection);
         ShaderInjection.registerVSHInjection("rendertype_translucent", LightManager::ChunkInjection);
-        ShaderInjection.registerVSHInjection("rendertype_armor_cutout_no_cull", LightManager::ArmorInjection);
+        ShaderInjection.registerVSHInjection("rendertype_armor_cutout_no_cull", LightManager::PositionInjection);
         ShaderInjection.registerVSHInjection("rendertype_entity_cutout", LightManager::EntityInjectionLightMapColor);
         ShaderInjection.registerVSHInjection("rendertype_entity_cutout_no_cull", LightManager::EntityInjectionLightMapColor);
         ShaderInjection.registerVSHInjection("rendertype_entity_cutout_no_cull_z_offset", LightManager::EntityInjectionLightMapColor);
@@ -123,7 +122,7 @@ public enum LightManager {
             envUBO.createBufferData(32, GL30.GL_STREAM_DRAW); // stream -- modified each frame
             envUBO.blockBinding(1);
         }
-        bindProgram("shimmer:rendertype_bloom");
+        bindProgram("particle");
         bindProgram("rendertype_solid");
         bindProgram("rendertype_cutout");
         bindProgram("rendertype_cutout_mipped");
@@ -161,26 +160,6 @@ public enum LightManager {
         return (index * ColorPointLight.STRUCT_SIZE) << 2;
     }
 
-
-
-// *********************** block light *********************** //
-
-
-    private final Map<Block, ColorPointLight> BLOCK_MAP = Maps.newHashMap();
-    private final Map<BlockState, ColorPointLight> STATE_MAP = Maps.newHashMap();
-
-    public boolean isBlockHasLight(BlockState blockState) {
-        return STATE_MAP.containsKey(blockState) || BLOCK_MAP.containsKey(blockState.getBlock());
-    }
-
-    public ColorPointLight getBlockLight(BlockPos blockpos, BlockState blockstate) {
-        ColorPointLight template = STATE_MAP.get(blockstate);
-        if (template == null) {
-            template = BLOCK_MAP.get(blockstate.getBlock());
-        }
-        return new ColorPointLight(blockpos, template);
-    }
-
     void removeLight(ColorPointLight removed) {
         int index = lights.indexOf(removed);
         if (index >= 0) {
@@ -201,12 +180,29 @@ public enum LightManager {
         }
     }
 
-    public void registerBlockLight(Block block, int color, float radius) {
-        BLOCK_MAP.put(block, new ColorPointLight(color, radius));
+
+// *********************** block light *********************** //
+
+    private final Map<Block, Function<BlockState, ColorPointLight.Template>> BLOCK_MAP = Maps.newHashMap();
+
+    public boolean isBlockHasLight(Block block) {
+        return BLOCK_MAP.containsKey(block);
     }
 
-    public void registerBlockStateLight(BlockState blockState, int color, float radius) {
-        STATE_MAP.put(blockState, new ColorPointLight(color, radius));
+    @Nullable
+    public ColorPointLight getBlockStateLight(BlockPos blockpos, BlockState blockstate) {
+        ColorPointLight.Template
+                template = BLOCK_MAP.getOrDefault(blockstate.getBlock(), s -> null).apply(blockstate);
+        return template == null ? null : new ColorPointLight(blockpos, template);
+    }
+
+    public void registerBlockLight(Block block, Function<BlockState, ColorPointLight.Template> supplier) {
+        BLOCK_MAP.put(block, supplier);
+    }
+
+    public void registerBlockLight(Block block, int color, float radius) {
+        ColorPointLight.Template template = new ColorPointLight.Template(radius, color);
+        registerBlockLight(block, state -> template);
     }
 
     public void loadConfig() {

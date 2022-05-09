@@ -2,7 +2,8 @@ package com.lowdragmc.shimmer.core.mixins;
 
 import com.lowdragmc.shimmer.client.ResourceUtils;
 import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
-import com.lowdragmc.shimmer.client.bloom.Bloom;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
+import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -29,10 +30,8 @@ public class HumanoidArmorLayerMixin {
         ResourceLocation bloomResource = new ResourceLocation(armorResource.getNamespace(), armorResource.getPath().replace(".png", "_bloom.png"));
         if (ResourceUtils.isResourceExist(bloomResource)) {
             RenderType renderType = ShimmerRenderTypes.emissiveArmor(bloomResource);
-            PoseStack finalStack = new PoseStack();
-            finalStack.setIdentity();
-            finalStack.mulPoseMatrix(poseStack.last().pose());
-            Bloom.ENTITY_LAST_BLOOM.postBloom(renderType, vertexConsumer -> model.renderToBuffer(finalStack, vertexConsumer, 0xF000F0, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F));
+            PoseStack finalStack = RenderUtils.copyPoseStack(poseStack);
+            PostProcessing.BLOOM_UNREAL.postEntity(renderType, vertexConsumer -> model.renderToBuffer(finalStack, vertexConsumer, 0xF000F0, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F));
         }
     }
 

@@ -52,8 +52,11 @@ public abstract class RebuildTaskMixin {
                                Iterator var15,
                                BlockPos blockpos2,
                                BlockState blockstate) {
-        if (LightManager.INSTANCE.isBlockHasLight(blockstate)) {
-            lights.add(LightManager.INSTANCE.getBlockLight(blockpos2, blockstate));
+        if (LightManager.INSTANCE.isBlockHasLight(blockstate.getBlock())) {
+            ColorPointLight light = LightManager.INSTANCE.getBlockStateLight(blockpos2, blockstate);
+            if (light != null) {
+                lights.add(light);
+            }
         }
     }
 

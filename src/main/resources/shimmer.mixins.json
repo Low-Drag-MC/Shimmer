@@ -9,6 +9,7 @@
     "HumanoidArmorLayerMixin",
     "LevelRendererMixin",
     "MainTargetMixin",
+    "ParticleEngineMixin",
     "PostChainMixin",
     "ProgramMixin",
     "RebuildTaskMixin",

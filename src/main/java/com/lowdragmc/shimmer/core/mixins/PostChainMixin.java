@@ -2,13 +2,10 @@ package com.lowdragmc.shimmer.core.mixins;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.lowdragmc.shimmer.client.bloom.Bloom;
+import com.lowdragmc.shimmer.client.rendertarget.ProxyTarget;
 import com.lowdragmc.shimmer.client.rendertarget.ScaleTextureTarget;
-import com.lowdragmc.shimmer.core.IMainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.shaders.Uniform;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.util.GsonHelper;
@@ -85,36 +82,8 @@ public abstract class PostChainMixin {
 
     @Inject(method = "getRenderTarget", at = @At(value = "HEAD"), cancellable = true)
     private void injectGetRenderTarget(String pTarget, CallbackInfoReturnable<RenderTarget> cir) {
-        if (pTarget != null && pTarget.equals("minecraft:main:bloom") && screenTarget instanceof IMainTarget) {
-            RenderTarget renderTarget = new RenderTarget(false) {
-                @Override
-                public int getColorTextureId() {
-                    return ((IMainTarget) screenTarget).getColorBloomTextureId();
-                }
-
-                @Override
-                public void resize(int pWidth, int pHeight, boolean pClearError) {
-                    this.viewWidth = pWidth;
-                    this.viewHeight = pHeight;
-                    this.width = pWidth;
-                    this.height = pHeight;
-                }
-
-                @Override
-                public void bindRead() {
-                    RenderSystem.assertOnRenderThread();
-                    GlStateManager._bindTexture(this.getColorTextureId());
-                }
-
-                @Override
-                public void bindWrite(boolean pSetViewport) {
-                }
-            };
-            renderTarget.width = screenTarget.width;
-            renderTarget.height = screenTarget.height;
-            cir.setReturnValue(renderTarget);
-        } else if (pTarget != null && pTarget.equals("shimmer:bloom")) {
-            cir.setReturnValue(Bloom.getBloomTarget());
+        if (pTarget != null && pTarget.equals("shimmer:input")) {
+            cir.setReturnValue(customRenderTargets.computeIfAbsent(pTarget, k -> new ProxyTarget(screenTarget)));
         }
     }
 

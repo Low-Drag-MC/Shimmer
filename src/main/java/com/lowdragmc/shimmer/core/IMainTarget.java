@@ -1,7 +1,7 @@
 package com.lowdragmc.shimmer.core;
 
 public interface IMainTarget {
-    int getColorBloomTextureId();
+    int getTexture1Id();
 
-    void clearBloomTexture(boolean error);
+    void clearTexture1(boolean error);
 }

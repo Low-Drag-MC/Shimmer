@@ -17,10 +17,10 @@ import java.io.IOException;
 /**
  * @author KilaBash
  * @date 2022/5/6
- * @implNote ShaderUtils
+ * @implNote RenderUtils
  */
 @OnlyIn(Dist.CLIENT)
-public class ShaderUtils {
+public class RenderUtils {
     public static ShaderInstance blitShader;
 
     public static void fastBlit(RenderTarget from, RenderTarget to) {
@@ -51,6 +51,13 @@ public class ShaderUtils {
         GlStateManager._depthMask(true);
         GlStateManager._colorMask(true, true, true, true);
         GlStateManager._enableDepthTest();
+    }
+
+    public static PoseStack copyPoseStack(PoseStack poseStack) {
+        PoseStack finalStack = new PoseStack();
+        finalStack.setIdentity();
+        finalStack.poseStack.addLast(poseStack.last());
+        return finalStack;
     }
 
     public static void registerShaders(RegisterShadersEvent event) {

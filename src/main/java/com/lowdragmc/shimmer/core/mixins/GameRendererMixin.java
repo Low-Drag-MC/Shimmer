@@ -1,6 +1,6 @@
 package com.lowdragmc.shimmer.core.mixins;
 
-import com.lowdragmc.shimmer.client.bloom.Bloom;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -19,7 +19,7 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "resize", at = @At(value = "RETURN"))
     private void injectResize(int width, int height, CallbackInfo ci) {
-        Bloom.resize(width, height);
+        PostProcessing.resize(width, height);
     }
 
     @Inject(method = "reloadShaders", at = @At(value = "RETURN"))

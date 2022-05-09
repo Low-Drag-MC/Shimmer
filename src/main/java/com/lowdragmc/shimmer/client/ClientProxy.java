@@ -5,9 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lowdragmc.shimmer.CommonProxy;
 import com.lowdragmc.shimmer.Configuration;
-import com.lowdragmc.shimmer.client.bloom.Bloom;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.light.LightManager;
-import com.lowdragmc.shimmer.client.shader.ShaderUtils;
+import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.core.IMultiLayerModelLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -43,7 +43,7 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
 
     @SubscribeEvent
     public void shaderRegistry(RegisterShadersEvent event) {
-        ShaderUtils.registerShaders(event);
+        RenderUtils.registerShaders(event);
         ShimmerRenderTypes.registerShaders(event);
     }
 
@@ -75,8 +75,8 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
 
     @Override
     public void onResourceManagerReload(@NotNull ResourceManager resourceManager) {
-        for (Bloom bloom : Bloom.values()) {
-            bloom.onResourceManagerReload(resourceManager);
+        for (PostProcessing postProcessing : PostProcessing.values()) {
+            postProcessing.onResourceManagerReload(resourceManager);
         }
     }
 }
