@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * @author KilaBash
  * @date 2022/05/02
- * @implNote LevelRendererMixin
+ * @implNote GameRendererMixin, used to refresh shader and fbo size.
  */
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {

@@ -16,9 +16,9 @@ import java.nio.FloatBuffer;
 @OnlyIn(Dist.CLIENT)
 public class ColorPointLight {
     public static final int STRUCT_SIZE = (4 + 3 + 1);
-    float r, g, b, a;
-    float x, y, z;
-    float radius;
+    public float r, g, b, a;
+    public float x, y, z;
+    public float radius;
     LightManager lightManager;
     int offset;
 
@@ -38,6 +38,7 @@ public class ColorPointLight {
         y = pos.y();
         z = pos.z();
         setColor(color);
+        this.lightManager = lightManager;
         this.radius = radius;
         this.offset = offset;
     }
@@ -56,8 +57,10 @@ public class ColorPointLight {
         this.a = a;
     }
 
-    public void setPos() {
-
+    public void setPos(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     public boolean isRemoved() {

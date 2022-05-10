@@ -1,6 +1,7 @@
 #version 150
 
 uniform sampler2D DiffuseSampler;
+uniform sampler2D HighLight;
 uniform sampler2D BlurTexture1;
 uniform sampler2D BlurTexture2;
 uniform sampler2D BlurTexture3;
@@ -26,6 +27,8 @@ void main() {
     lerpBloomFactor(0.4) * texture(BlurTexture4, texCoord));
 
     vec4 background = texture(DiffuseSampler, texCoord);
+    vec4 highLight = texture(HighLight, texCoord);
+    background.rgb = background.rgb * (1 - highLight.a) + highLight.a * highLight.rgb;
     float max = max(background.b, max(background.r, background.g));
     float min = min(background.b, min(background.r, background.g));
     fragColor = vec4(background.rgb + bloom.rgb * ((1. - (max + min) / 2.) * (BloomThresholdUp - BloomThresholdDown) + BloomThresholdDown + BloomBase), 1.);

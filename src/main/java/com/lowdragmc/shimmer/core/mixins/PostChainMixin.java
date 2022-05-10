@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * @author KilaBash
  * @date 2022/05/03
- * @implNote PostChainMixin
+ * @implNote PostChainMixin, add more features for vanilla PostChain stuff
  */
 @Mixin(PostChain.class)
 public abstract class PostChainMixin {
@@ -37,6 +37,8 @@ public abstract class PostChainMixin {
     @Shadow private int screenWidth;
     @Shadow private int screenHeight;
     @Shadow @Final private List<RenderTarget> fullSizedTargets;
+
+    @Shadow public abstract void addTempTarget(String pName, int pWidth, int pHeight);
 
     public void addTempTarget(String pName, float sw, float sh) {
         RenderTarget rendertarget = new ScaleTextureTarget(sw, sh, screenWidth, screenHeight, true, Minecraft.ON_OSX);
@@ -82,8 +84,14 @@ public abstract class PostChainMixin {
 
     @Inject(method = "getRenderTarget", at = @At(value = "HEAD"), cancellable = true)
     private void injectGetRenderTarget(String pTarget, CallbackInfoReturnable<RenderTarget> cir) {
-        if (pTarget != null && pTarget.equals("shimmer:input")) {
-            cir.setReturnValue(customRenderTargets.computeIfAbsent(pTarget, k -> new ProxyTarget(screenTarget)));
+        if (pTarget != null) {
+            if (pTarget.equals("shimmer:input")) {
+                cir.setReturnValue(customRenderTargets.computeIfAbsent(pTarget, k -> new ProxyTarget(screenTarget)));
+            } else if (pTarget.equals("shimmer:output")) {
+                if (!customRenderTargets.containsKey(pTarget)) {
+                    addTempTarget(pTarget, screenWidth, screenHeight);
+                }
+            }
         }
     }
 

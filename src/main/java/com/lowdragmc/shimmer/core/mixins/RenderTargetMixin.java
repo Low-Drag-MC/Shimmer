@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 /**
  * @author KilaBash
  * @date 2022/05/03
- * @implNote RenderTargetMixin
+ * @implNote RenderTargetMixin, fix filterMode settings.
  */
 @Mixin(RenderTarget.class)
 public abstract class RenderTargetMixin {

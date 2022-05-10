@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author KilaBash
  * @date 2022/05/02
- * @implNote LevelRendererMixin
+ * @implNote RenderChunkMixin, used to compile and save light info to the chunk.
  */
 @Mixin(ChunkRenderDispatcher.RenderChunk.class)
 public abstract class RenderChunkMixin implements IRenderChunk {

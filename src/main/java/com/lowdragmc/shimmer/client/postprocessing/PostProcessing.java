@@ -6,10 +6,8 @@ import com.lowdragmc.shimmer.ShimmerMod;
 import com.lowdragmc.shimmer.client.rendertarget.CopyDepthTarget;
 import com.lowdragmc.shimmer.client.rendertarget.ProxyTarget;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
-import com.lowdragmc.shimmer.core.IMainTarget;
 import com.lowdragmc.shimmer.core.IParticleEngine;
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -41,22 +39,20 @@ import java.util.function.Consumer;
  */
 @OnlyIn(Dist.CLIENT)
 public enum PostProcessing implements ResourceManagerReloadListener {
-    BLOOM_UNREAL(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unreal.json"), true),
-//    BLOOM_UNITY(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unity.json")),
-    BLOOM_VANILLA(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_vanilla.json"), true);
+    BLOOM_UNREAL(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unreal.json")),
+    BLOOM_UNITY(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unity.json")),
+    BLOOM_VANILLA(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_vanilla.json"));
 
     private static final Minecraft mc = Minecraft.getInstance();
     private CopyDepthTarget postTarget;
     private PostChain postChain = null;
     private boolean loadFailed = false;
-    private final boolean renderBase;
     private final ResourceLocation shader;
     private final Map<RenderType, List<Consumer<VertexConsumer>>> postEntityDraw = Maps.newHashMap();
     private final Map<ParticleRenderType, IPostParticleType> particleTypeMap = Maps.newHashMap();
     private boolean hasParticle;
 
-    PostProcessing(ResourceLocation shader, boolean renderBase) {
-        this.renderBase = renderBase;
+    PostProcessing(ResourceLocation shader) {
         this.shader = shader;
     }
 
@@ -64,11 +60,10 @@ public enum PostProcessing implements ResourceManagerReloadListener {
      * register your custom postprocessing
      * @param name post name
      * @param shader post shader
-     * @param renderBase  should render the original image to the main buffer
      * @return PostProcessing
      */
-    public static PostProcessing registerPost(String name, ResourceLocation shader, boolean renderBase) {
-        return EnumHelper.addEnum(PostProcessing.class, name, new Class[]{ResourceLocation.class, Boolean.class}, shader, renderBase);
+    public static PostProcessing registerPost(String name, ResourceLocation shader) {
+        return EnumHelper.addEnum(PostProcessing.class, name, new Class[]{ResourceLocation.class, Boolean.class}, shader);
     }
 
     public CopyDepthTarget getPostTarget() {
@@ -93,46 +88,14 @@ public enum PostProcessing implements ResourceManagerReloadListener {
         return postChain;
     }
 
-    private static RenderTarget MAIN_PROXY_TARGET;
-
-    private static RenderTarget getMainProxyTarget() {
-        return MAIN_PROXY_TARGET == null ? MAIN_PROXY_TARGET = new RenderTarget(false) {
-            @Override
-            public int getColorTextureId() {
-                return ((IMainTarget) mc.getMainRenderTarget()).getTexture1Id();
-            }
-
-            @Override
-            public void resize(int pWidth, int pHeight, boolean pClearError) {
-                this.viewWidth = pWidth;
-                this.viewHeight = pHeight;
-                this.width = pWidth;
-                this.height = pHeight;
-            }
-
-            @Override
-            public void bindRead() {
-                RenderSystem.assertOnRenderThread();
-                GlStateManager._bindTexture(this.getColorTextureId());
-            }
-
-            @Override
-            public void bindWrite(boolean pSetViewport) {
-            }
-
-        }: MAIN_PROXY_TARGET;
-    }
-
-
     public void renderBlockPost() {
         PostChain postChain = getPostChain();
         if (postChain != null) {
             RenderTarget mainTarget = mc.getMainRenderTarget();
-            renderPost(postChain, getMainProxyTarget(), mainTarget);
-            if (mainTarget instanceof IMainTarget) {
-                ((IMainTarget) mainTarget).clearTexture1(Minecraft.ON_OSX);
-                mainTarget.bindWrite(false);
-            }
+            CopyDepthTarget postTarget = getPostTarget();
+            renderPost(postChain, postTarget, mainTarget);
+            postTarget.clear(Minecraft.ON_OSX);
+            mainTarget.bindWrite(false);
         }
     }
 
@@ -144,7 +107,7 @@ public enum PostProcessing implements ResourceManagerReloadListener {
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
         postChain.process(mc.getFrameTime());
-        RenderUtils.fastBlit(postChain.getTempTarget("output"), output);
+        RenderUtils.fastBlit(postChain.getTempTarget("shimmer:output"), output);
     }
 
     public void renderEntityPost() {
@@ -162,9 +125,8 @@ public enum PostProcessing implements ResourceManagerReloadListener {
 
             postEntityDraw.clear();
 
-            if (renderBase) {
-                RenderUtils.fastBlit(postTarget, mainTarget);
-            }
+            PostChain postChain = getPostChain();
+            if (postChain == null) return;
 
             renderPost(postChain, postTarget, mainTarget);
 
@@ -179,9 +141,11 @@ public enum PostProcessing implements ResourceManagerReloadListener {
             RenderTarget mainTarget = mc.getMainRenderTarget();
             CopyDepthTarget postTarget = getPostTarget();
             postTarget.bindWrite(false);
-            if (renderBase) {
-                RenderUtils.fastBlit(postTarget, mainTarget);
-            }
+
+            PostChain postChain = getPostChain();
+
+            if (postChain == null) return;
+
             renderPost(postChain, postTarget, mainTarget);
             postTarget.clear(Minecraft.ON_OSX);
             mainTarget.bindWrite(false);

@@ -8,7 +8,6 @@
     "GameRendererMixin",
     "HumanoidArmorLayerMixin",
     "LevelRendererMixin",
-    "MainTargetMixin",
     "ParticleEngineMixin",
     "PostChainMixin",
     "ProgramMixin",

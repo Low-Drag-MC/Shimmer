@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
  * @implNote ProxyTarget
  */
 public class ProxyTarget extends RenderTarget {
-    RenderTarget parent;
+    public RenderTarget parent;
 
     public ProxyTarget(boolean useDepth) {
         super(useDepth);

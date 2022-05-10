@@ -1,10 +1,6 @@
 {
   "targets": [
-    "swap",
-    {
-      "name": "output",
-      "bilinear": true
-    }
+    "swap"
   ],
   "passes": [
     {
@@ -40,8 +36,9 @@
     {
       "name": "shimmer:vanilla_composite",
       "intarget": "minecraft:main",
-      "outtarget": "output",
+      "outtarget": "shimmer:output",
       "auxtargets": [
+        {"id":"shimmer:input", "name":"HighLight"},
         {"id":"swap", "name":"BlurTexture"}
       ]
     }

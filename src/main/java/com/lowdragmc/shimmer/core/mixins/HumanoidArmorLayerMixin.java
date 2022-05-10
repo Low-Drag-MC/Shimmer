@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * @author KilaBash
  * @date 2022/05/02
- * @implNote LevelRendererMixin
+ * @implNote HumanoidArmorLayerMixin, used to inject emissive + bloom armor via custom resource pack.
  */
 @Mixin(HumanoidArmorLayer.class)
 public class HumanoidArmorLayerMixin {
@@ -31,7 +31,7 @@ public class HumanoidArmorLayerMixin {
         if (ResourceUtils.isResourceExist(bloomResource)) {
             RenderType renderType = ShimmerRenderTypes.emissiveArmor(bloomResource);
             PoseStack finalStack = RenderUtils.copyPoseStack(poseStack);
-            PostProcessing.BLOOM_UNREAL.postEntity(renderType, vertexConsumer -> model.renderToBuffer(finalStack, vertexConsumer, 0xF000F0, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F));
+            PostProcessing.BLOOM_UNITY.postEntity(renderType, vertexConsumer -> model.renderToBuffer(finalStack, vertexConsumer, 0xF000F0, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F));
         }
     }
 

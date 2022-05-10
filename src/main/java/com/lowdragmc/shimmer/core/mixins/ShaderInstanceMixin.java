@@ -15,7 +15,7 @@ import java.io.Reader;
 /**
  * @author KilaBash
  * @date 2022/05/02
- * @implNote ShaderInstance
+ * @implNote ShaderInstanceMixin,  inject custom shader config to vanilla shader configs.
  */
 @Mixin(ShaderInstance.class)
 public abstract class ShaderInstanceMixin {

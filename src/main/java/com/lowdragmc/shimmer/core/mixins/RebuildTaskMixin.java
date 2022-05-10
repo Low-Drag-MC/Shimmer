@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * @author KilaBash
  * @date 2022/05/02
- * @implNote LevelRendererMixin
+ * @implNote RebuildTaskMixin, used to compile and save light info to the chunk.
  */
 @Mixin(targets = { "net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$RenderChunk$RebuildTask" })
 public abstract class RebuildTaskMixin {

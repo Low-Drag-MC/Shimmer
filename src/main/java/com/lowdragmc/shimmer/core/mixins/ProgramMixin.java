@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author KilaBash
  * @date 2022/05/02
- * @implNote ProgramMixin
+ * @implNote ProgramMixin, inject custom shader to vanilla shaders
  */
 @Mixin(Program.class)
 public abstract class ProgramMixin {

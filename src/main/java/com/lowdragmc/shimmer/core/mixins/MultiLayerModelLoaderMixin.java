@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 /**
  * @author KilaBash
  * @date 2022/05/07
- * @implNote MultilayerModelMixin
+ * @implNote MultiLayerModelLoaderMixin, inject a new rendertype (bloom)
  */
 @Mixin(MultiLayerModel.Loader.class)
 public class MultiLayerModelLoaderMixin implements IMultiLayerModelLoader {

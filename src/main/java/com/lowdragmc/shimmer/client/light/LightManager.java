@@ -28,6 +28,7 @@ import org.lwjgl.opengl.GL30;
 
 import javax.annotation.Nullable;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -40,7 +41,7 @@ import java.util.function.Function;
 @OnlyIn(Dist.CLIENT)
 public enum LightManager {
     INSTANCE;
-    private final List<ColorPointLight> lights = Lists.newArrayList();
+    private final List<ColorPointLight> lights = new ArrayList<>(2048);
     private final FloatBuffer buffer = BufferUtils.createFloatBuffer(2048 * ColorPointLight.STRUCT_SIZE);
     ShaderUBO lightUBO;
     ShaderUBO envUBO;
@@ -84,14 +85,22 @@ public enum LightManager {
         ShaderInjection.registerVSHInjection("rendertype_entity_solid", LightManager::EntityInjectionLightMapColor);
         ShaderInjection.registerVSHInjection("rendertype_entity_translucent", LightManager::EntityInjectionLightMapColor);
         ShaderInjection.registerVSHInjection("rendertype_entity_translucent_cull", LightManager::EntityInjectionVertexColor);
+
     }
 
     public void renderLevelPre(ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum, float camX, float camY, float camZ) {
         int blockLightSize = 0;
+        int left = 2048 - lights.size();
         buffer.clear();
         for (LevelRenderer.RenderChunkInfo chunkInfo : renderChunksInFrustum) {
+            if (left <= blockLightSize) {
+                break;
+            }
             if (chunkInfo.chunk instanceof IRenderChunk) {
                 for (ColorPointLight shimmerLight : ((IRenderChunk) chunkInfo.chunk).getShimmerLights()) {
+                    if (left <= blockLightSize) {
+                        break;
+                    }
                     shimmerLight.uploadBuffer(buffer);
                     blockLightSize++;
                 }
@@ -149,14 +158,23 @@ public enum LightManager {
         }
     }
 
+    /**
+     * Create and add a new PointLight. Have to maintain instances yourself.
+     * @param pos position
+     * @param color colored
+     * @param radius radius
+     * @return instance created. null -- if no more available space.
+     */
+    @Nullable
     public ColorPointLight addLight(Vector3f pos, int color, float radius) {
+        if (lights.size() == 2048) return null;
         ColorPointLight light = new ColorPointLight(this, pos, color, radius, getOffset(lights.size()));
         lights.add(light);
         lightUBO.bufferSubData(light.offset, light.getData());
         return light;
     }
 
-    public int getOffset(int index) {
+    private int getOffset(int index) {
         return (index * ColorPointLight.STRUCT_SIZE) << 2;
     }
 
@@ -196,6 +214,11 @@ public enum LightManager {
         return template == null ? null : new ColorPointLight(blockpos, template);
     }
 
+    /**
+     * register colored light for a block.
+     * @param block block
+     * @param supplier light supplier from a BlockState
+     */
     public void registerBlockLight(Block block, Function<BlockState, ColorPointLight.Template> supplier) {
         BLOCK_MAP.put(block, supplier);
     }

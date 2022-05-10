@@ -1,10 +1,6 @@
 {
   "targets": [
     {
-      "name": "output",
-      "bilinear": true
-    },
-    {
       "name": "swap2a",
       "bilinear": true,
       "scaleSize": {
@@ -193,8 +189,9 @@
     {
       "name": "shimmer:unreal_composite",
       "intarget": "minecraft:main",
-      "outtarget": "output",
+      "outtarget": "shimmer:output",
       "auxtargets": [
+        {"id":"shimmer:input", "name":"HighLight"},
         {"id":"swap2b", "name":"BlurTexture1"},
         {"id":"swap4b", "name":"BlurTexture2"},
         {"id":"swap8b", "name":"BlurTexture3"},

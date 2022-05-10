@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 /**
  * @author KilaBash
  * @date 2022/05/02
- * @implNote LevelRendererMixin
+ * @implNote LevelRendererMixin, used to inject level renderer, for block, entity, particle postprocessing.
  */
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin {
@@ -42,6 +42,7 @@ public abstract class LevelRendererMixin {
                     target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;constantAmbientLight()Z"))
     private void injectRenderLevel(PoseStack poseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera camera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
         Vec3 camPos = camera.getPosition();
+        PostProcessing.BLOOM_UNREAL.getPostTarget().bindWrite(false);
         this.renderChunkLayer(ShimmerRenderTypes.bloom(), poseStack, camPos.x, camPos.y, camPos.z, projectionMatrix);
         this.level.getProfiler().popPush("block_bloom");
         PostProcessing.BLOOM_UNREAL.renderBlockPost();
@@ -51,7 +52,7 @@ public abstract class LevelRendererMixin {
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/LevelRenderer;checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V",
                     ordinal = 1))
-    private void injectRenderLevelBloom(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
+    private void injectRenderLevelBloom(PoseStack poseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera camera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
         this.level.getProfiler().popPush("entity_last_bloom");
         for (PostProcessing postProcessing : PostProcessing.values()) {
             postProcessing.renderEntityPost();

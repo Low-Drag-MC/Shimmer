@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author KilaBash
  * @date 2022/05/02
- * @implNote RenderTypeMixin
+ * @implNote RenderTypeMixin, inject a new rendertype (bloom)
  */
 @Mixin(RenderType.class)
 public class RenderTypeMixin {

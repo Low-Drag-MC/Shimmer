@@ -30,7 +30,7 @@ import java.util.Queue;
 /**
  * @author KilaBash
  * @date 2022/05/02
- * @implNote LevelRendererMixin
+ * @implNote ParticleEngineMixin, inject particle postprocessing
  */
 @Mixin(ParticleEngine.class)
 public abstract class ParticleEngineMixin implements IParticleEngine {
