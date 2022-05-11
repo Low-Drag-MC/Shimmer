@@ -29,9 +29,8 @@ public class HumanoidArmorLayerMixin {
     private void injectRenderModel(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, boolean hasFoil, Model model, float r, float g, float b, ResourceLocation armorResource, CallbackInfo ci) {
         ResourceLocation bloomResource = new ResourceLocation(armorResource.getNamespace(), armorResource.getPath().replace(".png", "_bloom.png"));
         if (ResourceUtils.isResourceExist(bloomResource)) {
-            RenderType renderType = ShimmerRenderTypes.emissiveArmor(bloomResource);
             PoseStack finalStack = RenderUtils.copyPoseStack(poseStack);
-            PostProcessing.BLOOM_UNITY.postEntity(renderType, vertexConsumer -> model.renderToBuffer(finalStack, vertexConsumer, 0xF000F0, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F));
+            PostProcessing.BLOOM_UNITY.postEntity(sourceConsumer -> model.renderToBuffer(finalStack, sourceConsumer.getBuffer(ShimmerRenderTypes.emissiveArmor(bloomResource)), 0xF000F0, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F));
         }
     }
 

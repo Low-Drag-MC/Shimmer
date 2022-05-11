@@ -88,6 +88,13 @@ public enum LightManager {
 
     }
 
+    public static void clear() {
+        for (ColorPointLight light : INSTANCE.lights) {
+            light.lightManager = null;
+        }
+        INSTANCE.lights.clear();
+    }
+
     public void renderLevelPre(ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum, float camX, float camY, float camZ) {
         int blockLightSize = 0;
         int left = 2048 - lights.size();

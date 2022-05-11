@@ -9,25 +9,23 @@ import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.core.IParticleEngine;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -48,7 +46,7 @@ public enum PostProcessing implements ResourceManagerReloadListener {
     private PostChain postChain = null;
     private boolean loadFailed = false;
     private final ResourceLocation shader;
-    private final Map<RenderType, List<Consumer<VertexConsumer>>> postEntityDraw = Maps.newHashMap();
+    private final List<Consumer<MultiBufferSource>> postEntityDraw = Lists.newArrayList();
     private final Map<ParticleRenderType, IPostParticleType> particleTypeMap = Maps.newHashMap();
     private boolean hasParticle;
 
@@ -110,18 +108,20 @@ public enum PostProcessing implements ResourceManagerReloadListener {
         RenderUtils.fastBlit(postChain.getTempTarget("shimmer:output"), output);
     }
 
-    public void renderEntityPost() {
-        if (!postEntityDraw.isEmpty()) {
+    public void renderEntityPost(ProfilerFiller profilerFiller) {
+        if (!postEntityDraw.isEmpty() ) {
+            profilerFiller.popPush("ENTITY_" + name());
+
             RenderTarget mainTarget = mc.getMainRenderTarget();
             CopyDepthTarget postTarget = getPostTarget();
             postTarget.bindWrite(false);
 
-            postEntityDraw.forEach((renderType, consumers) -> {
-                BufferBuilder buffer = Tesselator.getInstance().getBuilder();
-                buffer.begin(renderType.mode(), renderType.format());
-                consumers.forEach(consumer -> consumer.accept(buffer));
-                renderType.end(buffer, 0, 0, 0);
-            });
+            MultiBufferSource.BufferSource bufferSource = PostMultiBufferSource.BUFFER_SOURCE;
+            for (Consumer<MultiBufferSource> sourceConsumer : postEntityDraw) {
+                sourceConsumer.accept(bufferSource);
+            }
+
+            bufferSource.endBatch();
 
             postEntityDraw.clear();
 
@@ -152,8 +152,12 @@ public enum PostProcessing implements ResourceManagerReloadListener {
         }
     }
 
-    public void postEntity(RenderType renderType, Consumer<VertexConsumer> consumer) {
-        postEntityDraw.computeIfAbsent(renderType, x->new LinkedList<>()).add(consumer);
+    /**
+     * post rendering. rendered in next frame, before entity.
+     * @param sourceConsumer BufferSource
+     */
+    public void postEntity(Consumer<MultiBufferSource> sourceConsumer) {
+        postEntityDraw.add(sourceConsumer);
 
     }
 
