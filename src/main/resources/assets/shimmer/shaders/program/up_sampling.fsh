@@ -22,15 +22,15 @@ void main(){
     vec3 textel = vec3(1., -1., 0.) / OutSize.xyx;
     //    out_colour = up_sampling(textel, texCoord);
 
-    vec4 out_colour = texture(DiffuseSampler, texCoord + textel.xx);
-    out_colour += texture(DiffuseSampler, texCoord + textel.xz) * 2.0;
-    out_colour += texture(DiffuseSampler, texCoord + textel.xy);
-    out_colour += texture(DiffuseSampler, texCoord + textel.yz) * 2.0;
-    out_colour += texture(DiffuseSampler, texCoord) * 4.0;
-    out_colour += texture(DiffuseSampler, texCoord + textel.zx) * 2.0;
-    out_colour += texture(DiffuseSampler, texCoord + textel.yy);
-    out_colour += texture(DiffuseSampler, texCoord + textel.zy) * 2.0;
-    out_colour += texture(DiffuseSampler, texCoord + textel.yx);
+    vec4 out_colour = texture(DiffuseSampler, texCoord + textel.xx); // 1 1
+    out_colour += texture(DiffuseSampler, texCoord + textel.xz) * 2.0; // 1 0
+    out_colour += texture(DiffuseSampler, texCoord + textel.xy); // 1 -1
+    out_colour += texture(DiffuseSampler, texCoord + textel.yz) * 2.0; // -1 0
+    out_colour += texture(DiffuseSampler, texCoord) * 4.0; // 0 0
+    out_colour += texture(DiffuseSampler, texCoord + textel.zx) * 2.0; // 0 1
+    out_colour += texture(DiffuseSampler, texCoord + textel.yy); // -1 -1
+    out_colour += texture(DiffuseSampler, texCoord + textel.zy) * 2.0; // 0 -1
+    out_colour += texture(DiffuseSampler, texCoord + textel.yx); // -1 1
 
     fragColor = vec4(out_colour.rgb * 0.8 / 16. + texture(DownTexture, texCoord).rgb * 0.8, 1.);
 }

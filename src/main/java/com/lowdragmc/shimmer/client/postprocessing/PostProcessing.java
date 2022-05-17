@@ -22,9 +22,9 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.compress.utils.Lists;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -158,7 +158,6 @@ public enum PostProcessing implements ResourceManagerReloadListener {
      */
     public void postEntity(Consumer<MultiBufferSource> sourceConsumer) {
         postEntityDraw.add(sourceConsumer);
-
     }
 
     public void postParticle(ParticleOptions particleOptions, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
@@ -190,7 +189,7 @@ public enum PostProcessing implements ResourceManagerReloadListener {
     }
 
     @Override
-    public void onResourceManagerReload(@NotNull ResourceManager pResourceManager) {
+    public void onResourceManagerReload(@Nullable ResourceManager pResourceManager) {
         if (postChain != null) {
             postChain.close();
         }

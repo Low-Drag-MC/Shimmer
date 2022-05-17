@@ -75,7 +75,9 @@ public class ColorPointLight {
     }
 
     public void update() {
-        Minecraft.getInstance().execute(() -> lightManager.lightUBO.bufferSubData(offset, getData()));
+        if (lightManager != null) {
+            Minecraft.getInstance().execute(() -> lightManager.lightUBO.bufferSubData(offset, getData()));
+        }
     }
 
     protected float[] getData() {
