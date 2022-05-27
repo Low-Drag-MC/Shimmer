@@ -19,10 +19,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
@@ -209,15 +210,18 @@ public enum LightManager {
 // *********************** block light *********************** //
 
     private final Map<Block, Function<BlockState, ColorPointLight.Template>> BLOCK_MAP = Maps.newHashMap();
+    private final Map<Fluid, ColorPointLight.Template> FLUID_MAP = Maps.newHashMap();
 
-    public boolean isBlockHasLight(Block block) {
-        return BLOCK_MAP.containsKey(block);
+    public boolean isBlockHasLight(Block block, FluidState fluidState) {
+        return BLOCK_MAP.containsKey(block) || (!fluidState.isEmpty() && FLUID_MAP.containsKey(fluidState.getType()));
     }
 
     @Nullable
-    public ColorPointLight getBlockStateLight(BlockPos blockpos, BlockState blockstate) {
-        ColorPointLight.Template
-                template = BLOCK_MAP.getOrDefault(blockstate.getBlock(), s -> null).apply(blockstate);
+    public ColorPointLight getBlockStateLight(BlockPos blockpos, BlockState blockstate, FluidState fluidstate) {
+        ColorPointLight.Template template = BLOCK_MAP.getOrDefault(blockstate.getBlock(), s -> null).apply(blockstate);
+        if (template == null && !fluidstate.isEmpty()){
+            template = FLUID_MAP.get(fluidstate.getType());
+        }
         return template == null ? null : new ColorPointLight(blockpos, template);
     }
 
@@ -235,6 +239,11 @@ public enum LightManager {
         registerBlockLight(block, state -> template);
     }
 
+    public void registerFluidLight(Fluid fluid, int color, float radius) {
+        ColorPointLight.Template template = new ColorPointLight.Template(radius, color);
+        FLUID_MAP.put(fluid, template);
+    }
+
     public void loadConfig() {
         JsonElement jsonElement = Configuration.config.get("LightBlock");
         if (jsonElement.isJsonArray()) {
@@ -249,6 +258,15 @@ public enum LightManager {
                     int b = JsonUtils.getIntOr("b", jsonObj, 0);
                     if (bb != null) {
                         registerBlockLight(bb, (a << 24) | (r << 16) | (g << 8) | b, jsonObj.get("radius").getAsFloat());
+                    }
+                } else if (jsonObj.has("fluid")) {
+                    Fluid ff = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(jsonObj.get("fluid").getAsString()));
+                    int a = JsonUtils.getIntOr("a", jsonObj, 0);
+                    int r = JsonUtils.getIntOr("r", jsonObj, 0);
+                    int g = JsonUtils.getIntOr("g", jsonObj, 0);
+                    int b = JsonUtils.getIntOr("b", jsonObj, 0);
+                    if (ff != null) {
+                        registerFluidLight(ff, (a << 24) | (r << 16) | (g << 8) | b, jsonObj.get("radius").getAsFloat());
                     }
                 }
             }

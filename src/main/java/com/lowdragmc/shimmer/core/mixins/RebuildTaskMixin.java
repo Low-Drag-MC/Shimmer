@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.chunk.VisGraph;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,7 +39,7 @@ public abstract class RebuildTaskMixin {
     @Inject(method = "compile",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/state/BlockState;hasBlockEntity()Z"),
+                    target = "Lnet/minecraft/client/renderer/chunk/ChunkRenderDispatcher$RenderChunk$RebuildTask;getModelData(Lnet/minecraft/core/BlockPos;)Lnet/minecraftforge/client/model/data/IModelData;"),
             locals = LocalCapture.CAPTURE_FAILHARD)
     private void injectCompile(float pX, float pY, float pZ,
                                ChunkRenderDispatcher.CompiledChunk pCompiledChunk,
@@ -51,9 +52,11 @@ public abstract class RebuildTaskMixin {
                                BlockRenderDispatcher blockrenderdispatcher,
                                Iterator var15,
                                BlockPos blockpos2,
-                               BlockState blockstate) {
-        if (LightManager.INSTANCE.isBlockHasLight(blockstate.getBlock())) {
-            ColorPointLight light = LightManager.INSTANCE.getBlockStateLight(blockpos2, blockstate);
+                               BlockState blockstate,
+                               BlockState blockstate1,
+                               FluidState fluidstate) {
+        if (LightManager.INSTANCE.isBlockHasLight(blockstate.getBlock(), fluidstate)) {
+            ColorPointLight light = LightManager.INSTANCE.getBlockStateLight(blockpos2, blockstate, fluidstate);
             if (light != null) {
                 lights.add(light);
             }

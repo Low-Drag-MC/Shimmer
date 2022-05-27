@@ -17,6 +17,7 @@ import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.client.model.MultiLayerModel;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -55,22 +56,33 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
             JsonElement jsonElement = Configuration.config.get("CustomLayer");
             if (jsonElement.isJsonArray()) {
                 JsonArray customLayers = jsonElement.getAsJsonArray();
-                for (JsonElement block : customLayers) {
-                    JsonObject jsonObj = block.getAsJsonObject();
+                for (JsonElement object : customLayers) {
+                    JsonObject jsonObj = object.getAsJsonObject();
                     if (jsonObj.has("block")) {
                         Block bb = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(jsonObj.get("block").getAsString()));
                         if (bb != null) {
-                            JsonArray layers = jsonObj.get("layers").getAsJsonArray();
-                            RenderType[] types = new RenderType[layers.size()];
-                            for (int i = 0; i < layers.size(); i++) {
-                                types[i] = MultiLayerModel.Loader.BLOCK_LAYERS.get(layers.get(i).getAsString());
-                            }
+                            RenderType[] types = detectTypes(jsonObj);
                             ItemBlockRenderTypes.setRenderLayer(bb, type -> ArrayUtils.contains(types, type));
+                        }
+                    } else if (jsonObj.has("fluid")) {
+                        Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(jsonObj.get("fluid").getAsString()));
+                        if (fluid != null) {
+                            RenderType[] types = detectTypes(jsonObj);
+                            ItemBlockRenderTypes.setRenderLayer(fluid, type -> ArrayUtils.contains(types, type));
                         }
                     }
                 }
             }
         });
+    }
+
+    private RenderType[] detectTypes(JsonObject jsonObj) {
+        JsonArray layers = jsonObj.get("layers").getAsJsonArray();
+        RenderType[] types = new RenderType[layers.size()];
+        for (int i = 0; i < layers.size(); i++) {
+            types[i] = MultiLayerModel.Loader.BLOCK_LAYERS.get(layers.get(i).getAsString());
+        }
+        return types;
     }
 
     @Override

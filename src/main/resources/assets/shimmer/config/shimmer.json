@@ -13,6 +13,10 @@
     {
       "block": "minecraft:redstone_wire",
       "layers": ["bloom"]
+    },
+    {
+      "fluid": "minecraft:lava",
+      "layers": ["bloom"]
     }
   ]
 }
