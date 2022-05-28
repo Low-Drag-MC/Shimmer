@@ -11,7 +11,7 @@ version="${file.jarVersion}" #mandatory
 displayName="Shimmer" #mandatory
 logoFile="examplemod.png" #optional
 # A text field displayed in the mod UI
-credits="Thanks for this example mod goes to Java" #optional
+credits="zomb-676, better coloured lights" #optional
 # A text field displayed in the mod UI
 authors="KilaBash" #optional
 description='''
