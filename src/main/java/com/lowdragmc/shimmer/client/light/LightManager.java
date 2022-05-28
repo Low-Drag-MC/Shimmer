@@ -49,13 +49,13 @@ public enum LightManager {
     
     private static String ChunkInjection(String s) {
         s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
-        return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light(pos, vertexColor);\n").toString();
+        return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light_uv(pos, vertexColor,UV2);\n").toString();
     }
 
     private static String PositionInjection(String s) {
         //TODO fix armor lighting. what the hell!!!!!
         s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
-        return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light(Position, vertexColor);\n").toString();
+        return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light_uv(Position, vertexColor,UV2);\n").toString();
     }
 
     private static String EntityInjectionLightMapColor(String s) {
