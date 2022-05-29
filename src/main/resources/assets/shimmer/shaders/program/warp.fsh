@@ -47,12 +47,9 @@ float noise3d(vec3 p)
 }
 
 void main(){
-    vec4 wrapBG = texture(WarpImage, texCoord);
-    if (length(wrapBG) > 0.005) {
-        float v1 = noise3d(vec3(texCoord * 10.0 + iTime, 0.0));
-        float v2 = noise3d(vec3(texCoord * 10.0 + iTime, 1.0));
-        fragColor = texture(DiffuseSampler, texCoord + vec2(v1, v2) * 0.1);
-    } else {
-        fragColor = texture(DiffuseSampler, texCoord);
-    }
+    vec4 warpBG = texture(WarpImage, texCoord);
+    float a = length(warpBG.rgb);
+    float v1 = noise3d(vec3(texCoord * 10.0 + iTime, 0.0));
+    float v2 = noise3d(vec3(texCoord * 10.0 + iTime, 1.0));
+    fragColor = texture(DiffuseSampler, texCoord + vec2(v1, v2) * 0.1 * a);
 }
