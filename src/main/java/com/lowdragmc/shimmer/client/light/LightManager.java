@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -82,7 +83,6 @@ public enum LightManager {
         ShaderInjection.registerVSHInjection("rendertype_entity_cutout_no_cull_z_offset", LightManager::EntityInjectionLightMapColor);
         ShaderInjection.registerVSHInjection("rendertype_entity_decal", LightManager::EntityInjectionVertexColor);
         ShaderInjection.registerVSHInjection("rendertype_entity_no_outline", LightManager::EntityInjectionVertexColor);
-        ShaderInjection.registerVSHInjection("rendertype_entity_shadow", LightManager::EntityInjectionVertexColor);
         ShaderInjection.registerVSHInjection("rendertype_entity_smooth_cutout", LightManager::EntityInjectionLightMapColor);
         ShaderInjection.registerVSHInjection("rendertype_entity_solid", LightManager::EntityInjectionLightMapColor);
         ShaderInjection.registerVSHInjection("rendertype_entity_translucent", LightManager::EntityInjectionLightMapColor);
@@ -151,7 +151,6 @@ public enum LightManager {
         bindProgram("rendertype_entity_cutout_no_cull_z_offset");
         bindProgram("rendertype_entity_decal");
         bindProgram("rendertype_entity_no_outline");
-        bindProgram("rendertype_entity_shadow");
         bindProgram("rendertype_entity_smooth_cutout");
         bindProgram("rendertype_entity_solid");
         bindProgram("rendertype_entity_translucent");
@@ -273,5 +272,28 @@ public enum LightManager {
                 }
             }
         }
+    }
+
+    public int getLight(BlockGetter instance, BlockPos pPos) {
+        BlockState blockState = instance.getBlockState(pPos);
+        FluidState fluidState = blockState.getFluidState();
+        int light = 0;
+        if (isBlockHasLight(blockState.getBlock(), fluidState)) {
+            ColorPointLight.Template template = BLOCK_MAP.getOrDefault(blockState.getBlock(), (s,p) -> null).apply(blockState, pPos);
+            if (template == null && !fluidState.isEmpty()){
+                template = FLUID_MAP.get(fluidState.getType());
+            }
+            if (template != null) {
+                light = (int) template.radius;
+            }
+        }
+        for (ColorPointLight colorPointLight : lights) {
+            double dist = pPos.distToCenterSqr(colorPointLight.x, colorPointLight.y, colorPointLight.z);
+            double r2 = colorPointLight.radius * colorPointLight.radius;
+            if (dist < r2) {
+                light = (int) Math.max(Math.sqrt(r2) - Math.sqrt(dist), light);
+            }
+        }
+        return light;
     }
 }

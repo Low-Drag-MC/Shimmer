@@ -10,6 +10,7 @@
     "LevelRendererMixin",
     "ParticleEngineMixin",
     "PostChainMixin",
+    "PostPassMixin",
     "ProgramMixin",
     "RebuildTaskMixin",
     "RenderChunkMixin",
@@ -18,6 +19,7 @@
     "ShaderInstanceMixin"
   ],
   "mixins": [
+    "BlockLightEngineMixin",
     "MultiLayerModelLoaderMixin"
   ]
 }

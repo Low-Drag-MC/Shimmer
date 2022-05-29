@@ -35,21 +35,27 @@ vec4 color_light(vec3 pos, vec4 vertex_color) {
 }
 
 vec4 color_light_uv(vec3 pos, vec4 vertex_color,ivec2 uv) {
-    vec3 lightColor = vec3(0., 0., 0.);
-    vec3 fragPos = pos + camPos;
-    for (int i = 0; i < lightCount; i++) {
-        Light l = lights[i];
-        float radius = pow(l.radius, 2);
-        vec3 poss = vec3(0.,0.,0.);
-        float intensity = pow(max(0., 1. - distance(l.position, fragPos) / l.radius), 2);
-        lightColor += l.color.rgb * l.color.a * intensity;
+    vec2 normalized_light = clamp(uv / 256.0, vec2(0.5 / 16.0), vec2(20. / 16.0));
+
+    if (normalized_light.x > 0.03125) {
+        vec3 lightColor = vec3(0., 0., 0.);
+        vec3 fragPos = pos + camPos;
+        for (int i = 0; i < lightCount; i++) {
+            Light l = lights[i];
+            float radius = pow(l.radius, 2);
+            vec3 poss = vec3(0.,0.,0.);
+            float intensity = pow(max(0., 1. - distance(l.position, fragPos) / l.radius), 2);
+            lightColor += l.color.rgb * l.color.a * intensity;
+        }
+
+        // from light.glsl#minecraft_sample_lightmap
+
+        vec3 lcolor_2 = clamp(lightColor.rgb, 0.0f, 1.0f);
+
+        return vec4(vertex_color.rgb + lcolor_2 * normalized_light.x * 4., 1.0);
+    } else {
+        return vertex_color;
     }
 
-    vec2 normalized_light = clamp(uv / 256.0, vec2(0.5 / 16.0), vec2(15.5 / 16.0));
-    // from light.glsl#minecraft_sample_lightmap
-
-    vec3 lcolor_2 = clamp(lightColor.rgb, 0.0f, 1.0f);
-
-    return vec4(vertex_color.rgb + lcolor_2 * normalized_light.x, 1.0);
     // just take x coordinate into account as it represent block light , skip the sky light
 }

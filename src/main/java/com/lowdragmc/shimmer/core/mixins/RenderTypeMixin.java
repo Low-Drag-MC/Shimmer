@@ -18,7 +18,7 @@ import java.util.List;
 @Mixin(RenderType.class)
 public class RenderTypeMixin {
 
-    @Inject(method = "chunkBufferLayers",  at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "chunkBufferLayers",  at = @At(value = "RETURN"), cancellable = true)
     private static void injectChunkBufferLayers(CallbackInfoReturnable<List<RenderType>> cir) {
         cir.setReturnValue(ImmutableList.<RenderType>builder()
                 .addAll(cir.getReturnValue())

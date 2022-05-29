@@ -83,6 +83,10 @@ public class PostProcessing implements ResourceManagerReloadListener {
         return BLOOM_UNREAL;
     }
 
+    public static float getITime(float pPartialTicks) {
+        return mc.level == null ? pPartialTicks : (mc.level.getGameTime() + pPartialTicks) / 20f;
+    }
+
     public CopyDepthTarget getPostTarget() {
         if (postTarget == null) {
             postTarget = new CopyDepthTarget(mc.getMainRenderTarget(), Minecraft.ON_OSX);
@@ -123,7 +127,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
         }
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
-        postChain.process(mc.getFrameTime() + (mc.level == null ? 0 : (mc.level.getGameTime() % 10000)));
+        postChain.process(mc.getFrameTime());
         RenderUtils.fastBlit(postChain.getTempTarget("shimmer:output"), output);
     }
 
