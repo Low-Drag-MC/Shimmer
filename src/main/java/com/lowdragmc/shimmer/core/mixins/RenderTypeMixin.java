@@ -20,12 +20,9 @@ public class RenderTypeMixin {
 
     @Inject(method = "chunkBufferLayers",  at = @At(value = "HEAD"), cancellable = true)
     private static void injectChunkBufferLayers(CallbackInfoReturnable<List<RenderType>> cir) {
-        cir.setReturnValue(ImmutableList.of(
-                RenderType.solid(),
-                RenderType.cutoutMipped(),
-                RenderType.cutout(),
-                ShimmerRenderTypes.bloom(),
-                RenderType.translucent(),
-                RenderType.tripwire()));
+        cir.setReturnValue(ImmutableList.<RenderType>builder()
+                .addAll(cir.getReturnValue())
+                .add(ShimmerRenderTypes.bloom())
+                .build());
     }
 }

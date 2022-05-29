@@ -32,7 +32,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * @author KilaBash
@@ -46,7 +46,7 @@ public enum LightManager {
     private final FloatBuffer buffer = BufferUtils.createFloatBuffer(2048 * ColorPointLight.STRUCT_SIZE);
     ShaderUBO lightUBO;
     ShaderUBO envUBO;
-    
+
     private static String ChunkInjection(String s) {
         s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
         return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light_uv(pos, vertexColor,UV2);\n").toString();
@@ -209,7 +209,7 @@ public enum LightManager {
 
 // *********************** block light *********************** //
 
-    private final Map<Block, Function<BlockState, ColorPointLight.Template>> BLOCK_MAP = Maps.newHashMap();
+    private final Map<Block, BiFunction<BlockState, BlockPos, ColorPointLight.Template>> BLOCK_MAP = Maps.newHashMap();
     private final Map<Fluid, ColorPointLight.Template> FLUID_MAP = Maps.newHashMap();
 
     public boolean isBlockHasLight(Block block, FluidState fluidState) {
@@ -218,7 +218,7 @@ public enum LightManager {
 
     @Nullable
     public ColorPointLight getBlockStateLight(BlockPos blockpos, BlockState blockstate, FluidState fluidstate) {
-        ColorPointLight.Template template = BLOCK_MAP.getOrDefault(blockstate.getBlock(), s -> null).apply(blockstate);
+        ColorPointLight.Template template = BLOCK_MAP.getOrDefault(blockstate.getBlock(), (s,p) -> null).apply(blockstate,blockpos);
         if (template == null && !fluidstate.isEmpty()){
             template = FLUID_MAP.get(fluidstate.getType());
         }
@@ -228,15 +228,15 @@ public enum LightManager {
     /**
      * register colored light for a block.
      * @param block block
-     * @param supplier light supplier from a BlockState
+     * @param supplier light supplier from a BlockState and BlockPos
      */
-    public void registerBlockLight(Block block, Function<BlockState, ColorPointLight.Template> supplier) {
+    public void registerBlockLight(Block block, BiFunction<BlockState, BlockPos, ColorPointLight.Template> supplier) {
         BLOCK_MAP.put(block, supplier);
     }
 
     public void registerBlockLight(Block block, int color, float radius) {
         ColorPointLight.Template template = new ColorPointLight.Template(radius, color);
-        registerBlockLight(block, state -> template);
+        registerBlockLight(block, (state, pos) -> template);
     }
 
     public void registerFluidLight(Fluid fluid, int color, float radius) {
