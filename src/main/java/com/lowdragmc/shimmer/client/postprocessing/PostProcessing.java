@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.client.postprocessing;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.lowdragmc.shimmer.ShimmerMod;
 import com.lowdragmc.shimmer.client.rendertarget.CopyDepthTarget;
@@ -20,7 +21,6 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.commons.compress.utils.Lists;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,6 +42,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
     public static final PostProcessing BLOOM_UNREAL = new PostProcessing("bloom_unreal", new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unreal.json"));
     public static final PostProcessing BLOOM_UNITY = new PostProcessing("bloom_unity", new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unity.json"));
     public static final PostProcessing BLOOM_VANILLA = new PostProcessing("bloom_vanilla", new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_vanilla.json"));
+    public static final PostProcessing WARP = new PostProcessing("warp", new ResourceLocation(ShimmerMod.MODID, "shaders/post/warp.json"));
 
     private static final Minecraft mc = Minecraft.getInstance();
     public final String name;
@@ -76,6 +77,10 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
     public static Collection<PostProcessing> values() {
         return POST_PROCESSING_MAP.values();
+    }
+    
+    public static PostProcessing getBlockBloom() {
+        return BLOOM_UNREAL;
     }
 
     public CopyDepthTarget getPostTarget() {
@@ -118,7 +123,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
         }
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
-        postChain.process(mc.getFrameTime());
+        postChain.process(mc.getFrameTime() + (mc.level == null ? 0 : (mc.level.getGameTime() % 10000)));
         RenderUtils.fastBlit(postChain.getTempTarget("shimmer:output"), output);
     }
 
@@ -207,6 +212,10 @@ public class PostProcessing implements ResourceManagerReloadListener {
         if (postChain != null) {
             postChain.close();
         }
+        if (postTarget != null) {
+            postTarget.destroyBuffers();
+        }
+        postTarget = null;
         postChain = null;
         loadFailed = false;
     }

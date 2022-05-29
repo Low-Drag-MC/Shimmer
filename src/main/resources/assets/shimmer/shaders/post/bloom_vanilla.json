@@ -6,7 +6,7 @@
     {
       "name": "blur",
       "intarget": "shimmer:input",
-      "outtarget": "output",
+      "outtarget": "shimmer:output",
       "uniforms": [
         {
           "name": "BlurDir",
@@ -20,7 +20,7 @@
     },
     {
       "name": "blur",
-      "intarget": "output",
+      "intarget": "shimmer:output",
       "outtarget": "swap",
       "uniforms": [
         {
