@@ -1,7 +1,6 @@
 package com.lowdragmc.shimmer.client.postprocessing;
 
 import com.google.common.collect.Maps;
-import com.lowdragmc.shimmer.EnumHelper;
 import com.lowdragmc.shimmer.ShimmerMod;
 import com.lowdragmc.shimmer.client.rendertarget.CopyDepthTarget;
 import com.lowdragmc.shimmer.client.rendertarget.ProxyTarget;
@@ -26,6 +25,8 @@ import org.apache.commons.compress.utils.Lists;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -36,12 +37,14 @@ import java.util.function.Consumer;
  * @implNote Custom PostProcessing
  */
 @OnlyIn(Dist.CLIENT)
-public enum PostProcessing implements ResourceManagerReloadListener {
-    BLOOM_UNREAL(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unreal.json")),
-    BLOOM_UNITY(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unity.json")),
-    BLOOM_VANILLA(new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_vanilla.json"));
+public class PostProcessing implements ResourceManagerReloadListener {
+    private static final Map<String, PostProcessing> POST_PROCESSING_MAP = new HashMap<>();
+    public static final PostProcessing BLOOM_UNREAL = new PostProcessing("bloom_unreal", new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unreal.json"));
+    public static final PostProcessing BLOOM_UNITY = new PostProcessing("bloom_unity", new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_unity.json"));
+    public static final PostProcessing BLOOM_VANILLA = new PostProcessing("bloom_vanilla", new ResourceLocation(ShimmerMod.MODID, "shaders/post/bloom_vanilla.json"));
 
     private static final Minecraft mc = Minecraft.getInstance();
+    public final String name;
     private CopyDepthTarget postTarget;
     private PostChain postChain = null;
     private boolean loadFailed = false;
@@ -50,18 +53,29 @@ public enum PostProcessing implements ResourceManagerReloadListener {
     private final Map<ParticleRenderType, IPostParticleType> particleTypeMap = Maps.newHashMap();
     private boolean hasParticle;
 
-    PostProcessing(ResourceLocation shader) {
+    private PostProcessing(String name, ResourceLocation shader) {
         this.shader = shader;
+        this.name = name;
+        POST_PROCESSING_MAP.put(name, this);
     }
 
     /**
-     * register your custom postprocessing
+     * register your custom postprocessing or replace the original one
      * @param name post name
      * @param shader post shader
      * @return PostProcessing
      */
     public static PostProcessing registerPost(String name, ResourceLocation shader) {
-        return EnumHelper.addEnum(PostProcessing.class, name, new Class[]{ResourceLocation.class, Boolean.class}, shader);
+        return new PostProcessing(name, shader);
+    }
+
+    @Nullable
+    public static PostProcessing getPost(String name) {
+        return POST_PROCESSING_MAP.get(name);
+    }
+
+    public static Collection<PostProcessing> values() {
+        return POST_PROCESSING_MAP.values();
     }
 
     public CopyDepthTarget getPostTarget() {
@@ -80,7 +94,7 @@ public enum PostProcessing implements ResourceManagerReloadListener {
                 postChain.resize(mc.getWindow().getWidth(), mc.getWindow().getHeight());
             }
         } catch (IOException e) {
-            ShimmerMod.LOGGER.error("load post: [{}] post chain: [{}] failed!", this.name(), shader, e);
+            ShimmerMod.LOGGER.error("load post: [{}] post chain: [{}] failed!", this.name, shader, e);
             loadFailed = true;
         }
         return postChain;
@@ -110,7 +124,7 @@ public enum PostProcessing implements ResourceManagerReloadListener {
 
     public void renderEntityPost(ProfilerFiller profilerFiller) {
         if (!postEntityDraw.isEmpty() ) {
-            profilerFiller.popPush("ENTITY_" + name());
+            profilerFiller.popPush("ENTITY_" + name.toUpperCase());
 
             RenderTarget mainTarget = mc.getMainRenderTarget();
             CopyDepthTarget postTarget = getPostTarget();

@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -231,6 +232,7 @@ public enum LightManager {
      * @param supplier light supplier from a BlockState
      */
     public void registerBlockLight(Block block, Function<BlockState, ColorPointLight.Template> supplier) {
+        if (block == Blocks.AIR) return;
         BLOCK_MAP.put(block, supplier);
     }
 
