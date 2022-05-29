@@ -43,10 +43,10 @@ public abstract class LevelRendererMixin {
                     target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;constantAmbientLight()Z"))
     private void injectRenderLevel(PoseStack poseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera camera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
         Vec3 camPos = camera.getPosition();
-        PostProcessing.BLOOM_UNREAL.getPostTarget().bindWrite(false);
+        PostProcessing.getBlockBloom().getPostTarget().bindWrite(false);
         this.renderChunkLayer(ShimmerRenderTypes.bloom(), poseStack, camPos.x, camPos.y, camPos.z, projectionMatrix);
         this.level.getProfiler().popPush("block_bloom");
-        PostProcessing.BLOOM_UNREAL.renderBlockPost();
+        PostProcessing.getBlockBloom().renderBlockPost();
     }
     @Inject(method = "renderLevel",
             at = @At(

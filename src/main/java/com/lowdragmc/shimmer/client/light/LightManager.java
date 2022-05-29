@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -46,7 +47,7 @@ public enum LightManager {
     private final FloatBuffer buffer = BufferUtils.createFloatBuffer(2048 * ColorPointLight.STRUCT_SIZE);
     ShaderUBO lightUBO;
     ShaderUBO envUBO;
-
+    
     private static String ChunkInjection(String s) {
         s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
         return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light_uv(pos, vertexColor,UV2);\n").toString();
@@ -231,6 +232,7 @@ public enum LightManager {
      * @param supplier light supplier from a BlockState and BlockPos
      */
     public void registerBlockLight(Block block, BiFunction<BlockState, BlockPos, ColorPointLight.Template> supplier) {
+        if (block == Blocks.AIR) return;
         BLOCK_MAP.put(block, supplier);
     }
 
