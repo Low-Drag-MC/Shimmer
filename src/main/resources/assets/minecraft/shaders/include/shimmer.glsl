@@ -35,9 +35,9 @@ vec4 color_light(vec3 pos, vec4 vertex_color) {
 }
 
 vec4 color_light_uv(vec3 pos, vec4 vertex_color,ivec2 uv) {
-    vec2 normalized_light = clamp(uv / 256.0, vec2(0.5 / 16.0), vec2(20. / 16.0));
+    float blockLight = smoothstep(0.5 / 16.0, 20.5 / 16.0, uv.x / 256.0);
 
-    if (normalized_light.x > 0.03125) {
+    if (blockLight > 0.) {
         vec3 lightColor = vec3(0., 0., 0.);
         vec3 fragPos = pos + camPos;
         for (int i = 0; i < lightCount; i++) {
@@ -50,9 +50,9 @@ vec4 color_light_uv(vec3 pos, vec4 vertex_color,ivec2 uv) {
 
         // from light.glsl#minecraft_sample_lightmap
 
-        vec3 lcolor_2 = clamp(lightColor.rgb, 0.0f, 1.0f);
-
-        return vec4(vertex_color.rgb + lcolor_2 * normalized_light.x * 4., 1.0);
+        //        vec3 lcolor_2 = clamp(lightColor.rgb, 0.0f, 1.0f);
+        return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5, 0.0, 1.0), 1.0);
+        //        return vec4(vertex_color.rgb + lcolor_2 * blockLight * 3., 1.0);
     } else {
         return vertex_color;
     }
