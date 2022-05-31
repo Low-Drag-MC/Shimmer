@@ -1,6 +1,5 @@
 package com.lowdragmc.shimmer.core.mixins;
 
-import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -14,6 +13,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.phys.Vec3;
+import org.lwjgl.opengl.GL30;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,8 +31,6 @@ import javax.annotation.Nullable;
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin {
 
-    @Shadow protected abstract void renderChunkLayer(RenderType pRenderType, PoseStack pPoseStack, double pCamX, double pCamY, double pCamZ, Matrix4f pProjectionMatrix);
-
     @Shadow @Nullable private ClientLevel level;
 
     @Shadow @Final private ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum;
@@ -42,12 +40,30 @@ public abstract class LevelRendererMixin {
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;constantAmbientLight()Z"))
     private void injectRenderLevel(PoseStack poseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera camera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
-        Vec3 camPos = camera.getPosition();
-        PostProcessing.getBlockBloom().getPostTarget().bindWrite(false);
-        this.renderChunkLayer(ShimmerRenderTypes.bloom(), poseStack, camPos.x, camPos.y, camPos.z, projectionMatrix);
         this.level.getProfiler().popPush("block_bloom");
         PostProcessing.getBlockBloom().renderBlockPost();
     }
+
+    @Inject(method = "renderChunkLayer",
+            at = @At(value = "HEAD"))
+    private void preRenderChunkLayer(RenderType pRenderType,
+                                        PoseStack pPoseStack, double pCamX,
+                                        double pCamY, double pCamZ,
+                                        Matrix4f pProjectionMatrix,
+                                        CallbackInfo ci) {
+        GL30.glDrawBuffers(new int[] {GL30.GL_COLOR_ATTACHMENT0, GL30.GL_COLOR_ATTACHMENT1});
+    }
+
+    @Inject(method = "renderChunkLayer",
+            at = @At(value = "RETURN"))
+    private void postRenderChunkLayer(RenderType pRenderType,
+                                        PoseStack pPoseStack, double pCamX,
+                                        double pCamY, double pCamZ,
+                                        Matrix4f pProjectionMatrix,
+                                        CallbackInfo ci) {
+        GL30.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT0);
+    }
+
     @Inject(method = "renderLevel",
             at = @At(
                     value = "INVOKE",

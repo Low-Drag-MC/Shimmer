@@ -60,8 +60,9 @@ public class ShaderInjection {
     public static boolean hasInjectVSH(String shaderName) {
         return VSH_INJECTIONS.containsKey(shaderName);
     }
+
     public static String injectVSH(String shaderName, String content) {
-        ShimmerMod.LOGGER.info("inject shader fsh {}.", shaderName);
+        ShimmerMod.LOGGER.info("inject shader vsh {}.", shaderName);
         for (Function<String, String> function : VSH_INJECTIONS.getOrDefault(shaderName, Collections.emptyList())) {
             content = function.apply(content);
         }

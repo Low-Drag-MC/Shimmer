@@ -4,8 +4,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.lowdragmc.shimmer.ShimmerMod;
 import com.lowdragmc.shimmer.client.rendertarget.CopyDepthTarget;
+import com.lowdragmc.shimmer.client.rendertarget.MRTTarget;
 import com.lowdragmc.shimmer.client.rendertarget.ProxyTarget;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
+import com.lowdragmc.shimmer.client.shader.ShaderInjection;
+import com.lowdragmc.shimmer.core.IMainTarget;
 import com.lowdragmc.shimmer.core.IParticleEngine;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -87,6 +90,43 @@ public class PostProcessing implements ResourceManagerReloadListener {
         return mc.level == null ? pPartialTicks : (mc.level.getGameTime() + pPartialTicks) / 20f;
     }
 
+    public static void injectShaders() {
+        ShaderInjection.registerVSHInjection("rendertype_solid", PostProcessing::BloomMRTVSHInjection);
+        ShaderInjection.registerVSHInjection("rendertype_cutout", PostProcessing::BloomMRTVSHInjection);
+        ShaderInjection.registerVSHInjection("rendertype_cutout_mipped", PostProcessing::BloomMRTVSHInjection);
+
+        ShaderInjection.registerFSHInjection("rendertype_solid", PostProcessing::BloomMRTFSHInjection);
+        ShaderInjection.registerFSHInjection("rendertype_cutout", PostProcessing::BloomMRTFSHInjection);
+        ShaderInjection.registerFSHInjection("rendertype_cutout_mipped", PostProcessing::BloomMRTFSHInjection);
+    }
+
+    private static String BloomMRTVSHInjection(String s) {
+        s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), """                        
+                        out float isBloom;
+                        """).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
+                        isBloom = UV2.x;
+                        """).toString();
+        return s;
+    }
+
+    private static String BloomMRTFSHInjection(String s) {
+        s = new StringBuffer(s).insert(s.lastIndexOf("out vec4 fragColor"), """
+                        in float isBloom;
+                        """).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), """
+                        out vec4 bloomColor;
+                        """).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
+                    if (isBloom > 255.) {
+                        bloomColor = fragColor;
+                    } else {
+                        bloomColor = vec4(0.);
+                    }
+                """).toString();
+        return s;
+    }
+
     public CopyDepthTarget getPostTarget() {
         if (postTarget == null) {
             postTarget = new CopyDepthTarget(mc.getMainRenderTarget(), Minecraft.ON_OSX);
@@ -113,9 +153,8 @@ public class PostProcessing implements ResourceManagerReloadListener {
         PostChain postChain = getPostChain();
         if (postChain != null) {
             RenderTarget mainTarget = mc.getMainRenderTarget();
-            CopyDepthTarget postTarget = getPostTarget();
-            renderPost(postChain, postTarget, mainTarget);
-            postTarget.clear(Minecraft.ON_OSX);
+            renderPost(postChain, new MRTTarget((IMainTarget) mainTarget), mainTarget);
+            ((IMainTarget) mainTarget).clearBloomTexture(Minecraft.ON_OSX);
             mainTarget.bindWrite(false);
         }
     }

@@ -1,6 +1,5 @@
 package com.lowdragmc.shimmer.client.postprocessing;
 
-import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.Util;
@@ -31,7 +30,7 @@ public class PostMultiBufferSource extends MultiBufferSource.BufferSource {
             map.put(Sheets.solidBlockSheet(), fixedBufferPack.builder(RenderType.solid()));
             map.put(Sheets.cutoutBlockSheet(), fixedBufferPack.builder(RenderType.cutout()));
             map.put(Sheets.bannerSheet(), fixedBufferPack.builder(RenderType.cutoutMipped()));
-            map.put(ShimmerRenderTypes.bloom(), fixedBufferPack.builder(ShimmerRenderTypes.bloom()));
+//            map.put(ShimmerRenderTypes.bloom(), fixedBufferPack.builder(ShimmerRenderTypes.bloom()));
             map.put(Sheets.translucentCullBlockSheet(), fixedBufferPack.builder(RenderType.translucent()));
             put(map, Sheets.shieldSheet());
             put(map, Sheets.bedSheet());

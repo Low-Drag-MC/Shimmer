@@ -48,7 +48,7 @@ public abstract class ProgramMixin {
             }
         } else {
             if (ShaderInjection.hasInjectFSH(shaderName)) {
-                String newShader = ShaderInjection.injectVSH(shaderName, shader);
+                String newShader = ShaderInjection.injectFSH(shaderName, shader);
                 GlStateManager.glShaderSource(id, pPreprocessor.process(newShader));
                 GlStateManager.glCompileShader(id);
                 if (GlStateManager.glGetShaderi(id, 35713) == 0) {
