@@ -40,8 +40,6 @@ public abstract class ParticleEngineMixin implements IParticleEngine {
 
     @Shadow @Final private Map<ParticleRenderType, Queue<Particle>> particles;
 
-    @Shadow @Final private TextureManager textureManager;
-
     @Nullable
     public Particle createPostParticle(PostProcessing postProcessing, ParticleOptions pParticleData, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
         Particle particle = makeParticle(pParticleData, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
@@ -63,12 +61,14 @@ public abstract class ParticleEngineMixin implements IParticleEngine {
             postProcessing.getPostTarget().bindWrite(false);
             postProcessing.hasParticle();
         }
+        particlerendertype.begin(bufferBuilder, textureManager);
     }
 
     @Redirect(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/culling/Frustum;)V",
         at = @At(value = "INVOKE",
                 target = "Lnet/minecraft/client/particle/ParticleRenderType;end(Lcom/mojang/blaze3d/vertex/Tesselator;)V"))
     private void injectRenderPost(ParticleRenderType particlerendertype, Tesselator tesselator){
+        particlerendertype.end(tesselator);
         if (particlerendertype instanceof IPostParticleType) {
             Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
         }
