@@ -5,9 +5,12 @@
   "refmap": "shimmer.refmap.json",
   "minVersion": "0.8",
   "client": [
+    "BakedQuadMixin",
     "GameRendererMixin",
     "HumanoidArmorLayerMixin",
     "LevelRendererMixin",
+    "MainTargetMixin",
+    "ModelBlockRendererMixin",
     "ParticleEngineMixin",
     "PostChainMixin",
     "PostPassMixin",
@@ -15,11 +18,9 @@
     "RebuildTaskMixin",
     "RenderChunkMixin",
     "RenderTargetMixin",
-    "RenderTypeMixin",
     "ShaderInstanceMixin"
   ],
   "mixins": [
-    "BlockLightEngineMixin",
-    "MultiLayerModelLoaderMixin"
+    "BlockLightEngineMixin"
   ]
 }
