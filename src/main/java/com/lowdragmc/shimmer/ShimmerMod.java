@@ -4,6 +4,7 @@ import com.lowdragmc.shimmer.client.ClientProxy;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.IExtensionPoint;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkConstants;
@@ -19,4 +20,7 @@ public class ShimmerMod {
         DistExecutor.unsafeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
     }
 
+    public static boolean isRubidiumLoaded() {
+        return ModList.get().isLoaded("rubidium");
+    }
 }

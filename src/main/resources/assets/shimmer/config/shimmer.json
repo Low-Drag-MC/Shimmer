@@ -8,15 +8,5 @@
       "a": 255,
       "radius": 7
     }
-  ],
-  "CustomLayer": [
-    {
-      "block": "minecraft:redstone_wire",
-      "layers": ["bloom"]
-    },
-    {
-      "fluid": "minecraft:lava",
-      "layers": ["bloom"]
-    }
   ]
 }

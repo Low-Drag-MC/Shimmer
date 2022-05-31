@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @implNote HumanoidArmorLayerMixin, used to inject emissive + bloom armor via custom resource pack.
  */
 @Mixin(HumanoidArmorLayer.class)
-public class HumanoidArmorLayerMixin {
+public abstract class HumanoidArmorLayerMixin {
 
     @Inject(method = "renderModel(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IZLnet/minecraft/client/model/Model;FFFLnet/minecraft/resources/ResourceLocation;)V",
             at = @At(value = "RETURN"), remap = false)

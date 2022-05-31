@@ -5,18 +5,19 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lowdragmc.shimmer.Configuration;
+import com.lowdragmc.shimmer.FileUtility;
+import com.lowdragmc.shimmer.ShimmerMod;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.client.shader.ShaderUBO;
-import com.lowdragmc.shimmer.core.IRenderChunk;
 import com.mojang.math.Vector3f;
 import com.mojang.realmsclient.util.JsonUtils;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -30,6 +31,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +72,38 @@ public enum LightManager {
         return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light(IViewRotMat * Position, vertexColor);\n").toString();
     }
 
+    private static String lightShader;
+
+    private static String getLightShader() {
+        if (lightShader == null) {
+            try {
+                lightShader = FileUtility.readInputStream(LightManager.class.getResourceAsStream("/assets/minecraft/shaders/include/shimmer.glsl"));
+                lightShader = lightShader.replace("#version 150", "");
+            } catch (IOException e) {
+                ShimmerMod.LOGGER.error("error while loading shimmer lighting shader");
+                lightShader = "";
+            }
+        }
+        return lightShader;
+    }
+
+    public static String RbVFSHInjection(String s) {
+        s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), getLightShader()).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
+                    v_Color = rb_color_light_uv(position, v_Color, v_LightCoord);
+                """).toString();
+        return s;
+    }
+
+    public void bindRbProgram(int programID) {
+        lightUBO.bindToShader(programID, "Lights");
+        envUBO.bindToShader(programID, "Env");
+    }
+
+    public static void onResourceManagerReload() {
+        lightShader = null;
+    }
+
     public static void injectShaders() {
 
         ShaderInjection.registerVSHInjection("particle", LightManager::PositionInjection);
@@ -97,25 +131,15 @@ public enum LightManager {
         INSTANCE.lights.clear();
     }
 
-    public void renderLevelPre(ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum, float camX, float camY, float camZ) {
-        int blockLightSize = 0;
-        int left = 2048 - lights.size();
-        buffer.clear();
-        for (LevelRenderer.RenderChunkInfo chunkInfo : renderChunksInFrustum) {
-            if (left <= blockLightSize) {
-                break;
-            }
-            if (chunkInfo.chunk instanceof IRenderChunk) {
-                for (ColorPointLight shimmerLight : ((IRenderChunk) chunkInfo.chunk).getShimmerLights()) {
-                    if (left <= blockLightSize) {
-                        break;
-                    }
-                    shimmerLight.uploadBuffer(buffer);
-                    blockLightSize++;
-                }
-            }
-        }
-        buffer.flip();
+    public int leftLightCount() {
+        return 2048 - lights.size();
+    }
+
+    public FloatBuffer getBuffer() {
+        return buffer;
+    }
+
+    public void renderLevelPre(int blockLightSize, float camX, float camY, float camZ) {
         if (blockLightSize > 0) {
             lightUBO.bufferSubData(getOffset(lights.size()), buffer);
         }
@@ -134,11 +158,11 @@ public enum LightManager {
             // create ubo
             lightUBO = new ShaderUBO();
             lightUBO.createBufferData(size, GL30.GL_STREAM_DRAW); // stream -- modified each frame
-            lightUBO.blockBinding(0);
+            lightUBO.blockBinding(1);
 
             envUBO = new ShaderUBO();
             envUBO.createBufferData(32, GL30.GL_STREAM_DRAW); // stream -- modified each frame
-            envUBO.blockBinding(1);
+            envUBO.blockBinding(2);
         }
         bindProgram("particle");
         bindProgram("rendertype_solid");
@@ -217,7 +241,18 @@ public enum LightManager {
     }
 
     @Nullable
-    public ColorPointLight getBlockStateLight(BlockPos blockpos, BlockState blockstate, FluidState fluidstate) {
+    public ColorPointLight getBlockStateLight(BlockAndTintGetter level, BlockPos blockpos, BlockState blockstate, FluidState fluidstate) {
+        boolean solid = true;
+        for (Direction side : Direction.values()) {
+            BlockPos offset = blockpos.relative(side);
+            if (!level.getBlockState(offset).isSolidRender(level, offset)) {
+                solid = false;
+                break;
+            }
+        }
+        if (solid) {
+            return null;
+        }
         ColorPointLight.Template template = BLOCK_MAP.getOrDefault(blockstate.getBlock(), (s,p) -> null).apply(blockstate,blockpos);
         if (template == null && !fluidstate.isEmpty()){
             template = FLUID_MAP.get(fluidstate.getType());

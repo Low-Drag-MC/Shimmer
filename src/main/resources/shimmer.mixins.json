@@ -21,6 +21,13 @@
     "ShaderInstanceMixin"
   ],
   "mixins": [
-    "BlockLightEngineMixin"
+    "BlockLightEngineMixin",
+    "rubidium.BlockRendererMixin",
+    "rubidium.ChunkRenderRebuildTaskMixin",
+    "rubidium.RenderSectionManagerAccessor",
+    "rubidium.RenderSectionMixin",
+    "rubidium.ShaderChunkRendererMixin",
+    "rubidium.ShaderLoaderMixin",
+    "rubidium.SodiumWorldRendererMixin"
   ]
 }

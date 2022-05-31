@@ -1,7 +1,9 @@
 package com.lowdragmc.shimmer.core.mixins;
 
+import com.lowdragmc.shimmer.client.light.ColorPointLight;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.light.LightManager;
+import com.lowdragmc.shimmer.core.IRenderChunk;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -22,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
+import java.nio.FloatBuffer;
 
 /**
  * @author KilaBash
@@ -79,7 +82,26 @@ public abstract class LevelRendererMixin {
     @Inject(method = "renderLevel", at = @At(value = "HEAD"))
     private void injectRenderLevelPre(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
         Vec3 position = pCamera.getPosition();
-        LightManager.INSTANCE.renderLevelPre(renderChunksInFrustum, (float)position.x,(float) position.y, (float)position.z);
+        int blockLightSize = 0;
+        int left = LightManager.INSTANCE.leftLightCount();
+        FloatBuffer buffer = LightManager.INSTANCE.getBuffer();
+        buffer.clear();
+        for (LevelRenderer.RenderChunkInfo chunkInfo : renderChunksInFrustum) {
+            if (left <= blockLightSize) {
+                break;
+            }
+            if (chunkInfo.chunk instanceof IRenderChunk) {
+                for (ColorPointLight shimmerLight : ((IRenderChunk) chunkInfo.chunk).getShimmerLights()) {
+                    if (left <= blockLightSize) {
+                        break;
+                    }
+                    shimmerLight.uploadBuffer(buffer);
+                    blockLightSize++;
+                }
+            }
+        }
+        buffer.flip();
+        LightManager.INSTANCE.renderLevelPre(blockLightSize, (float)position.x,(float) position.y, (float)position.z);
     }
 
     @Inject(method = "renderLevel", at = @At(value = "RETURN"))
