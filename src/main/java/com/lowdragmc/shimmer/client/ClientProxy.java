@@ -51,6 +51,7 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
     @Override
     public void onResourceManagerReload(@NotNull ResourceManager resourceManager) {
         ShimmerMetadataSection.onResourceManagerReload();
+        LightManager.onResourceManagerReload();
         for (PostProcessing postProcessing : PostProcessing.values()) {
             postProcessing.onResourceManagerReload(resourceManager);
         }

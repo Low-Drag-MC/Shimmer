@@ -84,7 +84,7 @@ public class ColorPointLight {
         return new float[]{r,g,b,a,x,y,z,radius};
     }
 
-    protected void uploadBuffer(FloatBuffer buffer) {
+    public void uploadBuffer(FloatBuffer buffer) {
         buffer.put(getData());
     }
 

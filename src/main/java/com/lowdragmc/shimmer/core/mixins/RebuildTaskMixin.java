@@ -28,7 +28,7 @@ import java.util.Set;
  */
 @Mixin(targets = {"net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$RenderChunk$RebuildTask"})
 public abstract class RebuildTaskMixin {
-    @Shadow @Final ChunkRenderDispatcher.RenderChunk this$1;
+    @Shadow(aliases = {"this$1", "f_112859_"}) @Final ChunkRenderDispatcher.RenderChunk this$1;
     ImmutableList.Builder<ColorPointLight> lights;
 
     @Redirect(method = "compile",
@@ -39,7 +39,7 @@ public abstract class RebuildTaskMixin {
         BlockState blockstate = instance.getBlockState(pPos);
         FluidState fluidstate = blockstate.getFluidState();
         if (LightManager.INSTANCE.isBlockHasLight(blockstate.getBlock(), fluidstate)) {
-            ColorPointLight light = LightManager.INSTANCE.getBlockStateLight(pPos, blockstate, fluidstate);
+            ColorPointLight light = LightManager.INSTANCE.getBlockStateLight(instance, pPos, blockstate, fluidstate);
             if (light != null) {
                 lights.add(light);
             }

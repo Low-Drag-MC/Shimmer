@@ -127,6 +127,20 @@ public class PostProcessing implements ResourceManagerReloadListener {
         return s;
     }
 
+    public static String RbBloomMRTFSHInjection(String s) {
+        s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), """
+                        out vec4 bloomColor;
+                        """).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
+                    if (v_LightCoord.x > .97) {
+                        bloomColor = fragColor;
+                    } else {
+                        bloomColor = vec4(0.);
+                    }
+                """).toString();
+        return s;
+    }
+
     public CopyDepthTarget getPostTarget() {
         if (postTarget == null) {
             postTarget = new CopyDepthTarget(mc.getMainRenderTarget(), Minecraft.ON_OSX);

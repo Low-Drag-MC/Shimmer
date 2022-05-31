@@ -21,11 +21,7 @@ public abstract class BakedQuadMixin implements IBakedQuad {
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
     private void injectResize(int[] pVertices, int pTintIndex, Direction pDirection, TextureAtlasSprite pSprite, boolean pShade, CallbackInfo ci) {
-        if ((pTintIndex == -10 || ShimmerMetadataSection.isBloom(pSprite))) {
-            bloom = true;
-        } else {
-            bloom = false;
-        }
+        bloom = pTintIndex < -100 || ShimmerMetadataSection.isBloom(pSprite);
     }
 
     @Override
