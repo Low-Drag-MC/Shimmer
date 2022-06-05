@@ -1,0 +1,61 @@
+name: Bug Report
+description: Report an issue with supported versions of Shimmer
+labels: ["bug"]
+body:
+  - type: markdown
+    id: md-description
+    attributes:
+      value: "Please enter the following contents"
+  - type: input
+    id: mc-version
+    attributes:
+      label: Minecraft Version
+      placeholder: eg. 1.18.2
+    validations:
+      required: true
+  - type: input
+    id: mod-version
+    attributes:
+      label: Shimmer version
+      placeholder: eg. Shimmer-1.18.2-0.4
+    validations:
+      required: true
+  - type: input
+    id: modList
+    attributes:
+      label: Modpack info or mod list
+      description: |
+        If playing a modpack, post the link to it!
+        if not , use a paste site such as [gist](https://gist.github.com/) / [pastebin](https://pastebin.com/) / etc."
+        to list all the mods you use
+  - type: input
+    id: log-file
+    attributes:
+      label: "The latest.log file"
+      description: "Please use a paste site such as [gist](https://gist.github.com/) / [pastebin](https://pastebin.com/) / etc."
+    validations:
+      required: true
+  - type: textarea
+    id: rendering-related-mod
+    attributes:
+      label:  optifine , Rubidium , flywheel or any rendering related mods. mod versrion is required.
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue description
+      placeholder: A description of the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. First step
+        2. Second step
+        3. etc...
+  - type: textarea
+    id: other-information
+    attributes:
+      label: Other information
+      description: Any other relevant information that is related to this issue, such as other mods and their versions.
