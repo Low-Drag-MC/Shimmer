@@ -11,7 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 

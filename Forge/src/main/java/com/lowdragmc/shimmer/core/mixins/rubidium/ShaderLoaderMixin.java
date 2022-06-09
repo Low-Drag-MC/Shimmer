@@ -2,11 +2,7 @@ package com.lowdragmc.shimmer.core.mixins.rubidium;
 
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
-import me.jellysquid.mods.sodium.client.gl.shader.GlShader;
-import me.jellysquid.mods.sodium.client.gl.shader.ShaderConstants;
-import me.jellysquid.mods.sodium.client.gl.shader.ShaderLoader;
-import me.jellysquid.mods.sodium.client.gl.shader.ShaderParser;
-import me.jellysquid.mods.sodium.client.gl.shader.ShaderType;
+import me.jellysquid.mods.sodium.client.gl.shader.*;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

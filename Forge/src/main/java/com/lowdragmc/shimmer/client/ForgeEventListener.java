@@ -1,7 +1,6 @@
 package com.lowdragmc.shimmer.client;
 
 import com.lowdragmc.shimmer.ShimmerConstants;
-import com.lowdragmc.shimmer.ShimmerMod;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import net.minecraft.client.Minecraft;

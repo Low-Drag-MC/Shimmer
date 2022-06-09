@@ -7,7 +7,6 @@ import com.lowdragmc.shimmer.core.IParticleEngine;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
-import me.jellysquid.mods.sodium.client.util.frustum.Frustum;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;

@@ -1,8 +1,8 @@
 package com.lowdragmc.shimmer.core.mixins;
 
 import com.lowdragmc.shimmer.client.light.ColorPointLight;
-import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.light.LightManager;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.core.IRenderChunk;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;

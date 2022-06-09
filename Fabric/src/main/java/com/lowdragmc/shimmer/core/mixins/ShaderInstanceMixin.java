@@ -2,9 +2,7 @@ package com.lowdragmc.shimmer.core.mixins;
 
 import com.google.gson.JsonObject;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.server.packs.resources.ResourceProvider;
 import net.minecraft.util.GsonHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
