@@ -2,6 +2,10 @@ package com.lowdragmc.shimmer.platform.services;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 
+/**
+ * @author HypherionSA
+ * @date 2022/06/09
+ */
 public interface IPlatformHelper {
 
     /**

@@ -5,6 +5,10 @@ import com.lowdragmc.shimmer.platform.services.IPlatformHelper;
 
 import java.util.ServiceLoader;
 
+/**
+ * @author HypherionSA
+ * @date 2022/06/09
+ */
 public class Services {
 
     public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);

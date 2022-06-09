@@ -6,6 +6,10 @@ import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 
+/**
+ * @author HypherionSA
+ * @date 2022/06/09
+ */
 public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override

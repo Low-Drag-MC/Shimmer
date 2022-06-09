@@ -1,8 +1,8 @@
 package com.lowdragmc.shimmer.core.mixins;
 
 import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
-import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.light.LightManager;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.datafixers.util.Pair;
@@ -15,9 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -44,7 +42,7 @@ public abstract class GameRendererMixin {
     }
 
     /* Replacement for RegisterShadersEvent, as fabric has no equivalent event  */
-    @Inject(method = "reloadShaders", at = @At("RETURN"))
+    @Inject(method = "reloadShaders", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;shutdownShaders()V", shift = At.Shift.AFTER))
     private void reloadShaders(ResourceManager resourceManager, CallbackInfo ci) {
         if (Services.PLATFORM.getPlatformName().equalsIgnoreCase("fabric")) {
             Pair<ShaderInstance, Consumer<ShaderInstance>> blitShader = RenderUtils.registerShaders(resourceManager);

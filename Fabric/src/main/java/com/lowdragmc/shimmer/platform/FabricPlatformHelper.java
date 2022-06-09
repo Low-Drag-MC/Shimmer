@@ -4,6 +4,10 @@ import com.lowdragmc.shimmer.platform.services.IPlatformHelper;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.fabricmc.loader.api.FabricLoader;
 
+/**
+ * @author HypherionSA
+ * @date 2022/06/09
+ */
 public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override

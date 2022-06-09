@@ -61,10 +61,8 @@ public class RenderUtils {
 
     public static Pair<ShaderInstance, Consumer<ShaderInstance>> registerShaders(ResourceManager resourceManager) {
         try {
-            System.out.println("Registering BLIT shader");
             return Pair.of(new ShaderInstance(resourceManager, new ResourceLocation(ShimmerConstants.MOD_ID, "fast_blit").toString(), DefaultVertexFormat.POSITION), shaderInstance -> {
                 blitShader = shaderInstance;
-                System.out.println("SHADAA: " + blitShader.getName());
             });
         } catch (IOException e) {
             throw new RuntimeException(e);
