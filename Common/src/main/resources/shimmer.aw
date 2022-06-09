@@ -1,0 +1,9 @@
+accessWidener v1 named
+
+accessible class com/mojang/blaze3d/pipeline/MainTarget$Dimension
+accessible class net/minecraft/client/renderer/LevelRenderer$RenderChunkInfo
+
+accessible method net/minecraft/client/renderer/RenderType create (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
+
+accessible field net/minecraft/client/renderer/LevelRenderer$RenderChunkInfo chunk Lnet/minecraft/client/renderer/chunk/ChunkRenderDispatcher$RenderChunk;
+accessible field com/mojang/blaze3d/vertex/PoseStack poseStack Ljava/util/Deque;
