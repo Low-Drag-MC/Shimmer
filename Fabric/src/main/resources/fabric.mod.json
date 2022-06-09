@@ -1,0 +1,43 @@
+{
+    "schemaVersion": 1,
+    "id": "shimmer",
+    "version": "${version}",
+
+    "name": "Shimmer",
+    "description": "Shimemr",
+    "authors": [
+      "KillaBash",
+      "HypherionSA"
+    ],
+    "contact": {
+      "homepage": "https://fabricmc.net/",
+      "sources": "https://github.com/FabricMC/fabric-example-mod"
+    },
+
+    "license": "MIT",
+    "icon": "assets/modid/icon.png",
+
+    "environment": "*",
+    "entrypoints": {
+      "main": [
+        "com.lowdragmc.shimmer.ShimmerMod"
+      ],
+      "client": [
+        "com.lowdragmc.shimmer.client.ShimmerModClient"
+      ]
+    },
+    "mixins": [
+      "shimmer.mixins.json",
+      "shimmer.fabric.mixins.json"
+    ],
+    "accessWidener": "shimmer.aw",
+    "depends": {
+      "fabricloader": ">=0.13.3",
+      "fabric": "*",
+      "minecraft": "1.18.x",
+      "java": ">=17"
+    },
+    "suggests": {
+      "another-mod": "*"
+    }
+  }

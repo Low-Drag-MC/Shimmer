@@ -1,0 +1,28 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.lowdragmc.shimmer.core.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "plugin": "com.lowdragmc.shimmer.core.mixins.ShimmerMixinPlugin",
+  "client": [
+    "BakedQuadMixin",
+    "GameRendererMixin",
+    "HumanoidArmorLayerMixin",
+    "LevelRendererMixin",
+    "MainTargetMixin",
+    "ModelBlockRendererMixin",
+    "PostChainMixin",
+    "PostPassMixin",
+    "ProgramMixin",
+    "RebuildTaskMixin",
+    "RenderChunkMixin",
+    "RenderTargetMixin"
+  ],
+  "mixins": [
+    "BlockLightEngineMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "${refmap_target}refmap.json"
+}
