@@ -1,10 +1,13 @@
 package com.lowdragmc.shimmer.platform;
 
+import com.lowdragmc.shimmer.ForgeShimmerConfig;
 import com.lowdragmc.shimmer.platform.services.IPlatformHelper;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import net.minecraft.util.Mth;
 import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
+import org.lwjgl.opengl.GL31;
 
 /**
  * @author HypherionSA
@@ -40,5 +43,19 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public void enableStencil(RenderTarget renderTarget) {
         renderTarget.enableStencil();
+    }
+
+    @Override
+    public int getUniformBufferObjectOffset() {
+        int configValue = ForgeShimmerConfig.UBO_OFFSET.get();
+        if (configValue == -1) {
+            if (ModList.get().isLoaded("modernui")) {
+                return 6;
+            } else {
+                return 0;
+            }
+        } else {
+            return Mth.clamp(configValue, 0, GL31.glGetInteger(GL31.GL_MAX_UNIFORM_BUFFER_BINDINGS));
+        }
     }
 }

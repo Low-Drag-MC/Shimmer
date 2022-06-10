@@ -79,12 +79,39 @@ minecraft {
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
+repositories {
+    maven {
+        name 'IzzelAliz Maven'
+        url 'https://maven.izzel.io/releases/'
+    }
+}
+
+configurations {
+    library
+    implementation.extendsFrom library
+}
+
+configurations {
+    runtimeLibrary
+    implementation.extendsFrom runtimeLibrary
+}
+
+minecraft.runs.all {
+    lazyToken('minecraft_classpath') {
+        configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+        configurations.runtimeLibrary.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+    }
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly project(":Common")
 
     // Rubidium
     compileOnly fg.deobf("curse.maven:rubidium-574856:3749094")
+    //Modern UI
+    runtimeLibrary "icyllis.modernui:ModernUI-Core:3.4.4.103"
+    runtimeOnly fg.deobf("icyllis.modernui:ModernUI-Forge:${minecraft_version}-3.4.4.103")
 
     if (System.getProperty('idea.sync.active') != 'true') {
         annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'

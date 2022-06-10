@@ -39,4 +39,9 @@ public class FabricPlatformHelper implements IPlatformHelper {
     public void enableStencil(RenderTarget renderTarget) {
         /* Unused on Fabric */
     }
+
+    @Override
+    public int getUniformBufferObjectOffset() {
+        return 0;
+    }
 }

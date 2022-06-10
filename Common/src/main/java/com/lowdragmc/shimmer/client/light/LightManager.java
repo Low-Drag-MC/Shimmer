@@ -9,6 +9,7 @@ import com.lowdragmc.shimmer.FileUtility;
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.client.shader.ShaderUBO;
+import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.math.Vector3f;
 import com.mojang.realmsclient.util.JsonUtils;
 import net.minecraft.client.Minecraft;
@@ -153,13 +154,14 @@ public enum LightManager {
         if (lightUBO == null) {
             int size = getOffset(2048);
             // create ubo
+            int uboOffset = Services.PLATFORM.getUniformBufferObjectOffset();
             lightUBO = new ShaderUBO();
             lightUBO.createBufferData(size, GL30.GL_STREAM_DRAW); // stream -- modified each frame
-            lightUBO.blockBinding(1);
+            lightUBO.blockBinding(uboOffset);
 
             envUBO = new ShaderUBO();
             envUBO.createBufferData(32, GL30.GL_STREAM_DRAW); // stream -- modified each frame
-            envUBO.blockBinding(2);
+            envUBO.blockBinding(uboOffset+1);
         }
         bindProgram("particle");
         bindProgram("rendertype_solid");

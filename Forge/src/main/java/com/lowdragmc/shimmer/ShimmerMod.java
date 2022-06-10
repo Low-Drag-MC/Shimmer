@@ -16,6 +16,7 @@ public class ShimmerMod {
     public ShimmerMod() {
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
         DistExecutor.unsafeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+        ForgeShimmerConfig.registerConfig();
     }
 
     public static boolean isRubidiumLoaded() {
