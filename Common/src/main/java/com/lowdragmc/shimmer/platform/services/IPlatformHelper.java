@@ -43,4 +43,6 @@ public interface IPlatformHelper {
     boolean useCombinedDepthStencilAttachment();
 
     void enableStencil(RenderTarget renderTarget);
+
+    int getUniformBufferObjectOffset();
 }
