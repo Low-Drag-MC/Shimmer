@@ -15,5 +15,7 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "MutableQuadViewImplMixin",
+    "QuadViewImplMixin"
   ]
 }
