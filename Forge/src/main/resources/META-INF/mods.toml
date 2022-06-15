@@ -1,14 +1,14 @@
 modLoader="javafml"
 loaderVersion="[40,)"
 license="MIT"
-#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
+issueTrackerURL="https://github.com/Low-Drag-MC/Shimmer/issues"
 
 [[mods]]
 modId="shimmer"
 version="${file.jarVersion}"
 displayName="Shimmer"
 #displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
-logoFile="multiloader.png"
+logoFile="assets/shimmer/icon.png"
 credits="zomb_676"
 authors="KilaBash"
 description='''

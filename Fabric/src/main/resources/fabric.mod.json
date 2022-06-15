@@ -10,12 +10,11 @@
       "HypherionSA"
     ],
     "contact": {
-      "homepage": "https://fabricmc.net/",
-      "sources": "https://github.com/FabricMC/fabric-example-mod"
+      "sources": "https://github.com/Low-Drag-MC/Shimmer/"
     },
 
     "license": "MIT",
-    "icon": "assets/modid/icon.png",
+    "icon": "assets/shimmer/icon.png",
 
     "environment": "*",
     "entrypoints": {
@@ -36,8 +35,5 @@
       "fabric": "*",
       "minecraft": "1.18.x",
       "java": ">=17"
-    },
-    "suggests": {
-      "another-mod": "*"
     }
   }
