@@ -1,0 +1,30 @@
+modLoader="javafml"
+loaderVersion="[40,)"
+license="MIT"
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
+
+[[mods]]
+modId="shimmer"
+version="${file.jarVersion}"
+displayName="Shimmer"
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
+logoFile="multiloader.png"
+credits="zomb_676"
+authors="KilaBash"
+description='''
+Shimemr
+'''
+
+[[dependencies.shimmer]]
+    modId="forge"
+    mandatory=true
+    versionRange="[40,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.shimmer]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.18.2,1.19)"
+    ordering="NONE"
+    side="BOTH"
