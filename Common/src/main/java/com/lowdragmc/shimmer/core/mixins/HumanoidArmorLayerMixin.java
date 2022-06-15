@@ -28,7 +28,7 @@ public abstract class HumanoidArmorLayerMixin {
     @Shadow protected abstract ResourceLocation getArmorLocation(ArmorItem armorItem, boolean bl, String string);
 
     @Inject(method = "renderModel",
-            at = @At(value = "RETURN"), remap = false)
+            at = @At(value = "RETURN"))
     private void injectRenderModel(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, ArmorItem armorItem, boolean hasFoil, HumanoidModel model, boolean $$6, float r, float g, float b, String resourceLocation, CallbackInfo ci) {
         ResourceLocation armorResource = this.getArmorLocation(armorItem, hasFoil, resourceLocation);
         ResourceLocation bloomResource = new ResourceLocation(armorResource.getNamespace(), armorResource.getPath().replace(".png", "_bloom.png"));
