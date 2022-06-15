@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ArmorItem;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(HumanoidArmorLayer.class)
 public abstract class HumanoidArmorLayerMixin {
 
-    @Shadow protected abstract ResourceLocation getArmorLocation(ArmorItem armorItem, boolean bl, @Nullable String string);
+    @Shadow protected abstract ResourceLocation getArmorLocation(ArmorItem armorItem, boolean bl, String string);
 
     @Inject(method = "renderModel",
             at = @At(value = "RETURN"), remap = false)
