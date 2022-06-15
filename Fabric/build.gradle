@@ -12,8 +12,14 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation project(":Common")
-
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+
+    // Sodium
+    modImplementation ("curse.maven:sodium-394468:3669187") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    // This is a dependency of Sodium....
+    implementation 'org.joml:joml:1.10.4'
 }
 
 loom {

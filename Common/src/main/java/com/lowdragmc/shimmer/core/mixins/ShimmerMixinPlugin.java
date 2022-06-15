@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * @author HypherionSA
  * @date 2022/06/07
- * Added to stop Rubidium mixins from trying to load if the mod is not installed. Prevents log spam of Mixin Errors
+ * Added to stop Rubidium & Sodium mixins from trying to load if the mod is not installed. Prevents log spam of Mixin Errors
  */
 public class ShimmerMixinPlugin implements IMixinConfigPlugin {
 
@@ -29,6 +29,9 @@ public class ShimmerMixinPlugin implements IMixinConfigPlugin {
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains("com.lowdragmc.shimmer.core.mixins.rubidium")) {
             return Services.PLATFORM.isModLoaded("rubidium");
+        }
+        if (mixinClassName.contains("com.lowdragmc.shimmer.core.mixins.sodium")) {
+            return Services.PLATFORM.isModLoaded("sodium");
         }
         return true;
     }

@@ -16,6 +16,13 @@
   },
   "mixins": [
     "MutableQuadViewImplMixin",
-    "QuadViewImplMixin"
+    "QuadViewImplMixin",
+    "sodium.BlockRendererMixin",
+    "sodium.ChunkRenderRebuildTaskMixin",
+    "sodium.RenderSectionManagerAccessor",
+    "sodium.RenderSectionMixin",
+    "sodium.ShaderChunkRendererMixin",
+    "sodium.ShaderLoaderMixin",
+    "sodium.SodiumWorldRendererMixin"
   ]
 }
