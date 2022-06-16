@@ -48,14 +48,10 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public int getUniformBufferObjectOffset() {
         int configValue = ForgeShimmerConfig.UBO_OFFSET.get();
-        if (configValue == -1) {
-            if (ModList.get().isLoaded("modernui")) {
-                return 6;
-            } else {
-                return 0;
-            }
+        if (configValue < 0) {
+            return -1;
         } else {
-            return Mth.clamp(configValue, 0, GL31.glGetInteger(GL31.GL_MAX_UNIFORM_BUFFER_BINDINGS));
+            return Mth.clamp(configValue, 0, GL31.glGetInteger(GL31.GL_MAX_UNIFORM_BUFFER_BINDINGS) - 1);
         }
     }
 }

@@ -144,6 +144,11 @@ public enum LightManager {
 
         envUBO.bufferSubData(0, new int[]{lights.size() + blockLightSize});
         envUBO.bufferSubData(16, new float[]{camX, camY, camZ});
+
+        if (Services.PLATFORM.getUniformBufferObjectOffset() == -1) {
+            lightUBO.blockBinding(1);
+            envUBO.blockBinding(2);
+        }
     }
 
     public void renderLevelPost() {
@@ -157,11 +162,14 @@ public enum LightManager {
             int uboOffset = Services.PLATFORM.getUniformBufferObjectOffset();
             lightUBO = new ShaderUBO();
             lightUBO.createBufferData(size, GL30.GL_STREAM_DRAW); // stream -- modified each frame
-            lightUBO.blockBinding(uboOffset);
 
             envUBO = new ShaderUBO();
             envUBO.createBufferData(32, GL30.GL_STREAM_DRAW); // stream -- modified each frame
-            envUBO.blockBinding(uboOffset+1);
+
+            if (uboOffset > -1) {
+                lightUBO.blockBinding(uboOffset);
+                envUBO.blockBinding(uboOffset+1);
+            }
         }
         bindProgram("particle");
         bindProgram("rendertype_solid");
@@ -286,23 +294,23 @@ public enum LightManager {
             for (JsonElement block : blocks) {
                 JsonObject jsonObj = block.getAsJsonObject();
                 if (jsonObj.has("block")) {
-                    Block bb = Registry.BLOCK.get(new ResourceLocation(jsonObj.get("block").getAsString()));
+                    ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
+                    if (!Registry.BLOCK.containsKey(location)) continue;
+                    Block bb = Registry.BLOCK.get(location);
                     int a = JsonUtils.getIntOr("a", jsonObj, 0);
                     int r = JsonUtils.getIntOr("r", jsonObj, 0);
                     int g = JsonUtils.getIntOr("g", jsonObj, 0);
                     int b = JsonUtils.getIntOr("b", jsonObj, 0);
-                    if (bb != null) {
-                        registerBlockLight(bb, (a << 24) | (r << 16) | (g << 8) | b, jsonObj.get("radius").getAsFloat());
-                    }
+                    registerBlockLight(bb, (a << 24) | (r << 16) | (g << 8) | b, jsonObj.get("radius").getAsFloat());
                 } else if (jsonObj.has("fluid")) {
-                    Fluid ff = Registry.FLUID.get(new ResourceLocation(jsonObj.get("fluid").getAsString()));
+                    ResourceLocation location = new ResourceLocation(jsonObj.get("fluid").getAsString());
+                    if (!Registry.FLUID.containsKey(location)) continue;
+                    Fluid ff = Registry.FLUID.get(location);
                     int a = JsonUtils.getIntOr("a", jsonObj, 0);
                     int r = JsonUtils.getIntOr("r", jsonObj, 0);
                     int g = JsonUtils.getIntOr("g", jsonObj, 0);
                     int b = JsonUtils.getIntOr("b", jsonObj, 0);
-                    if (ff != null) {
-                        registerFluidLight(ff, (a << 24) | (r << 16) | (g << 8) | b, jsonObj.get("radius").getAsFloat());
-                    }
+                    registerFluidLight(ff, (a << 24) | (r << 16) | (g << 8) | b, jsonObj.get("radius").getAsFloat());
                 }
             }
         }
