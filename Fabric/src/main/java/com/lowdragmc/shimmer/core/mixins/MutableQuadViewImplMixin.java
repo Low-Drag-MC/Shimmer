@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MutableQuadViewImplMixin {
 
     @Inject(method = "fromVanilla(Lnet/minecraft/client/renderer/block/model/BakedQuad;Lnet/fabricmc/fabric/api/renderer/v1/material/RenderMaterial;Lnet/minecraft/core/Direction;)Lnet/fabricmc/fabric/impl/client/indigo/renderer/mesh/MutableQuadViewImpl;",
-            at = @At(value = "HEAD"), remap = false)
+            at = @At(value = "HEAD"))
     private void injectBaked(BakedQuad quad, RenderMaterial material, Direction cullFace, CallbackInfoReturnable<MutableQuadViewImpl> cir) {
         ((IQuadViewImpl) this).setBloom(((IBakedQuad)quad).isBloom());
     }
