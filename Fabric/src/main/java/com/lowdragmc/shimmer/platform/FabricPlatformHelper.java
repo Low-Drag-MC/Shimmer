@@ -42,6 +42,6 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public int getUniformBufferObjectOffset() {
-        return 0;
+        return 1;
     }
 }
