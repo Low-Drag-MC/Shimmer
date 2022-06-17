@@ -44,4 +44,9 @@ public class FabricPlatformHelper implements IPlatformHelper {
     public int getUniformBufferObjectOffset() {
         return 1;
     }
+
+    @Override
+    public boolean useBlockBloom() {
+        return true;
+    }
 }

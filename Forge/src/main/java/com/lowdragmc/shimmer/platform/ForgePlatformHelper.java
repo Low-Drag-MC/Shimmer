@@ -58,4 +58,9 @@ public class ForgePlatformHelper implements IPlatformHelper {
             return Mth.clamp(configValue, 0, GL31.glGetInteger(GL31.GL_MAX_UNIFORM_BUFFER_BINDINGS) - 1);
         }
     }
+
+    @Override
+    public boolean useBlockBloom() {
+        return ForgeShimmerConfig.BLOCK_BLOOM.get();
+    }
 }

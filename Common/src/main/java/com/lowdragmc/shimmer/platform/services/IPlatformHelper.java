@@ -45,4 +45,6 @@ public interface IPlatformHelper {
     void enableStencil(RenderTarget renderTarget);
 
     int getUniformBufferObjectOffset();
+
+    boolean useBlockBloom();
 }

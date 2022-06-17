@@ -2,6 +2,7 @@ package com.lowdragmc.shimmer.client.postprocessing;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.rendertarget.CopyDepthTarget;
 import com.lowdragmc.shimmer.client.rendertarget.MRTTarget;
@@ -10,6 +11,7 @@ import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.core.IMainTarget;
 import com.lowdragmc.shimmer.core.IParticleEngine;
+import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
@@ -162,7 +164,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
     public void renderBlockPost() {
         PostChain postChain = getPostChain();
-        if (postChain != null) {
+        if (postChain != null && Services.PLATFORM.useBlockBloom()) {
             RenderTarget mainTarget = mc.getMainRenderTarget();
             renderPost(postChain, new MRTTarget((IMainTarget) mainTarget), mainTarget);
             ((IMainTarget) mainTarget).clearBloomTexture(Minecraft.ON_OSX);
