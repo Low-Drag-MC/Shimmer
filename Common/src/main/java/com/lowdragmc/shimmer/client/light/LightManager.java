@@ -144,11 +144,6 @@ public enum LightManager {
 
         envUBO.bufferSubData(0, new int[]{lights.size() + blockLightSize});
         envUBO.bufferSubData(16, new float[]{camX, camY, camZ});
-
-        if (Services.PLATFORM.getUniformBufferObjectOffset() == -1) {
-            lightUBO.blockBinding(1);
-            envUBO.blockBinding(2);
-        }
     }
 
     public void renderLevelPost() {
@@ -160,16 +155,15 @@ public enum LightManager {
             int size = getOffset(2048);
             // create ubo
             int uboOffset = Services.PLATFORM.getUniformBufferObjectOffset();
+
             lightUBO = new ShaderUBO();
             lightUBO.createBufferData(size, GL30.GL_STREAM_DRAW); // stream -- modified each frame
 
             envUBO = new ShaderUBO();
             envUBO.createBufferData(32, GL30.GL_STREAM_DRAW); // stream -- modified each frame
 
-            if (uboOffset > -1) {
-                lightUBO.blockBinding(uboOffset);
-                envUBO.blockBinding(uboOffset+1);
-            }
+            lightUBO.blockBinding(uboOffset);
+            envUBO.blockBinding(uboOffset+1);
         }
         bindProgram("particle");
         bindProgram("rendertype_solid");

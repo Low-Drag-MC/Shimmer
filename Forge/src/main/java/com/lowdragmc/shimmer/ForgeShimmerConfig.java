@@ -8,18 +8,9 @@ public class ForgeShimmerConfig {
     public static ForgeConfigSpec.IntValue UBO_OFFSET;
 
     public static void registerConfig(){
-        ForgeConfigSpec.Builder commonBuilder = new ForgeConfigSpec.Builder();
-        registerCommonConfig(commonBuilder);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON,commonBuilder.build());
         ForgeConfigSpec.Builder clientBuilder = new ForgeConfigSpec.Builder();
         registerClientConfig(clientBuilder);
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT,clientBuilder.build());
-        ForgeConfigSpec.Builder serverBuilder = new ForgeConfigSpec.Builder();
-        registerServerConfig(serverBuilder);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER,serverBuilder.build());
-    }
-
-    private static void registerCommonConfig(ForgeConfigSpec.Builder builder){
     }
 
     private static void registerClientConfig(ForgeConfigSpec.Builder builder){
@@ -30,6 +21,4 @@ public class ForgeShimmerConfig {
                 .defineInRange("UBO offset",-1,-1,128);
     }
 
-    private static void registerServerConfig(ForgeConfigSpec.Builder builder){
-    }
 }

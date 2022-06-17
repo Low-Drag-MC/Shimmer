@@ -130,6 +130,12 @@ processResources {
     }
 }
 
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveBaseName.set(project.archivesBaseName)
+    archiveVersion.set("${project.version}")
+    archiveClassifier.set('sources')
+}
 
 jar.finalizedBy('reobfJar')
 
@@ -140,6 +146,7 @@ publishing {
             artifactId project.archivesBaseName
             version project.version
             artifact jar
+            artifact sourcesJar
         }
     }
     repositories {
