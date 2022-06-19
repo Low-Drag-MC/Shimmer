@@ -1,9 +1,9 @@
 package com.lowdragmc.shimmer.core.mixins;
 
 import com.lowdragmc.shimmer.client.postprocessing.IPostParticleType;
-import com.lowdragmc.shimmer.client.postprocessing.PostParticle;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.core.IParticleEngine;
+import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -46,7 +46,7 @@ public abstract class ParticleEngineMixin implements IParticleEngine {
     public Particle createPostParticle(PostProcessing postProcessing, ParticleOptions pParticleData, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
         Particle particle = makeParticle(pParticleData, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
         if (particle != null) {
-            particle = new PostParticle(particle, postProcessing);
+            particle = Services.PLATFORM.createPostParticle(particle, postProcessing);
             add(particle);
             return particle;
         } else {

@@ -29,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 public class ClientProxy extends CommonProxy implements ResourceManagerReloadListener {
 
     public ClientProxy() {
-        Configuration.load();
         LightManager.injectShaders();
         PostProcessing.injectShaders();
         // compatible with runData
@@ -54,12 +53,15 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
     public void clientSetup(FMLClientSetupEvent e) {
         e.enqueueWork(() -> {
             ((ReloadableResourceManager)Minecraft.getInstance().getResourceManager()).registerReloadListener(this);
-            LightManager.INSTANCE.loadConfig();
+            onResourceManagerReload(Minecraft.getInstance().getResourceManager());
         });
     }
 
     @Override
     public void onResourceManagerReload(@NotNull ResourceManager resourceManager) {
+        Configuration.load();
+        LightManager.INSTANCE.loadConfig();
+        PostProcessing.loadConfig();
         ShimmerMetadataSection.onResourceManagerReload();
         LightManager.onResourceManagerReload();
         for (PostProcessing postProcessing : PostProcessing.values()) {

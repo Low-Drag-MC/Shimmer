@@ -12,17 +12,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 
+import javax.annotation.Nullable;
+
 import static net.fabricmc.fabric.api.client.command.v1.ClientCommandManager.literal;
 
 /**
  * @author HypherionSA
  * @date 2022/06/09
  */
-public class ShimmerModClient implements ClientModInitializer {
+public class ShimmerModClient implements ClientModInitializer, SimpleSynchronousResourceReloadListener {
 
     @Override
     public void onInitializeClient() {
-        Configuration.load();
         LightManager.injectShaders();
         PostProcessing.injectShaders();
 
@@ -44,24 +45,24 @@ public class ShimmerModClient implements ClientModInitializer {
                             return 1;
                         })));
 
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
-
-            @Override
-            public void onResourceManagerReload(ResourceManager resourceManager) {
-                ShimmerMetadataSection.onResourceManagerReload();
-                LightManager.onResourceManagerReload();
-                for (PostProcessing postProcessing : PostProcessing.values()) {
-                    postProcessing.onResourceManagerReload(resourceManager);
-                }
-            }
-
-            @Override
-            public ResourceLocation getFabricId() {
-                return null;
-            }
-        });
-
-        LightManager.INSTANCE.loadConfig();
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
+        onResourceManagerReload(null);
     }
 
+    @Override
+    public ResourceLocation getFabricId() {
+        return null;
+    }
+
+    @Override
+    public void onResourceManagerReload(@Nullable ResourceManager resourceManager) {
+        Configuration.load();
+        LightManager.INSTANCE.loadConfig();
+        PostProcessing.loadConfig();
+        ShimmerMetadataSection.onResourceManagerReload();
+        LightManager.onResourceManagerReload();
+        for (PostProcessing postProcessing : PostProcessing.values()) {
+            postProcessing.onResourceManagerReload(resourceManager);
+        }
+    }
 }

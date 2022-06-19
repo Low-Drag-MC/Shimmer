@@ -3,6 +3,7 @@ package com.lowdragmc.shimmer.core.mixins.rubidium;
 import com.google.common.collect.ImmutableList;
 import com.lowdragmc.shimmer.client.light.ColorPointLight;
 import com.lowdragmc.shimmer.client.light.LightManager;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.core.IRenderChunk;
 import me.jellysquid.mods.sodium.client.gl.compile.ChunkBuildContext;
 import me.jellysquid.mods.sodium.client.render.chunk.RenderSection;
@@ -46,6 +47,7 @@ public abstract class ChunkRenderRebuildTaskMixin {
                 lights.add(light);
             }
         }
+        PostProcessing.setupBloom(blockstate, fluidstate);
         return blockstate;
     }
 
@@ -63,5 +65,6 @@ public abstract class ChunkRenderRebuildTaskMixin {
         if (this.render instanceof IRenderChunk renderChunk) {
             renderChunk.setShimmerLights(lights.build());
         }
+        PostProcessing.cleanBloom();
     }
 }

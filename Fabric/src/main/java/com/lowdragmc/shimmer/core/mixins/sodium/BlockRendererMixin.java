@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.core.mixins.sodium;
 
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.core.IBakedQuad;
 import me.jellysquid.mods.sodium.client.model.IndexBufferBuilder;
 import me.jellysquid.mods.sodium.client.model.light.LightPipeline;
@@ -32,7 +33,7 @@ import java.util.List;
 public abstract class BlockRendererMixin {
     @Inject(method = "renderQuadList", at = @At(value = "INVOKE", target = "Lme/jellysquid/mods/sodium/client/render/pipeline/BlockRenderer;renderQuad(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;Lme/jellysquid/mods/sodium/client/render/chunk/format/ModelVertexSink;Lme/jellysquid/mods/sodium/client/model/IndexBufferBuilder;Lnet/minecraft/world/phys/Vec3;Lme/jellysquid/mods/sodium/client/model/quad/blender/ColorSampler;Lnet/minecraft/client/renderer/block/model/BakedQuad;Lme/jellysquid/mods/sodium/client/model/light/data/QuadLightData;Lme/jellysquid/mods/sodium/client/render/chunk/compile/buffers/ChunkModelBuilder;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private void injectResize(BlockAndTintGetter world, BlockState state,
+    private void injectRender(BlockAndTintGetter world, BlockState state,
                               BlockPos pos, BlockPos origin,
                               LightPipeline lighter, Vec3 offset,
                               ChunkModelBuilder buffers, List<BakedQuad> quads,
@@ -41,7 +42,7 @@ public abstract class BlockRendererMixin {
                               ModelVertexSink vertices, IndexBufferBuilder indices, int i, int quadsSize,
                               BakedQuad quad,
                               QuadLightData light) {
-        if (quad instanceof IBakedQuad bakedQuad && bakedQuad.isBloom()) {
+        if (((IBakedQuad)quad).isBloom() || PostProcessing.isBlockBloom()) {
             // 0xf000f0 -> 0x1f001f0
             Arrays.fill(light.lm, 0xf200f2);
         }

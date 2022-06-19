@@ -19,6 +19,7 @@
     "QuadViewImplMixin",
     "sodium.BlockRendererMixin",
     "sodium.ChunkRenderRebuildTaskMixin",
+    "sodium.FluidRendererMixin",
     "sodium.RenderSectionManagerAccessor",
     "sodium.RenderSectionMixin",
     "sodium.ShaderChunkRendererMixin",

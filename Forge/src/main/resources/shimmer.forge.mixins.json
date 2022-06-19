@@ -10,6 +10,7 @@
   "mixins": [
     "rubidium.BlockRendererMixin",
     "rubidium.ChunkRenderRebuildTaskMixin",
+    "rubidium.FluidRendererMixin",
     "rubidium.RenderSectionManagerAccessor",
     "rubidium.RenderSectionMixin",
     "rubidium.ShaderChunkRendererMixin",

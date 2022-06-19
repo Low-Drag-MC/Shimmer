@@ -6,13 +6,7 @@ import com.google.gson.stream.JsonReader;
 import org.apache.commons.compress.utils.IOUtils;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
 
 /**
  * @author KilaBash
@@ -48,16 +42,16 @@ public class FileUtility {
 
     public static void extractJarFiles(String resource, File targetPath, boolean replace) {
         try {
-            Path resourcePath = Paths.get(FileUtility.class.getResource(resource).toURI());
-            List<Path> jarFiles =  Files.walk(resourcePath).filter(Files::isRegularFile).toList();
-            for (Path jarFile : jarFiles) {
-                Path genPath = targetPath.toPath().resolve(resourcePath.relativize(jarFile).toString());
-                Files.createDirectories(genPath.getParent());
-                if (replace || !genPath.toFile().isFile()) {
-                    Files.copy(jarFile, genPath, StandardCopyOption.REPLACE_EXISTING);
+            if (!targetPath.exists() || replace) {
+                InputStream inputstream = FileUtility.class.getResourceAsStream(resource);
+                if (inputstream != null) {
+                    String content = readInputStream(inputstream);
+                    Writer fileWriter = new OutputStreamWriter(new FileOutputStream(targetPath), StandardCharsets.UTF_8);
+                    fileWriter.write(content);
+                    fileWriter.close();
                 }
             }
-        } catch (URISyntaxException | IOException ignored) {
+        } catch (Exception ignored) {
         }
     }
 }

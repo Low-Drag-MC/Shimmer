@@ -1,6 +1,11 @@
 package com.lowdragmc.shimmer.platform.services;
 
+import com.lowdragmc.shimmer.client.postprocessing.PostParticle;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import net.minecraft.client.particle.Particle;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * @author HypherionSA
@@ -47,4 +52,13 @@ public interface IPlatformHelper {
     int getUniformBufferObjectOffset();
 
     boolean useBlockBloom();
+
+    @OnlyIn(Dist.CLIENT)
+    default PostParticle createPostParticle(Particle parent, PostProcessing postProcessing) {
+        return new PostParticle(parent, postProcessing);
+    }
+
+    default boolean mrtReverse() {
+        return false;
+    }
 }

@@ -18,7 +18,7 @@ public class Configuration {
         // compatible with runData
         if (Minecraft.getInstance() != null && Minecraft.getInstance().gameDirectory != null) {
             File path = new File(Minecraft.getInstance().gameDirectory, "config/shimmer.json");
-            FileUtility.extractJarFiles(String.format("/assets/%s/%s", ShimmerConstants.MOD_ID, "config"), new File(Minecraft.getInstance().gameDirectory, "config"), false);
+            FileUtility.extractJarFiles(String.format("/assets/%s/%s", ShimmerConstants.MOD_ID, "shimmer.json"), new File(Minecraft.getInstance().gameDirectory, "config/shimmer.json"), false);
             JsonElement jsonElement = FileUtility.loadJson(path);
             if (jsonElement instanceof JsonObject) {
                 config = (JsonObject) jsonElement;

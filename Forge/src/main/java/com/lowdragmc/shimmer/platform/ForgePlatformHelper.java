@@ -1,9 +1,14 @@
 package com.lowdragmc.shimmer.platform;
 
 import com.lowdragmc.shimmer.ForgeShimmerConfig;
+import com.lowdragmc.shimmer.client.postprocessing.PostParticle;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.platform.services.IPlatformHelper;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.util.Mth;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -62,5 +67,22 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public boolean useBlockBloom() {
         return ForgeShimmerConfig.BLOCK_BLOOM.get();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public PostParticle createPostParticle(Particle parent, PostProcessing postProcessing) {
+        return new PostParticle(parent, postProcessing) {
+            @Override
+            public boolean shouldCull() {
+                return parent.shouldCull();
+            }
+        };
+
+    }
+
+    @Override
+    public boolean mrtReverse() {
+        return ForgeShimmerConfig.MRT_REVERSED.get();
     }
 }

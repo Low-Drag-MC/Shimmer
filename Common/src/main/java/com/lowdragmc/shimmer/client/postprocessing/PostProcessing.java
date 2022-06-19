@@ -2,6 +2,9 @@ package com.lowdragmc.shimmer.client.postprocessing;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.rendertarget.CopyDepthTarget;
@@ -14,24 +17,31 @@ import com.lowdragmc.shimmer.core.IParticleEngine;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.realmsclient.util.JsonUtils;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -104,7 +114,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
                         out float isBloom;
                         """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
-                        isBloom = UV2.x;
+                        isBloom = float(UV2.x);
                         """).toString();
         return s;
     }
@@ -116,13 +126,24 @@ public class PostProcessing implements ResourceManagerReloadListener {
         s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), """
                         out vec4 bloomColor;
                         """).toString();
-        s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
+        if (Services.PLATFORM.mrtReverse()) {
+            s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
+                    bloomColor = fragColor;
+                    if (isBloom > 255.) {
+                        fragColor = bloomColor;
+                    } else {
+                        fragColor = vec4(0.);
+                    }
+                """).toString();
+        } else {
+            s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
                     if (isBloom > 255.) {
                         bloomColor = fragColor;
                     } else {
                         bloomColor = vec4(0.);
                     }
                 """).toString();
+        }
         return s;
     }
 
@@ -249,6 +270,13 @@ public class PostProcessing implements ResourceManagerReloadListener {
         }
     }
 
+    public void postParticle(Particle particle) {
+        if (mc.particleEngine instanceof IParticleEngine) {
+            particle = Services.PLATFORM.createPostParticle(particle, this);
+            mc.particleEngine.add(particle);
+        }
+    }
+
     public ParticleRenderType getParticleType(ParticleRenderType renderType) {
         return particleTypeMap.computeIfAbsent(renderType, type -> new IPostParticleType() {
             @Override
@@ -292,5 +320,58 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
     public void hasParticle() {
         hasParticle = true;
+    }
+
+    public static Set<BlockState> BLOOM_BLOCK = new HashSet<>();
+    public static Set<Fluid> BLOOM_FLUID = new HashSet<>();
+    private static final ThreadLocal<Boolean> BLOCK_BLOOM = ThreadLocal.withInitial(()->false);
+    private static final ThreadLocal<Boolean> FLUID_BLOOM = ThreadLocal.withInitial(()->false);
+
+    public static void loadConfig() {
+        JsonElement jsonElement = Configuration.config.get("BloomBlock");
+        if (jsonElement.isJsonArray()) {
+            JsonArray bloomBlocks = jsonElement.getAsJsonArray();
+            for (JsonElement block : bloomBlocks) {
+                JsonObject jsonObj = block.getAsJsonObject();
+                if (jsonObj.has("block")) {
+                    ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
+                    if (!Registry.BLOCK.containsKey(location)) continue;
+                    Block bb = Registry.BLOCK.get(location);
+                    BLOOM_BLOCK.add(bb.defaultBlockState());
+                } else if (jsonObj.has("fluid")) {
+                    ResourceLocation location = new ResourceLocation(jsonObj.get("fluid").getAsString());
+                    if (!Registry.FLUID.containsKey(location)) continue;
+                    Fluid ff = Registry.FLUID.get(location);
+                    BLOOM_FLUID.add(ff);
+                }
+            }
+        }
+    }
+
+    public static boolean isBlockBloom() {
+        return BLOCK_BLOOM.get();
+    }
+
+    public static boolean isFluidBloom() {
+        return FLUID_BLOOM.get();
+    }
+
+    public static void setupBloom(BlockState blockState, FluidState fluidState) {
+        if (BLOOM_BLOCK.contains(blockState)) {
+            BLOCK_BLOOM.set(true);
+        } else {
+            BLOCK_BLOOM.set(false);
+        }
+        Fluid fluid = fluidState.getType();
+        if (BLOOM_FLUID.contains(fluid) || (fluid instanceof FlowingFluid flowingFluid && BLOOM_FLUID.contains(flowingFluid.getSource()))) {
+            FLUID_BLOOM.set(true);
+        } else {
+            FLUID_BLOOM.set(false);
+        }
+    }
+
+    public static void cleanBloom() {
+        BLOCK_BLOOM.set(false);
+        FLUID_BLOOM.set(false);
     }
 }

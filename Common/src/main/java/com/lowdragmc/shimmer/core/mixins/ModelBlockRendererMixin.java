@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.core.mixins;
 
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.core.IBakedQuad;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -18,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class ModelBlockRendererMixin {
     @Redirect(method = "putQuadData", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexConsumer;putBulkData(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;[FFFF[IIZ)V"))
     private void injectResize(VertexConsumer pConsumer, PoseStack.Pose pPose, BakedQuad pQuad, float[] brightnesses, float r, float g, float b, int[] lightmaps, int packedOverlay, boolean mulColor) {
-        if (pQuad instanceof IBakedQuad bakedQuad && bakedQuad.isBloom()) {
+        if (((IBakedQuad)pQuad).isBloom() || PostProcessing.isBlockBloom()) {
             for (int i = 0; i < lightmaps.length; i++) {
                 lightmaps[i] |= 0x1000100; // 0xf000f0 -> 0x1f001f0
             }

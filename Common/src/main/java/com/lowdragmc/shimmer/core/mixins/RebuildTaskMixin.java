@@ -3,6 +3,7 @@ package com.lowdragmc.shimmer.core.mixins;
 import com.google.common.collect.ImmutableList;
 import com.lowdragmc.shimmer.client.light.ColorPointLight;
 import com.lowdragmc.shimmer.client.light.LightManager;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.core.IRenderChunk;
 import net.minecraft.client.renderer.ChunkBufferBuilderPack;
 import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
@@ -44,6 +45,7 @@ public abstract class RebuildTaskMixin {
                 lights.add(light);
             }
         }
+        PostProcessing.setupBloom(blockstate, fluidstate);
         return blockstate;
     }
 
@@ -57,5 +59,6 @@ public abstract class RebuildTaskMixin {
         if (this$1 instanceof IRenderChunk) {
             ((IRenderChunk) this$1).setShimmerLights(lights.build());
         }
+        PostProcessing.cleanBloom();
     }
 }

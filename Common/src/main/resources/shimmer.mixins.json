@@ -9,6 +9,7 @@
     "GameRendererMixin",
     "HumanoidArmorLayerMixin",
     "LevelRendererMixin",
+    "LiquidBlockRendererMixin",
     "MainTargetMixin",
     "ModelBlockRendererMixin",
     "PostChainMixin",
