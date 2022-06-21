@@ -11,5 +11,5 @@ maven {
 // Forge
 implementation fg.deobf("com.lowdragmc.shimmer:Shimmer-forge-1.18.2:0.1.1")
 // Fabric
-implementation fg.deobf("com.lowdragmc.shimmer:Shimmer-fabric-1.18.2:0.1.1")
+implementation "com.lowdragmc.shimmer:Shimmer-fabric-1.18.2:0.1.1"
 ```
