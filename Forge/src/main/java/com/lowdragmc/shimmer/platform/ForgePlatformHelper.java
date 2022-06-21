@@ -69,6 +69,11 @@ public class ForgePlatformHelper implements IPlatformHelper {
         return ForgeShimmerConfig.BLOCK_BLOOM.get();
     }
 
+    @Override
+    public boolean useLightMap() {
+        return ForgeShimmerConfig.LIGHT_MAP.get();
+    }
+
     @OnlyIn(Dist.CLIENT)
     @Override
     public PostParticle createPostParticle(Particle parent, PostProcessing postProcessing) {

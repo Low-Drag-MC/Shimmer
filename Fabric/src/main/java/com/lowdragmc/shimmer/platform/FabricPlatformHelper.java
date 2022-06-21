@@ -49,4 +49,9 @@ public class FabricPlatformHelper implements IPlatformHelper {
     public boolean useBlockBloom() {
         return true;
     }
+
+    @Override
+    public boolean useLightMap() {
+        return true;
+    }
 }

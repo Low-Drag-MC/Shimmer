@@ -7,13 +7,11 @@ issueTrackerURL="https://github.com/Low-Drag-MC/Shimmer/issues"
 modId="shimmer"
 version="${file.jarVersion}"
 displayName="Shimmer"
-#displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
-logoFile="assets/shimmer/icon.png"
-credits="zomb_676"
+displayURL="https://github.com/Low-Drag-MC/Shimmer"
+logoFile="icon.png"
+credits="zomb_676, hypherionsa"
 authors="KilaBash"
-description='''
-Shimemr
-'''
+description='''Shimemr, make rendering vivid'''
 
 [[dependencies.shimmer]]
     modId="forge"

@@ -51,6 +51,8 @@ public interface IPlatformHelper {
 
     boolean useBlockBloom();
 
+    boolean useLightMap();
+
     default PostParticle createPostParticle(Particle parent, PostProcessing postProcessing) {
         return new PostParticle(parent, postProcessing);
     }

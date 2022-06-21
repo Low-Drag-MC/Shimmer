@@ -7,6 +7,7 @@ import net.minecraftforge.fml.config.ModConfig;
 public class ForgeShimmerConfig {
     public static ForgeConfigSpec.IntValue UBO_OFFSET;
     public static ForgeConfigSpec.BooleanValue BLOCK_BLOOM;
+    public static ForgeConfigSpec.BooleanValue LIGHT_MAP;
     public static ForgeConfigSpec.BooleanValue MRT_REVERSED;
 
     public static void registerConfig(){
@@ -26,6 +27,11 @@ public class ForgeShimmerConfig {
                         "true for effect on",
                         "Block bloom only, does not apply to post-processing")
                 .define("Block Bloom Effect",true);
+        LIGHT_MAP = builder.comment(
+                        "using light map for more realistic lighting",
+                        "true for light map ON",
+                        "If using the light map, the light is more realistic and avoid lights through the wall. The light is smoother when closed. It is a tradeoff.")
+                .define("Using Light Map",true);
         MRT_REVERSED = builder.comment(
                         "If you are using an AMD Graphics, you may need to set true for Shimmer to work properly")
                 .define("MRT Reversed",false);

@@ -7,6 +7,17 @@
       "b": 200,
       "a": 255,
       "radius": 7
+    },
+    {
+      "block": "minecraft:redstone_lamp",
+      "state": {
+        "lit": true
+      },
+      "r": 255,
+      "g": 165,
+      "b": 13,
+      "a": 255,
+      "radius": 10
     }
   ],
   "BloomBlock": [
@@ -15,6 +26,15 @@
     },
     {
       "block": "minecraft:glowstone"
+    },
+    {
+      "block": "minecraft:redstone_wire"
+    },
+    {
+      "block": "minecraft:redstone_lamp",
+      "state": {
+        "lit": true
+      }
     }
   ]
 }

@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.FileUtility;
 import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.client.shader.ShaderUBO;
 import com.lowdragmc.shimmer.platform.Services;
@@ -24,6 +25,8 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import org.lwjgl.BufferUtils;
@@ -51,13 +54,17 @@ public enum LightManager {
 
     private static String ChunkInjection(String s) {
         s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
-        return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light_uv(pos, vertexColor,UV2);\n").toString();
+        return new StringBuffer(s).insert(s.lastIndexOf('}'),
+                Services.PLATFORM.useLightMap() ? "vertexColor = color_light_uv(pos, vertexColor,UV2);\n" : "vertexColor = color_light(pos, vertexColor);\n"
+        ).toString();
     }
 
     private static String PositionInjection(String s) {
         //TODO fix armor lighting. what the hell!!!!!
         s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
-        return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light_uv(Position, vertexColor,UV2);\n").toString();
+        return new StringBuffer(s).insert(s.lastIndexOf('}'),
+                Services.PLATFORM.useLightMap() ? "vertexColor = color_light_uv(Position, vertexColor,UV2);\n" : "vertexColor = color_light(Position, vertexColor);\n"
+        ).toString();
     }
 
     private static String EntityInjectionLightMapColor(String s) {
@@ -87,8 +94,10 @@ public enum LightManager {
 
     public static String RbVFSHInjection(String s) {
         s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), getLightShader()).toString();
-        s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
+        s = new StringBuffer(s).insert(s.lastIndexOf('}'), Services.PLATFORM.useLightMap() ? """
                     v_Color = rb_color_light_uv(position, v_Color, v_LightCoord);
+                """ : """
+                    v_Color = color_light(position, v_Color);
                 """).toString();
         return s;
     }
@@ -268,6 +277,17 @@ public enum LightManager {
      */
     public void registerBlockLight(Block block, BiFunction<BlockState, BlockPos, ColorPointLight.Template> supplier) {
         if (block == Blocks.AIR) return;
+        if (BLOCK_MAP.containsKey(block)) {
+            BiFunction<BlockState, BlockPos, ColorPointLight.Template> exist = BLOCK_MAP.get(block);
+            BiFunction<BlockState, BlockPos, ColorPointLight.Template> current = supplier;
+            supplier = (blockState, pos) -> {
+                ColorPointLight.Template template = current.apply(blockState, pos);
+                if (template == null) {
+                    template = exist.apply(blockState, pos);
+                }
+                return template;
+            };
+        }
         BLOCK_MAP.put(block, supplier);
     }
 
@@ -287,24 +307,41 @@ public enum LightManager {
             JsonArray blocks = jsonElement.getAsJsonArray();
             for (JsonElement block : blocks) {
                 JsonObject jsonObj = block.getAsJsonObject();
+                int color = (JsonUtils.getIntOr("a", jsonObj, 0) << 24) |
+                        (JsonUtils.getIntOr("r", jsonObj, 0) << 16) |
+                        (JsonUtils.getIntOr("g", jsonObj, 0) << 8) |
+                        JsonUtils.getIntOr("b", jsonObj, 0);
+                float radius = jsonObj.get("radius").getAsFloat();
                 if (jsonObj.has("block")) {
                     ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
                     if (!Registry.BLOCK.containsKey(location)) continue;
                     Block bb = Registry.BLOCK.get(location);
-                    int a = JsonUtils.getIntOr("a", jsonObj, 0);
-                    int r = JsonUtils.getIntOr("r", jsonObj, 0);
-                    int g = JsonUtils.getIntOr("g", jsonObj, 0);
-                    int b = JsonUtils.getIntOr("b", jsonObj, 0);
-                    registerBlockLight(bb, (a << 24) | (r << 16) | (g << 8) | b, jsonObj.get("radius").getAsFloat());
+
+                    if (jsonObj.has("state") && jsonObj.get("state").isJsonObject()) {
+                        JsonObject state = jsonObj.get("state").getAsJsonObject();
+                        BlockState blockState = bb.defaultBlockState();
+                        StateDefinition<Block, BlockState> stateStateDefinition = bb.getStateDefinition();
+                        for (String key : state.keySet()) {
+                            Property<?> property = stateStateDefinition.getProperty(key);
+                            if (property != null) {
+                                blockState = Utils.setValueHelper(blockState, property, state.get(key).getAsString());
+                            }
+                        }
+                        final BlockState found = blockState;
+                        registerBlockLight(bb, (bs, pos) -> {
+                            if (bs == found) {
+                                return new ColorPointLight.Template(radius, color);
+                            }
+                            return null;
+                        });
+                    } else {
+                        registerBlockLight(bb, color, radius);
+                    }
                 } else if (jsonObj.has("fluid")) {
                     ResourceLocation location = new ResourceLocation(jsonObj.get("fluid").getAsString());
                     if (!Registry.FLUID.containsKey(location)) continue;
                     Fluid ff = Registry.FLUID.get(location);
-                    int a = JsonUtils.getIntOr("a", jsonObj, 0);
-                    int r = JsonUtils.getIntOr("r", jsonObj, 0);
-                    int g = JsonUtils.getIntOr("g", jsonObj, 0);
-                    int b = JsonUtils.getIntOr("b", jsonObj, 0);
-                    registerFluidLight(ff, (a << 24) | (r << 16) | (g << 8) | b, jsonObj.get("radius").getAsFloat());
+                    registerFluidLight(ff, color, radius);
                 }
             }
         }

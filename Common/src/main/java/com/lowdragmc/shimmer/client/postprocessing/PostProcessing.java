@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.rendertarget.CopyDepthTarget;
 import com.lowdragmc.shimmer.client.rendertarget.MRTTarget;
 import com.lowdragmc.shimmer.client.rendertarget.ProxyTarget;
@@ -17,12 +18,10 @@ import com.lowdragmc.shimmer.core.IParticleEngine;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.realmsclient.util.JsonUtils;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.core.Registry;
@@ -33,10 +32,11 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -329,7 +329,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
     public static void loadConfig() {
         JsonElement jsonElement = Configuration.config.get("BloomBlock");
-        if (jsonElement.isJsonArray()) {
+        if (jsonElement != null && jsonElement.isJsonArray()) {
             JsonArray bloomBlocks = jsonElement.getAsJsonArray();
             for (JsonElement block : bloomBlocks) {
                 JsonObject jsonObj = block.getAsJsonObject();
@@ -337,7 +337,20 @@ public class PostProcessing implements ResourceManagerReloadListener {
                     ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
                     if (!Registry.BLOCK.containsKey(location)) continue;
                     Block bb = Registry.BLOCK.get(location);
-                    BLOOM_BLOCK.add(bb.defaultBlockState());
+                    if (jsonObj.has("state") && jsonObj.get("state").isJsonObject()) {
+                        JsonObject state = jsonObj.get("state").getAsJsonObject();
+                        BlockState blockState = bb.defaultBlockState();
+                        StateDefinition<Block, BlockState> stateStateDefinition = bb.getStateDefinition();
+                        for (String key : state.keySet()) {
+                            Property<?> property = stateStateDefinition.getProperty(key);
+                            if (property != null) {
+                                blockState = Utils.setValueHelper(blockState, property, state.get(key).getAsString());
+                            }
+                        }
+                        BLOOM_BLOCK.add(blockState);
+                    } else {
+                        BLOOM_BLOCK.addAll(bb.getStateDefinition().getPossibleStates());
+                    }
                 } else if (jsonObj.has("fluid")) {
                     ResourceLocation location = new ResourceLocation(jsonObj.get("fluid").getAsString());
                     if (!Registry.FLUID.containsKey(location)) continue;
