@@ -7,16 +7,14 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkConstants;
-import org.apache.logging.log4j.Logger;
 
 @Mod(ShimmerConstants.MOD_ID)
 public class ShimmerMod {
-    public static final Logger LOGGER = ShimmerConstants.LOGGER;
 
     public ShimmerMod() {
+        ForgeShimmerConfig.registerConfig();
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true));
         DistExecutor.unsafeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-        ForgeShimmerConfig.registerConfig();
     }
 
     public static boolean isRubidiumLoaded() {

@@ -52,7 +52,7 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public int getUniformBufferObjectOffset() {
-        int configValue = ForgeShimmerConfig.UBO_OFFSET.get();
+        int configValue = ForgeShimmerConfig.getUboOffset().get();
         if (configValue == -1) {
             if (ModList.get().isLoaded("modernui")) {
                 return 6;
@@ -66,12 +66,12 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean useBlockBloom() {
-        return ForgeShimmerConfig.BLOCK_BLOOM.get();
+        return ForgeShimmerConfig.getBlockBloom().get();
     }
 
     @Override
     public boolean useLightMap() {
-        return ForgeShimmerConfig.LIGHT_MAP.get();
+        return ForgeShimmerConfig.getLightMap().get();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -88,6 +88,6 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean mrtReverse() {
-        return ForgeShimmerConfig.MRT_REVERSED.get();
+        return ForgeShimmerConfig.getMrtReversed().get();
     }
 }

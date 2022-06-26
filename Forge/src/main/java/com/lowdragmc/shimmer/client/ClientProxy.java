@@ -7,7 +7,6 @@ import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
-import com.lowdragmc.shimmer.core.IMultiLayerModelLoader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ShaderInstance;
@@ -16,7 +15,6 @@ import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.client.event.RegisterShadersEvent;
-import net.minecraftforge.client.model.MultiLayerModel;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.NotNull;
@@ -31,10 +29,6 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
     public ClientProxy() {
         LightManager.injectShaders();
         PostProcessing.injectShaders();
-        // compatible with runData
-        if (((Object)(MultiLayerModel.Loader.INSTANCE)) instanceof IMultiLayerModelLoader) {
-            ((IMultiLayerModelLoader)(Object)(MultiLayerModel.Loader.INSTANCE)).update();
-        }
     }
 
     @SubscribeEvent

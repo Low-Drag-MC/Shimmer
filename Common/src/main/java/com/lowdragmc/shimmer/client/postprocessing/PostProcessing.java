@@ -338,16 +338,10 @@ public class PostProcessing implements ResourceManagerReloadListener {
                     if (!Registry.BLOCK.containsKey(location)) continue;
                     Block bb = Registry.BLOCK.get(location);
                     if (jsonObj.has("state") && jsonObj.get("state").isJsonObject()) {
-                        JsonObject state = jsonObj.get("state").getAsJsonObject();
-                        BlockState blockState = bb.defaultBlockState();
-                        StateDefinition<Block, BlockState> stateStateDefinition = bb.getStateDefinition();
-                        for (String key : state.keySet()) {
-                            Property<?> property = stateStateDefinition.getProperty(key);
-                            if (property != null) {
-                                blockState = Utils.setValueHelper(blockState, property, state.get(key).getAsString());
-                            }
+                        Set<BlockState> available = Utils.getAllPossibleStates(jsonObj, bb);
+                        if (!available.isEmpty()) {
+                            BLOOM_BLOCK.addAll(available);
                         }
-                        BLOOM_BLOCK.add(blockState);
                     } else {
                         BLOOM_BLOCK.addAll(bb.getStateDefinition().getPossibleStates());
                     }

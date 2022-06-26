@@ -25,8 +25,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import org.lwjgl.BufferUtils;
@@ -35,9 +33,7 @@ import org.lwjgl.opengl.GL30;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 
 /**
@@ -316,24 +312,16 @@ public enum LightManager {
                     ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
                     if (!Registry.BLOCK.containsKey(location)) continue;
                     Block bb = Registry.BLOCK.get(location);
-
                     if (jsonObj.has("state") && jsonObj.get("state").isJsonObject()) {
-                        JsonObject state = jsonObj.get("state").getAsJsonObject();
-                        BlockState blockState = bb.defaultBlockState();
-                        StateDefinition<Block, BlockState> stateStateDefinition = bb.getStateDefinition();
-                        for (String key : state.keySet()) {
-                            Property<?> property = stateStateDefinition.getProperty(key);
-                            if (property != null) {
-                                blockState = Utils.setValueHelper(blockState, property, state.get(key).getAsString());
-                            }
+                        Set<BlockState> available = Utils.getAllPossibleStates(jsonObj, bb);
+                        if (!available.isEmpty()) {
+                            registerBlockLight(bb, (bs, pos) -> {
+                                if (available.contains(bs)) {
+                                    return new ColorPointLight.Template(radius, color);
+                                }
+                                return null;
+                            });
                         }
-                        final BlockState found = blockState;
-                        registerBlockLight(bb, (bs, pos) -> {
-                            if (bs == found) {
-                                return new ColorPointLight.Template(radius, color);
-                            }
-                            return null;
-                        });
                     } else {
                         registerBlockLight(bb, color, radius);
                     }

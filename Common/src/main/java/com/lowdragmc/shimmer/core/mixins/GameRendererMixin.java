@@ -29,8 +29,6 @@ public abstract class GameRendererMixin {
 
     @Shadow @Final private Map<String, ShaderInstance> shaders;
 
-    @Shadow public ShaderInstance blitShader;
-
     @Inject(method = "resize", at = @At(value = "RETURN"))
     private void injectResize(int width, int height, CallbackInfo ci) {
         PostProcessing.resize(width, height);

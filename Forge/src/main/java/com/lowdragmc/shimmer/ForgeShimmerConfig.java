@@ -5,10 +5,38 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 
 public class ForgeShimmerConfig {
-    public static ForgeConfigSpec.IntValue UBO_OFFSET;
-    public static ForgeConfigSpec.BooleanValue BLOCK_BLOOM;
-    public static ForgeConfigSpec.BooleanValue LIGHT_MAP;
-    public static ForgeConfigSpec.BooleanValue MRT_REVERSED;
+    private static ForgeConfigSpec.IntValue UBO_OFFSET;
+    private static ForgeConfigSpec.BooleanValue BLOCK_BLOOM;
+    private static ForgeConfigSpec.BooleanValue LIGHT_MAP;
+    private static ForgeConfigSpec.BooleanValue MRT_REVERSED;
+
+    public static ForgeConfigSpec.IntValue getUboOffset() {
+        if (UBO_OFFSET == null) {
+            registerConfig();
+        }
+        return UBO_OFFSET;
+    }
+
+    public static ForgeConfigSpec.BooleanValue getBlockBloom() {
+        if (BLOCK_BLOOM == null) {
+            registerConfig();
+        }
+        return BLOCK_BLOOM;
+    }
+
+    public static ForgeConfigSpec.BooleanValue getLightMap() {
+        if (LIGHT_MAP == null) {
+            registerConfig();
+        }
+        return LIGHT_MAP;
+    }
+
+    public static ForgeConfigSpec.BooleanValue getMrtReversed() {
+        if (MRT_REVERSED == null) {
+            registerConfig();
+        }
+        return MRT_REVERSED;
+    }
 
     public static void registerConfig(){
         ForgeConfigSpec.Builder clientBuilder = new ForgeConfigSpec.Builder();
