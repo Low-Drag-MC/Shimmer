@@ -3,11 +3,14 @@
   "minVersion": "0.8",
   "package": "com.lowdragmc.shimmer.core.mixins",
   "compatibilityLevel": "JAVA_17",
+  "plugin": "com.lowdragmc.shimmer.core.mixins.ShimmerFabricMixinPlugin",
   "client": [
     "MinecraftMixin",
     "ParticleEngineMixin",
     "ResourceLocationMixin",
-    "ShaderInstanceMixin"
+    "ShaderInstanceMixin",
+    "MutableQuadViewImplMixin",
+    "QuadViewImplMixin"
   ],
   "server": [
   ],
@@ -15,8 +18,6 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "MutableQuadViewImplMixin",
-    "QuadViewImplMixin",
     "sodium.BlockRendererMixin",
     "sodium.ChunkRenderRebuildTaskMixin",
     "sodium.FluidRendererMixin",

@@ -26,6 +26,15 @@ public interface IPlatformHelper {
      */
     boolean isModLoaded(String modId);
 
+    default boolean isClassFound(String className) {
+        try {
+            Class.forName(className, false, getClass().getClassLoader());
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
     /**
      * Check if the game is currently in a development environment.
      *

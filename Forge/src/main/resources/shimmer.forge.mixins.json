@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "com.lowdragmc.shimmer.core.mixins",
   "compatibilityLevel": "JAVA_17",
+  "plugin": "com.lowdragmc.shimmer.core.mixins.ShimmerForgeMixinPlugin",
   "client": [
     "ForgeParticleEngineMixin",
     "ForgeShaderInstanceMixin"

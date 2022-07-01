@@ -17,10 +17,10 @@
     "ProgramMixin",
     "RebuildTaskMixin",
     "RenderChunkMixin",
-    "RenderTargetMixin"
+    "RenderTargetMixin",
+    "BlockLightEngineMixin"
   ],
   "mixins": [
-    "BlockLightEngineMixin"
   ],
   "injectors": {
     "defaultRequire": 1
