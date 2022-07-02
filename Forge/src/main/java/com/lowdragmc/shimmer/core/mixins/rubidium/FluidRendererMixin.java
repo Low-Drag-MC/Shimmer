@@ -26,7 +26,7 @@ import java.util.Arrays;
  */
 @Mixin(FluidRenderer.class)
 public abstract class FluidRendererMixin {
-    @Shadow @Final private QuadLightData quadLightData;
+    @Shadow(remap = false) @Final private QuadLightData quadLightData;
 
     @Inject(method = "calculateQuadColors", at = @At(value = "RETURN"), remap = false)
     private void injectRender(ModelQuadView quad, BlockAndTintGetter world, BlockPos pos, LightPipeline lighter, Direction dir, float brightness, ColorSampler<FluidState> colorSampler, FluidState fluidState, CallbackInfo ci) {

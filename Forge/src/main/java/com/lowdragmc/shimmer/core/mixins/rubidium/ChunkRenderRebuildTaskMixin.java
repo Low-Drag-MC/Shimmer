@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(ChunkRenderRebuildTask.class)
 public abstract class ChunkRenderRebuildTaskMixin {
-    @Shadow @Final private RenderSection render;
+    @Shadow(remap = false) @Final private RenderSection render;
     ImmutableList.Builder<ColorPointLight> lights;
 
     @Redirect(method = "performBuild",

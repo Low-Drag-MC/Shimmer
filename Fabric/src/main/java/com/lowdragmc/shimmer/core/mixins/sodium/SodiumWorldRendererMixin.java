@@ -29,7 +29,7 @@ import java.util.Map;
 @Mixin(SodiumWorldRenderer.class)
 public abstract class SodiumWorldRendererMixin {
 
-    @Shadow private RenderSectionManager renderSectionManager;
+    @Shadow(remap = false) private RenderSectionManager renderSectionManager;
 
     @Inject(method = "updateChunks", at = @At(value = "HEAD"), remap = false)
     private void injectCompilePre(Camera camera, Frustum frustum, int frame, boolean spectator, CallbackInfo ci) {

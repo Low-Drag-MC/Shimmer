@@ -2,6 +2,7 @@ package com.lowdragmc.shimmer.core.mixins;
 
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
+import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.preprocessor.GlslPreprocessor;
 import com.mojang.blaze3d.shaders.Program;
@@ -32,6 +33,9 @@ public abstract class ProgramMixin {
                                      CallbackInfoReturnable<Integer> cir,
                                      String shader,
                                      int id) {
+        if (!Services.PLATFORM.isLoadingStateValid()){
+            return;
+        }
         boolean isVSH = pType.getName().equals("vertex");
         if (isVSH) {
             if (ShaderInjection.hasInjectVSH(shaderName)) {

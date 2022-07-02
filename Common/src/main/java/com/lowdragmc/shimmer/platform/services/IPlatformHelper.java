@@ -69,4 +69,11 @@ public interface IPlatformHelper {
     default boolean mrtReverse() {
         return false;
     }
+
+    /**
+     * when stepping into broken state , stop doing some operations to prevent crashing from shimmer
+     */
+    default boolean isLoadingStateValid() {
+        return true;
+    }
 }

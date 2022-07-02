@@ -11,6 +11,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.lwjgl.opengl.GL31;
 
@@ -89,5 +90,10 @@ public class ForgePlatformHelper implements IPlatformHelper {
     @Override
     public boolean mrtReverse() {
         return ForgeShimmerConfig.getMrtReversed().get();
+    }
+
+    @Override
+    public boolean isLoadingStateValid() {
+        return ModLoader.isLoadingStateValid();
     }
 }

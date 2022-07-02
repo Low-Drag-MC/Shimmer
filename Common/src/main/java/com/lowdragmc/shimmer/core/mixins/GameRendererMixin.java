@@ -36,7 +36,9 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "reloadShaders", at = @At(value = "RETURN"))
     private void injectReloadShaders(ResourceManager pResourceManager, CallbackInfo ci) {
-        LightManager.INSTANCE.reloadShaders();
+        if (Services.PLATFORM.isLoadingStateValid()) {
+            LightManager.INSTANCE.reloadShaders();
+        }
     }
 
     /* Replacement for RegisterShadersEvent, as fabric has no equivalent event  */
