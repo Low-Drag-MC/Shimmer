@@ -12,6 +12,7 @@ public class ForgeShimmerConfig {
 
     public static ForgeConfigSpec.IntValue getUboOffset() {
         if (UBO_OFFSET == null) {
+            logAccessUnInit("UBO_OFFSET");
             registerConfig();
         }
         return UBO_OFFSET;
@@ -19,6 +20,7 @@ public class ForgeShimmerConfig {
 
     public static ForgeConfigSpec.BooleanValue getBlockBloom() {
         if (BLOCK_BLOOM == null) {
+            logAccessUnInit("BLOCK_BLOOM");
             registerConfig();
         }
         return BLOCK_BLOOM;
@@ -26,6 +28,7 @@ public class ForgeShimmerConfig {
 
     public static ForgeConfigSpec.BooleanValue getLightMap() {
         if (LIGHT_MAP == null) {
+            logAccessUnInit("LIGHT_MAP");
             registerConfig();
         }
         return LIGHT_MAP;
@@ -33,9 +36,19 @@ public class ForgeShimmerConfig {
 
     public static ForgeConfigSpec.BooleanValue getMrtReversed() {
         if (MRT_REVERSED == null) {
+            logAccessUnInit("MRT_REVERSED");
             registerConfig();
         }
         return MRT_REVERSED;
+    }
+
+    private static void logAccessUnInit(String configValueName){
+        ShimmerConstants.LOGGER.error("trying to access uninitialized shimmer config value:{}," +
+            "see stacktrace at debug log file",configValueName);
+        ShimmerConstants.LOGGER.debug("{} thread stacktrace",Thread.currentThread().getName());
+        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+            ShimmerConstants.LOGGER.debug(element);
+        }
     }
 
     public static void registerConfig(){

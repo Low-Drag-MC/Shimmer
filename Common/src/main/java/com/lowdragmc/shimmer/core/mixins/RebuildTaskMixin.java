@@ -29,7 +29,7 @@ import java.util.Set;
  */
 @Mixin(targets = {"net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$RenderChunk$RebuildTask"})
 public abstract class RebuildTaskMixin {
-    @Shadow(aliases = {"this$1", "f_112859_"}) @Final ChunkRenderDispatcher.RenderChunk this$1;
+    @SuppressWarnings("target") @Shadow(aliases = {"this$1", "f_112859_"}) @Final ChunkRenderDispatcher.RenderChunk this$1;
     ImmutableList.Builder<ColorPointLight> lights;
 
     @Redirect(method = "compile",
