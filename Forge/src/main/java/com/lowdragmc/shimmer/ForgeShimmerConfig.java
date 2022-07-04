@@ -8,7 +8,6 @@ public class ForgeShimmerConfig {
     private static ForgeConfigSpec.IntValue UBO_OFFSET;
     private static ForgeConfigSpec.BooleanValue BLOCK_BLOOM;
     private static ForgeConfigSpec.BooleanValue LIGHT_MAP;
-    private static ForgeConfigSpec.BooleanValue MRT_REVERSED;
 
     public static ForgeConfigSpec.IntValue getUboOffset() {
         if (UBO_OFFSET == null) {
@@ -32,14 +31,6 @@ public class ForgeShimmerConfig {
             registerConfig();
         }
         return LIGHT_MAP;
-    }
-
-    public static ForgeConfigSpec.BooleanValue getMrtReversed() {
-        if (MRT_REVERSED == null) {
-            logAccessUnInit("MRT_REVERSED");
-            registerConfig();
-        }
-        return MRT_REVERSED;
     }
 
     private static void logAccessUnInit(String configValueName){
@@ -73,9 +64,6 @@ public class ForgeShimmerConfig {
                         "true for light map ON",
                         "If using the light map, the light is more realistic and avoid lights through the wall. The light is smoother when closed. It is a tradeoff.")
                 .define("Using Light Map",true);
-        MRT_REVERSED = builder.comment(
-                        "If you are using an AMD Graphics, you may need to set true for Shimmer to work properly")
-                .define("MRT Reversed",false);
     }
 
 }

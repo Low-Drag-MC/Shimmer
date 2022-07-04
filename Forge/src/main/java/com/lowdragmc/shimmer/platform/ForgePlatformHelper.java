@@ -88,11 +88,6 @@ public class ForgePlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public boolean mrtReverse() {
-        return ForgeShimmerConfig.getMrtReversed().get();
-    }
-
-    @Override
     public boolean isLoadingStateValid() {
         return ModLoader.isLoadingStateValid();
     }

@@ -120,30 +120,21 @@ public class PostProcessing implements ResourceManagerReloadListener {
     }
 
     private static String BloomMRTFSHInjection(String s) {
+        s = s.replace("#version 150", "#version 330 core");
         s = new StringBuffer(s).insert(s.lastIndexOf("out vec4 fragColor"), """
                         in float isBloom;
                         """).toString();
+        s = s.replace("out vec4 fragColor", "layout (location = 0) out vec4 fragColor");
         s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), """
-                        out vec4 bloomColor;
+                        layout (location = 1) out vec4 bloomColor;
                         """).toString();
-        if (Services.PLATFORM.mrtReverse()) {
-            s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
-                    bloomColor = fragColor;
-                    if (isBloom > 255.) {
-                        fragColor = bloomColor;
-                    } else {
-                        fragColor = vec4(0.);
-                    }
-                """).toString();
-        } else {
-            s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
+        s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
                     if (isBloom > 255.) {
                         bloomColor = fragColor;
                     } else {
                         bloomColor = vec4(0.);
                     }
                 """).toString();
-        }
         return s;
     }
 
