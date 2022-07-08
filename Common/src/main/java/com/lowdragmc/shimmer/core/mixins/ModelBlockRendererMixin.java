@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ModelBlockRenderer.class)
 public abstract class ModelBlockRendererMixin {
     @Redirect(method = "putQuadData", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexConsumer;putBulkData(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;[FFFF[IIZ)V"))
-    private void injectResize(VertexConsumer pConsumer, PoseStack.Pose pPose, BakedQuad pQuad, float[] brightnesses, float r, float g, float b, int[] lightmaps, int packedOverlay, boolean mulColor) {
+    private void injectPutQuadData(VertexConsumer pConsumer, PoseStack.Pose pPose, BakedQuad pQuad, float[] brightnesses, float r, float g, float b, int[] lightmaps, int packedOverlay, boolean mulColor) {
         if (((IBakedQuad)pQuad).isBloom() || PostProcessing.isBlockBloom()) {
             for (int i = 0; i < lightmaps.length; i++) {
                 lightmaps[i] |= 0x1000100; // 0xf000f0 -> 0x1f001f0
