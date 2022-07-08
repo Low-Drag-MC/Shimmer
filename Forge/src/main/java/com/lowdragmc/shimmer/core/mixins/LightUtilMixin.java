@@ -39,7 +39,7 @@ public class LightUtilMixin {
                                           int e) {
         if (e == 3 && (((IBakedQuad)quad).isBloom() || PostProcessing.isBlockBloom())) {
             // 0xf000f0 -> 0x1f001f0
-            Arrays.fill(data, 2);
+            Arrays.fill(data, 0X1F0 / 240F);
         }
     }
 }
