@@ -16,6 +16,13 @@ layout (std140) uniform Env {
     vec3 camPos;
 };
 
+vec3 jodieReinhardTonemap(vec3 c){
+    float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+    vec3 tc = c / (c + 1.0);
+
+    return mix(c / (l + 1.0), tc, tc);
+}
+
 vec4 color_light(vec3 pos, vec4 vertex_color) {
     vec3 lightColor = vec3(0., 0., 0.);
     vec3 fragPos = pos + camPos;
@@ -24,6 +31,8 @@ vec4 color_light(vec3 pos, vec4 vertex_color) {
         float intensity = smoothstep(0., 1., 1. - distance(l.position, fragPos) / l.radius);
         lightColor += l.color.rgb * l.color.a * intensity;
     }
+
+    lightColor = jodieReinhardTonemap(lightColor);
 
     vec3 lcolor_2 = clamp(lightColor.rgb, 0.0f, 1.0f);
 
@@ -43,6 +52,8 @@ vec4 color_light_uv(vec3 pos, vec4 vertex_color,ivec2 uv) {
             lightColor += l.color.rgb * l.color.a * intensity;
         }
 
+        lightColor = jodieReinhardTonemap(lightColor);
+
         return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5, 0.0, 1.0), 1.0);
     } else {
         return vertex_color;
@@ -61,6 +72,8 @@ vec4 rb_color_light_uv(vec3 pos, vec4 vertex_color, vec2 uv) {
             float intensity = smoothstep(0., 1., 1. - distance(l.position, fragPos) / l.radius);
             lightColor += l.color.rgb * l.color.a * intensity;
         }
+
+        lightColor = jodieReinhardTonemap(lightColor);
 
         return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5, 0.0, 1.0), 1.0);
     } else {

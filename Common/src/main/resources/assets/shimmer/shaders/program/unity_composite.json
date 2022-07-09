@@ -14,9 +14,9 @@
     ],
     "uniforms": [
         { "name": "OutSize",     "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
-        { "name": "BloomIntensive",     "type": "float",     "count": 1,  "values": [ 1.7 ] },
+        { "name": "BloomIntensive",     "type": "float",     "count": 1,  "values": [ 1.3 ] },
         { "name": "BloomBase",     "type": "float",     "count": 1,  "values": [ 0.0 ] },
-        { "name": "BloomThresholdUp",     "type": "float",     "count": 1,  "values": [ 1.3 ] },
-        { "name": "BloomThresholdDown",     "type": "float",     "count": 1,  "values": [ 0.3 ] }
+        { "name": "BloomThresholdUp",     "type": "float",     "count": 1,  "values": [ 0.5 ] },
+        { "name": "BloomThresholdDown",     "type": "float",     "count": 1,  "values": [ 0.1 ] }
     ]
 }
