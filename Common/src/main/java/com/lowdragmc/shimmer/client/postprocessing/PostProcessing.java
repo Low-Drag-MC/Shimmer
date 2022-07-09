@@ -15,6 +15,7 @@ import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.core.IMainTarget;
 import com.lowdragmc.shimmer.core.IParticleEngine;
+import com.lowdragmc.shimmer.core.mixins.ShimmerMixinPlugin;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -32,8 +33,6 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -196,7 +195,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
     }
 
     public void renderEntityPost(ProfilerFiller profilerFiller) {
-        if (!postEntityDraw.isEmpty() ) {
+        if (!postEntityDraw.isEmpty()) {
             profilerFiller.popPush("ENTITY_" + name.toUpperCase());
 
             RenderTarget mainTarget = mc.getMainRenderTarget();
@@ -244,16 +243,29 @@ public class PostProcessing implements ResourceManagerReloadListener {
      * @param sourceConsumer BufferSource
      */
     public void postEntity(Consumer<MultiBufferSource> sourceConsumer) {
+        if (ShimmerMixinPlugin.IS_OPT_LOAD) {
+            sourceConsumer.accept(PostMultiBufferSource.BUFFER_SOURCE);
+            PostMultiBufferSource.BUFFER_SOURCE.endBatch();
+            return;
+        }
         postEntityDraw.add(sourceConsumer);
     }
 
     public void postParticle(ParticleOptions particleOptions, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        if (ShimmerMixinPlugin.IS_OPT_LOAD) {
+            mc.particleEngine.createParticle(particleOptions, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
+            return;
+        }
         if (mc.particleEngine instanceof IParticleEngine) {
             ((IParticleEngine) mc.particleEngine).createPostParticle(this, particleOptions, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
         }
     }
 
     public void postParticle(ParticleOptions particleOptions, int viewDistanceSqr, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+        if (ShimmerMixinPlugin.IS_OPT_LOAD) {
+            mc.particleEngine.createParticle(particleOptions, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
+            return;
+        }
         if (mc.particleEngine instanceof IParticleEngine) {
             Camera camera = mc.gameRenderer.getMainCamera();
             if (camera.getPosition().distanceToSqr(pX, pY, pZ) > viewDistanceSqr) return;
@@ -262,6 +274,10 @@ public class PostProcessing implements ResourceManagerReloadListener {
     }
 
     public void postParticle(Particle particle) {
+        if (ShimmerMixinPlugin.IS_OPT_LOAD) {
+            mc.particleEngine.add(particle);
+            return;
+        }
         if (mc.particleEngine instanceof IParticleEngine) {
             particle = Services.PLATFORM.createPostParticle(particle, this);
             mc.particleEngine.add(particle);
