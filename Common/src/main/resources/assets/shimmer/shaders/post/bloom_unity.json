@@ -1,10 +1,6 @@
 {
   "targets": [
     {
-      "name": "swap1",
-      "bilinear": true
-    },
-    {
       "name": "swap2a",
       "bilinear": true,
       "scaleSize": {
@@ -26,6 +22,14 @@
       "scaleSize": {
         "width": 0.125,
         "height": 0.125
+      }
+    },
+    {
+      "name": "swap16a",
+      "bilinear": true,
+      "scaleSize": {
+        "width": 0.0625,
+        "height": 0.0625
       }
     },
     {
@@ -54,116 +58,53 @@
     }
   ],
   "passes": [
-
     {
-      "name": "shimmer:seperable_blur",
+      "name": "shimmer:down_sampling",
       "intarget": "shimmer:input",
-      "outtarget": "swap2a",
-      "uniforms": [
-        {
-          "name": "BlurDir",
-          "values": [ 1.0, 0.0 ]
-        },
-        {
-          "name": "Radius",
-          "values": [3]
-        }
-      ]
+      "outtarget": "swap2a"
     },
     {
-      "name": "shimmer:seperable_blur",
+      "name": "shimmer:down_sampling",
       "intarget": "swap2a",
-      "outtarget": "swap2b",
-      "uniforms": [
-        {
-          "name": "BlurDir",
-          "values": [ 0.0, 1.0 ]
-        },
-        {
-          "name": "Radius",
-          "values": [3]
-        }
-      ]
+      "outtarget": "swap4a"
     },
     {
-      "name": "shimmer:seperable_blur",
-      "intarget": "swap2b",
-      "outtarget": "swap4a",
-      "uniforms": [
-        {
-          "name": "BlurDir",
-          "values": [ 1.0, 0.0 ]
-        },
-        {
-          "name": "Radius",
-          "values": [5]
-        }
-      ]
-    },
-    {
-      "name": "shimmer:seperable_blur",
+      "name": "shimmer:down_sampling",
       "intarget": "swap4a",
-      "outtarget": "swap4b",
-      "uniforms": [
-        {
-          "name": "BlurDir",
-          "values": [ 0.0, 1.0 ]
-        },
-        {
-          "name": "Radius",
-          "values": [5]
-        }
-      ]
+      "outtarget": "swap8a"
     },
     {
-      "name": "shimmer:seperable_blur",
-      "intarget": "swap4b",
-      "outtarget": "swap8a",
-      "uniforms": [
-        {
-          "name": "BlurDir",
-          "values": [ 1.0, 0.0 ]
-        },
-        {
-          "name": "Radius",
-          "values": [7]
-        }
-      ]
-    },
-    {
-      "name": "shimmer:seperable_blur",
+      "name": "shimmer:down_sampling",
       "intarget": "swap8a",
+      "outtarget": "swap16a"
+    },
+    {
+      "name": "shimmer:blit",
+      "intarget": "swap16a",
       "outtarget": "swap8b",
-      "uniforms": [
-        {
-          "name": "BlurDir",
-          "values": [ 0.0, 1.0 ]
-        },
-        {
-          "name": "Radius",
-          "values": [7]
-        }
+      "auxtargets": [
+        {"id":"swap8a", "name":"DownTexture"}
       ]
     },
     {
       "name": "shimmer:up_sampling",
       "intarget": "swap8b",
-      "outtarget": "swap4a",
+      "outtarget": "swap4b",
       "auxtargets": [
-        {"id":"swap4b", "name":"DownTexture"}
+        {"id":"swap4a", "name":"DownTexture"}
       ]
     },
     {
       "name": "shimmer:up_sampling",
-      "intarget": "swap4a",
-      "outtarget": "swap2a",
+      "intarget": "swap4b",
+      "outtarget": "swap2b",
       "auxtargets": [
-        {"id":"swap2b", "name":"DownTexture"}
+        {"id":"swap2a", "name":"DownTexture"}
       ]
     },
     {
       "name": "shimmer:unity_composite",
-      "intarget": "swap2a",
+      "intarget": "swap2b",
       "outtarget": "shimmer:output",
       "auxtargets": [
         {"id":"shimmer:input", "name":"DownTexture"},

@@ -52,8 +52,11 @@ public class PostProcessing implements ResourceManagerReloadListener {
     private static final Map<String, PostProcessing> POST_PROCESSING_MAP = new HashMap<>();
     public static final PostProcessing BLOOM_UNREAL = new PostProcessing("bloom_unreal", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/bloom_unreal.json"));
     public static final PostProcessing BLOOM_UNITY = new PostProcessing("bloom_unity", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/bloom_unity.json"));
-    public static final PostProcessing BLOOM_VANILLA = new PostProcessing("bloom_vanilla", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/bloom_vanilla.json"));
     public static final PostProcessing WARP = new PostProcessing("warp", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/warp.json"));
+    public static final PostProcessing VHS = new PostProcessing("vhs", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/vhs.json"));
+    public static final PostProcessing FLICKER = new PostProcessing("flicker", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/flicker.json"));
+    public static final PostProcessing HALFTONE = new PostProcessing("halftone", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/halftone.json"));
+    public static final PostProcessing DOT_SCREEN = new PostProcessing("dot_screen", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/dot_screen.json"));
 
     private static final Minecraft mc = Minecraft.getInstance();
     public final String name;

@@ -1,0 +1,14 @@
+{
+  "targets": [
+  ],
+  "passes": [
+    {
+      "name": "shimmer:dot_screen",
+      "intarget": "shimmer:input",
+      "outtarget": "shimmer:output",
+      "auxtargets": [
+        {"id":"minecraft:main", "name":"Background"}
+      ]
+    }
+  ]
+}

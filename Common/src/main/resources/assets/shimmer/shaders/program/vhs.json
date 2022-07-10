@@ -5,13 +5,14 @@
         "dstrgb": "zero"
     },
     "vertex": "shimmer:blit",
-    "fragment": "shimmer:up_sampling",
+    "fragment": "shimmer:vhs",
     "attributes": [ "Position" ],
     "samplers": [
         { "name": "DiffuseSampler" },
-        { "name": "DownTexture" }
+        { "name": "Background" }
     ],
     "uniforms": [
-        { "name": "OutSize",     "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] }
+        { "name": "OutSize",       "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
+        { "name": "iTime",       "type": "float",     "count": 1,  "values": [ 0.0 ] }
     ]
 }
