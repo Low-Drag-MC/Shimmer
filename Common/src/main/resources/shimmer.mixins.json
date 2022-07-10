@@ -6,6 +6,8 @@
   "plugin": "com.lowdragmc.shimmer.core.mixins.ShimmerMixinPlugin",
   "client": [
     "BakedQuadMixin",
+    "BlendModeMixin",
+    "BlockLightEngineMixin",
     "GameRendererMixin",
     "HumanoidArmorLayerMixin",
     "LevelRendererMixin",
@@ -17,8 +19,7 @@
     "ProgramMixin",
     "RebuildTaskMixin",
     "RenderChunkMixin",
-    "RenderTargetMixin",
-    "BlockLightEngineMixin"
+    "RenderTargetMixin"
   ],
   "mixins": [
   ],

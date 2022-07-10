@@ -37,7 +37,7 @@ vec4 color_light(vec3 pos, vec4 vertex_color) {
     vec3 lcolor_2 = clamp(lightColor.rgb, 0.0f, 1.0f);
 
     // blend
-    return vec4(vertex_color.rgb + lcolor_2, 1.0);
+    return vec4(vertex_color.rgb + lcolor_2, vertex_color.a);
 }
 
 vec4 color_light_uv(vec3 pos, vec4 vertex_color,ivec2 uv) {
@@ -54,7 +54,7 @@ vec4 color_light_uv(vec3 pos, vec4 vertex_color,ivec2 uv) {
 
         lightColor = jodieReinhardTonemap(lightColor);
 
-        return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5, 0.0, 1.0), 1.0);
+        return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5, 0.0, 1.0), vertex_color.a);
     } else {
         return vertex_color;
     }
@@ -75,7 +75,7 @@ vec4 rb_color_light_uv(vec3 pos, vec4 vertex_color, vec2 uv) {
 
         lightColor = jodieReinhardTonemap(lightColor);
 
-        return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5, 0.0, 1.0), 1.0);
+        return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5, 0.0, 1.0), vertex_color.a);
     } else {
         return vertex_color;
     }

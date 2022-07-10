@@ -15,9 +15,12 @@ import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.core.IMainTarget;
 import com.lowdragmc.shimmer.core.IParticleEngine;
+import com.lowdragmc.shimmer.core.mixins.BlendModeMixin;
 import com.lowdragmc.shimmer.core.mixins.ShimmerMixinPlugin;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.shaders.BlendMode;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -31,6 +34,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
@@ -98,7 +102,11 @@ public class PostProcessing implements ResourceManagerReloadListener {
     }
 
     public static float getITime(float pPartialTicks) {
-        return mc.level == null ? pPartialTicks : (mc.level.getGameTime() + pPartialTicks) / 20f;
+        if (mc.level == null || !mc.level.getGameRules().getRule(GameRules.RULE_DAYLIGHT).get()) {
+            return System.currentTimeMillis() % 2400000 / 1000f;
+        } else {
+            return (mc.level.dayTime() + pPartialTicks) / 20f;
+        }
     }
 
     public static void injectShaders() {
@@ -199,6 +207,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
     public void renderEntityPost(ProfilerFiller profilerFiller) {
         if (!postEntityDraw.isEmpty()) {
+            BlendMode lastBlendMode = BlendModeMixin.getLastApplied();
             profilerFiller.popPush("ENTITY_" + name.toUpperCase());
 
             RenderTarget mainTarget = mc.getMainRenderTarget();
@@ -221,6 +230,9 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
             postTarget.clear(Minecraft.ON_OSX);
             mainTarget.bindWrite(false);
+
+            BlendModeMixin.setLastApplied(lastBlendMode);
+            GlStateManager._disableBlend();
         }
     }
 
