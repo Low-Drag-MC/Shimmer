@@ -1,5 +1,5 @@
 plugins {
-    id "io.github.pacifistmc.forgix" version "1.2.1"
+    id "io.github.pacifistmc.forgix" version "1.2.2"
 }
 
 forgix {
