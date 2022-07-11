@@ -1,3 +1,24 @@
+plugins {
+    id "io.github.pacifistmc.forgix" version "1.2.1"
+}
+
+forgix {
+    // Documentation on how to configure Forgix can be found here
+    // https://github.com/PacifistMC/Forgix#configuration
+
+    group = "com.lowdragmc.shimmer"
+    mergedJarName = "Shimmer-${project.minecraft_version}-${project.version}.${project.version_patch}.jar"
+    outputDir = "artifacts"
+
+    forge {
+        projectName = "Forge"
+    }
+
+    fabric {
+        projectName = "Fabric"
+    }
+}
+
 subprojects {
 
     def version_base = "${project.version}"
@@ -57,14 +78,6 @@ subprojects {
         enabled = false
     }
 
-    task copyAllArtifacts(type: Copy) {
-        if (project.name !== "Common") {
-            from "$buildDir/libs"
-            into "$rootDir/artifacts"
-            include("*.jar")
-            delete("$rootDir/artifacts/*-common-*.jar")
-        }
-    }
-
-    build.finalizedBy(copyAllArtifacts)
+    build.finalizedBy(mergeJars)
+    assemble.finalizedBy(mergeJars)
 }
