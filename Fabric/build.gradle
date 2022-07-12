@@ -23,7 +23,7 @@ dependencies {
 }
 
 loom {
-    accessWidenerPath = project(":Common").file("src/main/resources/shimmer.aw")
+    accessWidenerPath = project(":Common").file("src/main/resources/shimmer.accesswidener")
     runs {
         client {
             client()

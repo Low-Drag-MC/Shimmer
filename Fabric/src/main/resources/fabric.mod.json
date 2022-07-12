@@ -29,7 +29,7 @@
       "shimmer.mixins.json",
       "shimmer.fabric.mixins.json"
     ],
-    "accessWidener": "shimmer.aw",
+    "accessWidener": "shimmer.accesswidener",
     "depends": {
       "fabricloader": ">=0.13.3",
       "fabric": "*",
