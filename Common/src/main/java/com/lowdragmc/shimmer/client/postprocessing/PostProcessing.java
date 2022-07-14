@@ -105,9 +105,9 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
     public static float getITime(float pPartialTicks) {
         if (mc.level == null || !mc.level.getGameRules().getRule(GameRules.RULE_DAYLIGHT).get()) {
-            return System.currentTimeMillis() % 2400000 / 1000f;
+            return System.currentTimeMillis() % 1200000 / 1000f;
         } else {
-            return (mc.level.dayTime() + pPartialTicks) / 20f;
+            return ((mc.level.dayTime() % 24000) + pPartialTicks) / 20f;
         }
     }
 
