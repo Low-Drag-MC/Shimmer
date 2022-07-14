@@ -1,9 +1,6 @@
 package com.lowdragmc.shimmer.client.postprocessing;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -56,7 +53,7 @@ import java.util.function.Consumer;
  * @implNote Custom PostProcessing
  */
 public class PostProcessing implements ResourceManagerReloadListener {
-    public static final Set<RenderType> CHUNK_TYPES =  ImmutableSet.of(RenderType.solid(), RenderType.cutoutMipped(), RenderType.cutout());
+    public static final Set<RenderType> CHUNK_TYPES = Sets.newHashSet(RenderType.solid(), RenderType.cutoutMipped(), RenderType.cutout());
 
     private static final Map<String, PostProcessing> POST_PROCESSING_MAP = new HashMap<>();
     public static final PostProcessing BLOOM_UNREAL = new PostProcessing("bloom_unreal", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/bloom_unreal.json"));
