@@ -1,5 +1,7 @@
 package com.lowdragmc.shimmer.client.postprocessing;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
@@ -28,6 +30,7 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
@@ -53,6 +56,8 @@ import java.util.function.Consumer;
  * @implNote Custom PostProcessing
  */
 public class PostProcessing implements ResourceManagerReloadListener {
+    public static final Set<RenderType> CHUNK_TYPES =  ImmutableSet.of(RenderType.solid(), RenderType.cutoutMipped(), RenderType.cutout());
+
     private static final Map<String, PostProcessing> POST_PROCESSING_MAP = new HashMap<>();
     public static final PostProcessing BLOOM_UNREAL = new PostProcessing("bloom_unreal", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/bloom_unreal.json"));
     public static final PostProcessing BLOOM_UNITY = new PostProcessing("bloom_unity", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/bloom_unity.json"));

@@ -54,7 +54,9 @@ public abstract class LevelRendererMixin {
                                         double pCamY, double pCamZ,
                                         Matrix4f pProjectionMatrix,
                                         CallbackInfo ci) {
-        GL30.glDrawBuffers(new int[] {GL30.GL_COLOR_ATTACHMENT0, GL30.GL_COLOR_ATTACHMENT1});
+        if (PostProcessing.CHUNK_TYPES.contains(pRenderType)) {
+            GL30.glDrawBuffers(new int[] {GL30.GL_COLOR_ATTACHMENT0, GL30.GL_COLOR_ATTACHMENT1});
+        }
     }
 
     @Inject(method = "renderChunkLayer",
@@ -64,7 +66,9 @@ public abstract class LevelRendererMixin {
                                         double pCamY, double pCamZ,
                                         Matrix4f pProjectionMatrix,
                                         CallbackInfo ci) {
-        GL30.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT0);
+        if (PostProcessing.CHUNK_TYPES.contains(pRenderType)) {
+            GL30.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT0);
+        }
     }
 
     @Inject(method = "renderLevel",
