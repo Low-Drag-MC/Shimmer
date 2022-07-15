@@ -4,6 +4,7 @@ import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
+import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -43,7 +44,18 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                         .executes(context -> {
                             LightManager.clear();
                             return 1;
-                        })));
+                        }))
+                .then(literal("reload_shader")
+                        .executes(context -> {
+                            ReloadShaderManager.reloadShader();
+                            return 1;
+                        }))
+                .then(literal("confirm_clear_resource")
+                        .executes(context -> {
+                            ReloadShaderManager.cleanResource();
+                            return 1;
+                        }))
+        );
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
         onResourceManagerReload(null);

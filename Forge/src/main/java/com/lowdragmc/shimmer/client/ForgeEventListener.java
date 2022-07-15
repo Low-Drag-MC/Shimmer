@@ -3,6 +3,7 @@ package com.lowdragmc.shimmer.client;
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
+import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
 import net.minecraftforge.api.distmarker.Dist;
@@ -41,6 +42,18 @@ public class ForgeEventListener {
                         .executes(context -> {
                             LightManager.clear();
                             return 1;
-                        })));
+                        }))
+                .then(Commands.literal("reload_shader")
+                        .executes(context -> {
+                            ReloadShaderManager.reloadShader();
+                            return 1;
+                        }))
+                .then(Commands.literal("confirm_clear_resource")
+                        .executes(context -> {
+                            ReloadShaderManager.cleanResource();
+                            return 1;
+                        })
+                )
+        );
     }
 }
