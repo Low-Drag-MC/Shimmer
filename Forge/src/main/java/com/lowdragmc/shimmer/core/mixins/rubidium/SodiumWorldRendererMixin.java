@@ -35,7 +35,7 @@ public abstract class SodiumWorldRendererMixin {
     private void injectCompilePre(Camera camera, Frustum frustum, int frame, boolean spectator, CallbackInfo ci) {
         Vec3 position = camera.getPosition();
         int blockLightSize = 0;
-        int left = LightManager.INSTANCE.leftLightCount();
+        int left = LightManager.INSTANCE.leftBlockLightCount();
         FloatBuffer buffer = LightManager.INSTANCE.getBuffer();
         buffer.clear();
         ChunkRenderList chunkRenderList = ((RenderSectionManagerAccessor)renderSectionManager).getChunkRenderList();

@@ -3,6 +3,7 @@ package com.lowdragmc.shimmer.client.light;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 import java.nio.FloatBuffer;
 
@@ -18,6 +19,17 @@ public class ColorPointLight {
     public float radius;
     LightManager lightManager;
     int offset;
+
+    protected ColorPointLight(Vec3 pos , Template template) {
+        a = template.a;
+        r = template.r;
+        g = template.g;
+        b = template.b;
+        radius = template.radius;
+        x = (float) (pos.x() + 0.5f);
+        y = (float) (pos.y() + 0.5f);
+        z = (float) (pos.z() + 0.5f);
+    }
 
     protected ColorPointLight(BlockPos pos , Template template) {
         a = template.a;
