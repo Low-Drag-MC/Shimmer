@@ -184,9 +184,9 @@ public enum LightManager {
         NO_UV_LIGHT_COUNT = 0;
         Vec3 localPlayerPosition = localPlayer.position();
         List<AbstractClientPlayer> players = Minecraft.getInstance().level.players();
-
+        float partialTicks = Minecraft.getInstance().getFrameTime();
         for (AbstractClientPlayer player : players) {
-            Vec3 position = player.position();
+            Vec3 position = player.getPosition(partialTicks);
             if (player == localPlayer || position.distanceToSqr(localPlayerPosition) < 32 * 32){
                 ColorPointLight light;
                 UUID uuid = player.getUUID();
@@ -205,9 +205,11 @@ public enum LightManager {
                     continue;
                 }
                 light = getItemLight(player.getOffhandItem(), position);
-                if (light!=null){
+                if (light != null){
                     NO_UV_LIGHT_COUNT++;
                     light.uploadBuffer(NO_UV_BUFFER);
+                } else {
+                    continue;
                 }
             } else {
                 continue;
