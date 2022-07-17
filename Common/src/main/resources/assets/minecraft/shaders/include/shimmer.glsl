@@ -12,8 +12,8 @@ layout (std140) uniform Lights {
 };
 
 layout (std140) uniform Env {
-    int blockLightCount;
-    int playerLightCount;
+    int uvLightCout;
+    int nouvLightCout;
     vec3 camPos;
 };
 
@@ -24,9 +24,9 @@ vec3 jodieReinhardTonemap(vec3 c){
     return mix(c / (l + 1.0), tc, tc);
 }
 
-vec3 player_light(vec3 fragPos, vec4 vertex_color) {
+vec3 collect_light(vec3 fragPos, vec4 vertex_color, int begin, int end) {
     vec3 lightColor = vec3(0., 0., 0.);
-    for (int i= blockLightCount ; i<blockLightCount + playerLightCount;i++){
+    for (int i= begin; i<end;i++){
         Light l = lights[i];
         float intensity = smoothstep(0., 1., 1. - distance(l.position, fragPos) / l.radius);
         lightColor += l.color.rgb * l.color.a * intensity;
@@ -37,12 +37,8 @@ vec3 player_light(vec3 fragPos, vec4 vertex_color) {
 vec4 color_light(vec3 pos, vec4 vertex_color) {
     vec3 lightColor = vec3(0., 0., 0.);
     vec3 fragPos = pos + camPos;
-    for (int i = 0; i < blockLightCount; i++) {
-        Light l = lights[i];
-        float intensity = smoothstep(0., 1., 1. - distance(l.position, fragPos) / l.radius);
-        lightColor += l.color.rgb * l.color.a * intensity;
-    }
-    lightColor += player_light(fragPos,vertex_color);
+    lightColor += collect_light(fragPos, vertex_color, 0, uvLightCout);
+    lightColor += collect_light(fragPos, vertex_color, uvLightCout, uvLightCout + nouvLightCout);
 
     lightColor = jodieReinhardTonemap(lightColor);
 
@@ -52,23 +48,20 @@ vec4 color_light(vec3 pos, vec4 vertex_color) {
     return vec4(vertex_color.rgb + lcolor_2, vertex_color.a);
 }
 
-vec4 color_light_uv(vec3 pos, vec4 vertex_color,ivec2 uv) {
+vec4 color_light_uv(vec3 pos, vec4 vertex_color, ivec2 uv) {
     float blockLight = smoothstep(0.5 / 16.0, 20.5 / 16.0, uv.x / 256.0);
     vec3 fragPos = pos + camPos;
 
+    vec3 nouvLightColor = jodieReinhardTonemap(collect_light(fragPos, vertex_color, uvLightCout, uvLightCout + nouvLightCout));
+
     if (blockLight > 0. && uv.x < 255.) {
-        vec3 lightColor = vec3(0., 0., 0.);
-        for (int i = 0; i < blockLightCount; i++) {
-            Light l = lights[i];
-            float intensity = smoothstep(0., 1., 1. - distance(l.position, fragPos) / l.radius);
-            lightColor += l.color.rgb * l.color.a * intensity;
-        }
+        vec3 uvlightColor = collect_light(fragPos, vertex_color, 0, uvLightCout);
 
-        lightColor = jodieReinhardTonemap(lightColor);
+        uvlightColor = jodieReinhardTonemap(uvlightColor);
 
-        return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5 + player_light(fragPos,vertex_color), 0.0, 1.0) , vertex_color.a);
+        return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5 + nouvLightColor, 0.0, 1.0), vertex_color.a);
     } else {
-        return vertex_color + vec4(player_light(fragPos,vertex_color),.0);
+        return vertex_color + vec4(nouvLightColor,.0);
     }
 }
 
@@ -76,19 +69,18 @@ vec4 color_light_uv(vec3 pos, vec4 vertex_color,ivec2 uv) {
 vec4 rb_color_light_uv(vec3 pos, vec4 vertex_color, vec2 uv) {
     float blockLight = uv.x;
 
+    vec3 nouvLightColor = jodieReinhardTonemap(collect_light(fragPos, vertex_color, uvLightCout, uvLightCout + nouvLightCout));
+
     if (blockLight > 0. && blockLight <= 0.97) {
         vec3 lightColor = vec3(0., 0., 0.);
         vec3 fragPos = pos + camPos;
-        for (int i = 0; i < blockLightCount; i++) {
-            Light l = lights[i];
-            float intensity = smoothstep(0., 1., 1. - distance(l.position, fragPos) / l.radius);
-            lightColor += l.color.rgb * l.color.a * intensity;
-        }
+
+        lightColor += collect_light(fragPos, vertex_color, 0, uvLightCout);
 
         lightColor = jodieReinhardTonemap(lightColor);
 
-        return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5, 0.0, 1.0), vertex_color.a);
+        return vec4(vertex_color.rgb + clamp(lightColor.rgb * blockLight * 3.5 + nouvLightColor, 0.0, 1.0), vertex_color.a);
     } else {
-        return vertex_color;
+        return vertex_color + vec4(nouvLightColor,.0);
     }
 }
