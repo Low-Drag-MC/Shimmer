@@ -19,9 +19,9 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceProvider;
 import net.minecraft.util.GsonHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -136,7 +136,7 @@ public class ReloadShaderManager {
         Minecraft.getInstance().player.sendMessage(component, Util.NIL_UUID);
     }
 
-    @NotNull
+    @Nonnull
     public static ShaderInstance backupNewShaderInstance(ResourceProvider resourceProvider, String shaderName, VertexFormat vertexFormat) throws IOException {
         if (foreReloadAll) {
             return new ShaderInstance(reloadShaderResource, shaderName, vertexFormat);
@@ -151,7 +151,7 @@ public class ReloadShaderManager {
         return backupNewShaderInstance(resourceProvider, shaderLocation.toString(), vertexFormat);
     }
 
-    @NotNull
+    @Nonnull
     private static void recordProgramResource(ResourceProvider resourceProvider, String nameSpace, String shaderName) throws IOException {
         ResourceLocation programResourceLocation = new ResourceLocation(nameSpace, "shaders/core/" + shaderName + ".json");
         Resource programResource = resourceProvider.getResource(programResourceLocation);
