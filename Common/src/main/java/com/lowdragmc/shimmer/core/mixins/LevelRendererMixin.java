@@ -91,7 +91,7 @@ public abstract class LevelRendererMixin {
     private void injectRenderLevelPre(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
         Vec3 position = pCamera.getPosition();
         int blockLightSize = 0;
-        int left = LightManager.INSTANCE.leftLightCount();
+        int left = LightManager.INSTANCE.leftBlockLightCount();
         FloatBuffer buffer = LightManager.INSTANCE.getBuffer();
         buffer.clear();
         for (LevelRenderer.RenderChunkInfo chunkInfo : renderChunksInFrustum) {

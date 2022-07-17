@@ -3,6 +3,7 @@ package com.lowdragmc.shimmer.client.light;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 import java.nio.FloatBuffer;
 
@@ -18,8 +19,28 @@ public class ColorPointLight {
     public float radius;
     LightManager lightManager;
     int offset;
+    /**
+     * only used for player dynamic light
+     */
+    boolean enable = true;
+    /**
+     * only use for block light
+     */
+    final boolean uv;
 
-    protected ColorPointLight(BlockPos pos , Template template) {
+    protected ColorPointLight(Vec3 pos , Template template,boolean uv) {
+        a = template.a;
+        r = template.r;
+        g = template.g;
+        b = template.b;
+        radius = template.radius;
+        x = (float) (pos.x() + 0.5f);
+        y = (float) (pos.y() + 0.5f);
+        z = (float) (pos.z() + 0.5f);
+        this.uv = uv;
+    }
+
+    protected ColorPointLight(BlockPos pos , Template template,boolean uv) {
         a = template.a;
         r = template.r;
         g = template.g;
@@ -28,9 +49,10 @@ public class ColorPointLight {
         x = pos.getX() + 0.5f;
         y = pos.getY() + 0.5f;
         z = pos.getZ() + 0.5f;
+        this.uv = uv;
     }
 
-    protected ColorPointLight(LightManager lightManager, Vector3f pos, int color, float radius, int offset) {
+    protected ColorPointLight(LightManager lightManager, Vector3f pos, int color, float radius, int offset,boolean uv) {
         x = pos.x();
         y = pos.y();
         z = pos.z();
@@ -38,6 +60,7 @@ public class ColorPointLight {
         this.lightManager = lightManager;
         this.radius = radius;
         this.offset = offset;
+        this.uv = uv;
     }
 
     public void setColor(int color) {
@@ -72,7 +95,7 @@ public class ColorPointLight {
     }
 
     public void update() {
-        if (lightManager != null) {
+        if (lightManager != null && offset >= 0) {
             Minecraft.getInstance().execute(() -> lightManager.lightUBO.bufferSubData(offset, getData()));
         }
     }
