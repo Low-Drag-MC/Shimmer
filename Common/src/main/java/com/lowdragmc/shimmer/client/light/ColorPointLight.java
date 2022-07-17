@@ -22,7 +22,7 @@ public class ColorPointLight {
     /**
      * only used for player dynamic light
      */
-    boolean enable = true;
+    public boolean enable = true;
     /**
      * only use for block light
      */
@@ -81,6 +81,10 @@ public class ColorPointLight {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 
     public boolean isRemoved() {

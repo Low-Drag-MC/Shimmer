@@ -18,15 +18,17 @@
       "b": 13,
       "a": 255,
       "radius": 10
-    },
-		{
-			"item_id" : "minecraft:torch",
-			"r": 255,
-			"g": 253,
-			"b": 85,
-			"a": 255,
-			"radius": 7
-		}
+    }
+  ],
+  "LightItem": [
+    {
+      "item_id" : "minecraft:torch",
+      "r": 255,
+      "g": 253,
+      "b": 85,
+      "a": 255,
+      "radius": 7
+    }
   ],
   "BloomBlock": [
     {

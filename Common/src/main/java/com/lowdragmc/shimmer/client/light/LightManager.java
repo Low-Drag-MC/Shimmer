@@ -35,6 +35,7 @@ import net.minecraft.world.phys.Vec3;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -175,6 +176,55 @@ public enum LightManager {
         envUBO.bufferSubData(16, new float[]{camX, camY, camZ});
     }
 
+    private int NO_UV_LIGHT_COUNT = 0;
+
+    public void updateNoUVLight(){
+        LocalPlayer localPlayer = Minecraft.getInstance().player;
+        NO_UV_BUFFER.clear();
+        NO_UV_LIGHT_COUNT = 0;
+        Vec3 localPlayerPosition = localPlayer.position();
+        List<AbstractClientPlayer> players = Minecraft.getInstance().level.players();
+
+        for (AbstractClientPlayer player : players) {
+            Vec3 position = player.position();
+            if (player == localPlayer || position.distanceToSqr(localPlayerPosition) < 32 * 32){
+                ColorPointLight light;
+                UUID uuid = player.getUUID();
+                if (NO_UV_LIGHT_PLAYER.containsKey(uuid)){
+                    light = NO_UV_LIGHT_PLAYER.get(uuid);
+                    if (light.enable){
+                        NO_UV_LIGHT_COUNT++;
+                        light.uploadBuffer(NO_UV_BUFFER);
+                    }
+                    continue;
+                }
+                light = getItemLight(player.getMainHandItem(), position);
+                if (light != null){
+                    NO_UV_LIGHT_COUNT++;
+                    light.uploadBuffer(NO_UV_BUFFER);
+                    continue;
+                }
+                light = getItemLight(player.getOffhandItem(), position);
+                if (light!=null){
+                    NO_UV_LIGHT_COUNT++;
+                    light.uploadBuffer(NO_UV_BUFFER);
+                }
+            } else {
+                continue;
+            }
+            NO_UV_LIGHT_COUNT++;
+            if (NO_UV_LIGHT_COUNT > MAXIMUM_PLAYER_LIGHT_SUPPORT) break;
+        }
+
+        for (ColorPointLight light:NO_UV_LIGHT_BLOCK){
+            if (light.enable){
+                light.uploadBuffer(NO_UV_BUFFER);
+                NO_UV_LIGHT_COUNT++;
+            }
+        }
+        NO_UV_BUFFER.flip();
+    }
+
     public void renderLevelPost() {
         envUBO.bufferSubData(0, new int[]{0,0});
     }
@@ -239,6 +289,11 @@ public enum LightManager {
             NO_UV_LIGHT_BLOCK.add(light);
         }
         return light;
+    }
+
+    @Nullable
+    public ColorPointLight addLight(Vector3f pos, int color, float radius) {
+        return addLight(pos, color, radius, false);
     }
 
     private int getOffset(int index) {
@@ -327,8 +382,8 @@ public enum LightManager {
     }
 
     public void loadConfig() {
-        JsonElement jsonElement = Configuration.config.get("LightBlock");
-        if (jsonElement.isJsonArray()) {
+        JsonElement jsonElement = Configuration.config.has("LightBlock") ? Configuration.config.get("LightBlock") : null;
+        if (jsonElement != null && jsonElement.isJsonArray()) {
             JsonArray blocks = jsonElement.getAsJsonArray();
             for (JsonElement block : blocks) {
                 JsonObject jsonObj = block.getAsJsonObject();
@@ -359,12 +414,31 @@ public enum LightManager {
                     if (!Registry.FLUID.containsKey(location)) continue;
                     Fluid ff = Registry.FLUID.get(location);
                     registerFluidLight(ff, color, radius);
-                } else if (jsonObj.has("item_id")){
+                }
+            }
+        }
+
+        jsonElement = Configuration.config.has("LightItem") ? Configuration.config.get("LightItem") : null;
+        if (jsonElement != null && jsonElement.isJsonArray()) {
+            JsonArray items = jsonElement.getAsJsonArray();
+            for (JsonElement element : items) {
+                JsonObject jsonObj = element.getAsJsonObject();
+                int color = (JsonUtils.getIntOr("a", jsonObj, 0) << 24) |
+                        (JsonUtils.getIntOr("r", jsonObj, 0) << 16) |
+                        (JsonUtils.getIntOr("g", jsonObj, 0) << 8) |
+                        JsonUtils.getIntOr("b", jsonObj, 0);
+                float radius = jsonObj.get("radius").getAsFloat();
+                if (jsonObj.has("item_id")) {
                     ResourceLocation itemResourceLocation = new ResourceLocation(jsonObj.get("item_id").getAsString());
                     if (Registry.ITEM.containsKey(itemResourceLocation)){
                         Item item = Registry.ITEM.get(itemResourceLocation);
-                        registerItemLight(item,(itemStack -> new ColorPointLight.Template(radius,color)));
+                        ColorPointLight.Template template = new ColorPointLight.Template(radius,color);
+                        registerItemLight(item, itemStack -> template);
                     }
+                } else if (jsonObj.has("item_tag")) {
+                    ResourceLocation tag = new ResourceLocation(jsonObj.get("item_tag").getAsString());
+                    ColorPointLight.Template template = new ColorPointLight.Template(radius,color);
+                    registerTagLight(tag, itemStack -> template);
                 }
             }
         }
@@ -395,63 +469,30 @@ public enum LightManager {
 
     // *********************** held item light *********************** //
     private final Map<Item,Function<ItemStack,ColorPointLight.Template>> ITEM_MAP = new HashMap<>();
+    private final Map<ResourceLocation,Function<ItemStack,ColorPointLight.Template>> TAG_MAP = new HashMap<>();
 
     @Nullable
-    public ColorPointLight getItemLight(ItemStack itemStack, Vec3 pos){
+    public ColorPointLight getItemLight(@Nonnull ItemStack itemStack, Vec3 pos){
         Function<ItemStack,ColorPointLight.Template> function = ITEM_MAP.get(itemStack.getItem());
-        if (function !=null){
+        if (function == null) {
+            var optional= itemStack.getTags().filter(tag -> TAG_MAP.containsKey(tag.location())).findAny();
+            if (optional.isPresent()) {
+                function = TAG_MAP.get(optional.get().location());
+            }
+        }
+        if (function != null) {
             ColorPointLight.Template template = function.apply(itemStack);
             return new ColorPointLight(pos,template,false);
-        }else return null;
-    }
-
-    private int NO_UV_LIGHT_COUNT = 0;
-
-    @Nullable
-    public void updateNoUVLight(){
-        LocalPlayer localPlayer = Minecraft.getInstance().player;
-        NO_UV_BUFFER.clear();
-        NO_UV_LIGHT_COUNT = 0;
-        Vec3 localPlayerPosition = localPlayer.position();
-        List<AbstractClientPlayer> players = Minecraft.getInstance().level.players();
-        for (int index = 0; index < Math.min(MAXIMUM_PLAYER_LIGHT_SUPPORT,players.size()) ; index++){
-            var player = players.get(index);
-            Vec3 position = player.position();
-            if (player == localPlayer || position.distanceTo(localPlayerPosition) < 32){
-                ColorPointLight light;
-                UUID uuid = player.getUUID();
-                if (NO_UV_LIGHT_PLAYER.containsKey(uuid)){
-                    light = NO_UV_LIGHT_PLAYER.get(uuid);
-                    if (light.enable){
-                        NO_UV_LIGHT_COUNT++;
-                        light.uploadBuffer(NO_UV_BUFFER);
-                    }
-                    continue;
-                }
-                 light = getItemLight(player.getMainHandItem(),position);
-                if (light != null){
-                    NO_UV_LIGHT_COUNT++;
-                    light.uploadBuffer(NO_UV_BUFFER);
-                    continue;
-                }
-                light = getItemLight(player.getOffhandItem(),position);
-                if (light!=null){
-                    NO_UV_LIGHT_COUNT++;
-                    light.uploadBuffer(NO_UV_BUFFER);
-                }
-            }
         }
-        for (ColorPointLight light:NO_UV_LIGHT_BLOCK){
-            if (light.enable){
-                light.uploadBuffer(NO_UV_BUFFER);
-                NO_UV_LIGHT_COUNT++;
-            }
-        }
-        NO_UV_BUFFER.flip();
+        return null;
     }
 
     public void registerItemLight(Item item,Function<ItemStack,ColorPointLight.Template> function){
         ITEM_MAP.put(item,function);
+    }
+
+    public void registerTagLight(ResourceLocation tag,Function<ItemStack,ColorPointLight.Template> function){
+        TAG_MAP.put(tag,function);
     }
 
     public ColorPointLight addPlayerItemLight(Vector3f pos, int color, float radius, UUID playerUUID) {
@@ -467,12 +508,10 @@ public enum LightManager {
 
     public boolean removePlayerLight(ColorPointLight removeLight){
         Set<UUID> set = NO_UV_LIGHT_PLAYER.keySet();
-        Iterator<UUID> iterator = set.iterator();
-        while (iterator.hasNext()){
-            UUID uuid = iterator.next();
+        for (UUID uuid : set) {
             ColorPointLight light = NO_UV_LIGHT_PLAYER.get(uuid);
-            if (light == removeLight){
-                NO_UV_LIGHT_PLAYER.remove(uuid,light);
+            if (light == removeLight) {
+                NO_UV_LIGHT_PLAYER.remove(uuid, light);
                 return true;
             }
         }
