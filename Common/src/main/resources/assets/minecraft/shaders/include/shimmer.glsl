@@ -70,7 +70,7 @@ vec4 rb_color_light_uv(vec3 pos, vec4 vertex_color, vec2 uv) {
     float blockLight = uv.x;
     vec3 fragPos = pos + camPos;
 
-    vec3 nouvLightColor = jodieReinhardTonemap(collect_light(fragPos, vertex_color, uvLightCout, uvLightCout + nouvLightCout));
+    vec3 nouvLightColor = jodieReinhardTonemap(collect_light(fragPos, vertex_color, uvLightCout, uvLightCout + nouvLightCout)) * 2.;
 
     if (blockLight > 0. && blockLight <= 0.97) {
         vec3 lightColor = vec3(0., 0., 0.);
