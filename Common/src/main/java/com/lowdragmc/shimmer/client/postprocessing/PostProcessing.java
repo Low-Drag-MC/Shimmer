@@ -133,6 +133,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
     private static String BloomMRTFSHInjection(String s) {
         s = s.replace("#version 150", "#version 330 core");
+        s = new StringBuilder(s).insert(s.lastIndexOf("#moj_import <fog.glsl>"),"#moj_import <shimmer_fog.glsl>\n").toString();
         s = new StringBuffer(s).insert(s.lastIndexOf("out vec4 fragColor"), """
                         in float isBloom;
                         """).toString();
@@ -142,11 +143,13 @@ public class PostProcessing implements ResourceManagerReloadListener {
                         """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
                     if (isBloom > 255.) {
-                        bloomColor = fragColor;
+                        bloomColor = fragColor * (1 - fogValue);
                     } else {
                         bloomColor = vec4(0.);
                     }
                 """).toString();
+        s = new StringBuilder(s).insert(s.lastIndexOf("vec4 color"),"float fogValue;\n").toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf("FogColor")+"FogColor".length(),",fogValue").toString();
         return s;
     }
 
@@ -156,7 +159,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
                         """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
                     if (v_LightCoord.x > .97) {
-                        bloomColor = fragColor;
+                        bloomColor = fragColor * smoothstep(u_FogEnd,u_FogStart,v_FragDistance);
                     } else {
                         bloomColor = vec4(0.);
                     }

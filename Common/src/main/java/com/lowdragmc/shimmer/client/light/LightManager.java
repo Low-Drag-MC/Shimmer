@@ -484,19 +484,38 @@ public enum LightManager {
         }
         if (function != null) {
             ColorPointLight.Template template = function.apply(itemStack);
-            return new ColorPointLight(pos,template,false);
+            if (template!=null){
+                return new ColorPointLight(pos,template,false);
+            }
         }
         return null;
     }
 
+    /**
+     * register dynamic light for items held by players.
+     * @param item the item used for register
+     * @param function supplier light supplier from an ItemStack
+     */
     public void registerItemLight(Item item,Function<ItemStack,ColorPointLight.Template> function){
         ITEM_MAP.put(item,function);
     }
 
+    /**
+     * register dynamic light for items held by players.
+     * @param tag the item tag used for identify
+     * @param function supplier light supplier from an ItemStack
+     */
     public void registerTagLight(ResourceLocation tag,Function<ItemStack,ColorPointLight.Template> function){
         TAG_MAP.put(tag,function);
     }
 
+    /**
+     * @param pos position
+     * @param color color
+     * @param radius radius
+     * @param playerUUID the specified player's UUID
+     * @return instance created. null -- if no more available space. control enable/disable yourself
+     */
     public ColorPointLight addPlayerItemLight(Vector3f pos, int color, float radius, UUID playerUUID) {
         if (NO_UV_LIGHT_PLAYER.size() == MAXIMUM_PLAYER_LIGHT_SUPPORT) return null;
         ColorPointLight light = new ColorPointLight(this,pos,color,radius,-1,false);
