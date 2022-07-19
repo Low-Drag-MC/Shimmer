@@ -59,7 +59,6 @@ public abstract class SodiumWorldRendererMixin {
                 }
             }
         }
-        buffer.flip();
         LightManager.INSTANCE.renderLevelPre(blockLightSize, (float)position.x,(float) position.y, (float)position.z);
     }
 

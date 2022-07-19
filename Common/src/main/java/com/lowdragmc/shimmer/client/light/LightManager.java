@@ -52,12 +52,10 @@ public enum LightManager {
     INSTANCE;
     private static final int MAXIMUM_LIGHT_SUPPORT = 2048;
     private static final int MAXIMUM_PLAYER_LIGHT_SUPPORT = 20;
-    private static final int MAXIMUM_BLOCK_LIGHT_SUPPORT = MAXIMUM_LIGHT_SUPPORT - MAXIMUM_PLAYER_LIGHT_SUPPORT;
-    private final List<ColorPointLight> UV_LIGHT = new ArrayList<>(MAXIMUM_BLOCK_LIGHT_SUPPORT);
-    private final List<ColorPointLight> NO_UV_LIGHT_BLOCK = new ArrayList<>(MAXIMUM_BLOCK_LIGHT_SUPPORT);
+    private final List<ColorPointLight> UV_LIGHT = new ArrayList<>(MAXIMUM_LIGHT_SUPPORT);
+    private final List<ColorPointLight> NO_UV_LIGHT = new ArrayList<>(MAXIMUM_LIGHT_SUPPORT);
     private final Map<UUID,ColorPointLight> NO_UV_LIGHT_PLAYER = new HashMap<>(MAXIMUM_PLAYER_LIGHT_SUPPORT);
-    private final FloatBuffer UV_BUFFER = BufferUtils.createFloatBuffer((MAXIMUM_BLOCK_LIGHT_SUPPORT) * ColorPointLight.STRUCT_SIZE);
-    private final FloatBuffer NO_UV_BUFFER = BufferUtils.createFloatBuffer(MAXIMUM_PLAYER_LIGHT_SUPPORT * ColorPointLight.STRUCT_SIZE);
+    private final FloatBuffer BUFFER = BufferUtils.createFloatBuffer(MAXIMUM_LIGHT_SUPPORT * ColorPointLight.STRUCT_SIZE);
 
     ShaderUBO lightUBO;
     ShaderUBO envUBO;
@@ -145,31 +143,28 @@ public enum LightManager {
         for (ColorPointLight light : INSTANCE.UV_LIGHT) {
             light.lightManager = null;
         }
-        for (ColorPointLight light : INSTANCE.NO_UV_LIGHT_BLOCK){
+        for (ColorPointLight light : INSTANCE.NO_UV_LIGHT){
             light.lightManager =null;
         }
         for (ColorPointLight light : INSTANCE.NO_UV_LIGHT_PLAYER.values()) {
             light.lightManager = null;
         }
         INSTANCE.UV_LIGHT.clear();
-        INSTANCE.NO_UV_LIGHT_BLOCK.clear();
+        INSTANCE.NO_UV_LIGHT.clear();
         INSTANCE.NO_UV_LIGHT_PLAYER.clear();
     }
 
     public int leftBlockLightCount() {
-        return MAXIMUM_BLOCK_LIGHT_SUPPORT - UV_LIGHT.size();
+        return MAXIMUM_LIGHT_SUPPORT - UV_LIGHT.size() - NO_UV_LIGHT.size() - NO_UV_LIGHT_PLAYER.size();
     }
 
     public FloatBuffer getBuffer() {
-        return UV_BUFFER;
+        return BUFFER;
     }
 
     public void renderLevelPre(int blockLightSize, float camX, float camY, float camZ) {
-        if (blockLightSize > 0) {
-            lightUBO.bufferSubData(getOffset(UV_LIGHT.size()), UV_BUFFER);
-        }
         updateNoUVLight();
-        lightUBO.bufferSubData(getOffset(UV_LIGHT.size() + blockLightSize), NO_UV_BUFFER);
+        lightUBO.bufferSubData(getOffset(UV_LIGHT.size()), BUFFER);
 
         envUBO.bufferSubData(0, new int[]{UV_LIGHT.size() + blockLightSize});
         envUBO.bufferSubData(4,new int[]{NO_UV_LIGHT_COUNT});
@@ -180,7 +175,6 @@ public enum LightManager {
 
     public void updateNoUVLight(){
         LocalPlayer localPlayer = Minecraft.getInstance().player;
-        NO_UV_BUFFER.clear();
         NO_UV_LIGHT_COUNT = 0;
         Vec3 localPlayerPosition = localPlayer.position();
         List<AbstractClientPlayer> players = Minecraft.getInstance().level.players();
@@ -194,7 +188,7 @@ public enum LightManager {
                     light = NO_UV_LIGHT_PLAYER.get(uuid);
                     if (light.enable){
                         NO_UV_LIGHT_COUNT++;
-                        light.uploadBuffer(NO_UV_BUFFER);
+                        light.uploadBuffer(BUFFER);
                         if (NO_UV_LIGHT_COUNT > MAXIMUM_PLAYER_LIGHT_SUPPORT) break;
                     }
                     continue;
@@ -202,26 +196,26 @@ public enum LightManager {
                 light = getItemLight(player.getMainHandItem(), position);
                 if (light != null){
                     NO_UV_LIGHT_COUNT++;
-                    light.uploadBuffer(NO_UV_BUFFER);
+                    light.uploadBuffer(BUFFER);
                     if (NO_UV_LIGHT_COUNT > MAXIMUM_PLAYER_LIGHT_SUPPORT) break;
                     continue;
                 }
                 light = getItemLight(player.getOffhandItem(), position);
                 if (light != null){
                     NO_UV_LIGHT_COUNT++;
-                    light.uploadBuffer(NO_UV_BUFFER);
+                    light.uploadBuffer(BUFFER);
                     if (NO_UV_LIGHT_COUNT > MAXIMUM_PLAYER_LIGHT_SUPPORT) break;
                 }
             }
         }
 
-        for (ColorPointLight light:NO_UV_LIGHT_BLOCK){
+        for (ColorPointLight light: NO_UV_LIGHT){
             if (light.enable){
-                light.uploadBuffer(NO_UV_BUFFER);
+                light.uploadBuffer(BUFFER);
                 NO_UV_LIGHT_COUNT++;
             }
         }
-        NO_UV_BUFFER.flip();
+        BUFFER.flip();
     }
 
     public void renderLevelPost() {
@@ -279,13 +273,13 @@ public enum LightManager {
      */
     @Nullable
     public ColorPointLight addLight(Vector3f pos, int color, float radius,boolean uv) {
-        if (UV_LIGHT.size() == MAXIMUM_BLOCK_LIGHT_SUPPORT) return null;
+        if (UV_LIGHT.size() + NO_UV_LIGHT.size() == MAXIMUM_LIGHT_SUPPORT) return null;
         ColorPointLight light = new ColorPointLight(this, pos, color, radius, getOffset(UV_LIGHT.size()),uv);
         if (uv){
             UV_LIGHT.add(light);
             lightUBO.bufferSubData(light.offset, light.getData());
         }else {
-            NO_UV_LIGHT_BLOCK.add(light);
+            NO_UV_LIGHT.add(light);
         }
         return light;
     }
@@ -308,12 +302,12 @@ public enum LightManager {
             UV_LIGHT.remove(index);
             if (index < UV_LIGHT.size()) {
                 Minecraft.getInstance().execute(() -> {
-                    UV_BUFFER.clear();
+                    BUFFER.clear();
                     for (int i = index; i < UV_LIGHT.size(); i++) {
-                        UV_LIGHT.get(i).uploadBuffer(UV_BUFFER);
+                        UV_LIGHT.get(i).uploadBuffer(BUFFER);
                     }
-                    UV_BUFFER.flip();
-                    lightUBO.bufferSubData(getOffset(index), UV_BUFFER);
+                    BUFFER.flip();
+                    lightUBO.bufferSubData(getOffset(index), BUFFER);
                 });
             }
         }

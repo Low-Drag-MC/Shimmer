@@ -108,7 +108,6 @@ public abstract class LevelRendererMixin {
                 }
             }
         }
-        buffer.flip();
         LightManager.INSTANCE.renderLevelPre(blockLightSize, (float)position.x,(float) position.y, (float)position.z);
     }
 
