@@ -195,6 +195,7 @@ public enum LightManager {
                     if (light.enable){
                         NO_UV_LIGHT_COUNT++;
                         light.uploadBuffer(NO_UV_BUFFER);
+                        if (NO_UV_LIGHT_COUNT > MAXIMUM_PLAYER_LIGHT_SUPPORT) break;
                     }
                     continue;
                 }
@@ -202,20 +203,16 @@ public enum LightManager {
                 if (light != null){
                     NO_UV_LIGHT_COUNT++;
                     light.uploadBuffer(NO_UV_BUFFER);
+                    if (NO_UV_LIGHT_COUNT > MAXIMUM_PLAYER_LIGHT_SUPPORT) break;
                     continue;
                 }
                 light = getItemLight(player.getOffhandItem(), position);
                 if (light != null){
                     NO_UV_LIGHT_COUNT++;
                     light.uploadBuffer(NO_UV_BUFFER);
-                } else {
-                    continue;
+                    if (NO_UV_LIGHT_COUNT > MAXIMUM_PLAYER_LIGHT_SUPPORT) break;
                 }
-            } else {
-                continue;
             }
-            NO_UV_LIGHT_COUNT++;
-            if (NO_UV_LIGHT_COUNT > MAXIMUM_PLAYER_LIGHT_SUPPORT) break;
         }
 
         for (ColorPointLight light:NO_UV_LIGHT_BLOCK){
