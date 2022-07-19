@@ -154,8 +154,12 @@ public enum LightManager {
         INSTANCE.NO_UV_LIGHT_PLAYER.clear();
     }
 
+    public int maxFixedLight() {
+        return UV_LIGHT.size() + NO_UV_LIGHT.size() + NO_UV_LIGHT_PLAYER.size() + MAXIMUM_PLAYER_LIGHT_SUPPORT;
+    }
+
     public int leftBlockLightCount() {
-        return MAXIMUM_LIGHT_SUPPORT - UV_LIGHT.size() - NO_UV_LIGHT.size() - NO_UV_LIGHT_PLAYER.size();
+        return MAXIMUM_LIGHT_SUPPORT - maxFixedLight();
     }
 
     public FloatBuffer getBuffer() {
@@ -272,9 +276,9 @@ public enum LightManager {
      * @return instance created. null -- if no more available space.
      */
     @Nullable
-    public ColorPointLight addLight(Vector3f pos, int color, float radius,boolean uv) {
-        if (UV_LIGHT.size() + NO_UV_LIGHT.size() == MAXIMUM_LIGHT_SUPPORT) return null;
-        ColorPointLight light = new ColorPointLight(this, pos, color, radius, getOffset(UV_LIGHT.size()),uv);
+    public ColorPointLight addLight(Vector3f pos, int color, float radius, boolean uv) {
+        if (maxFixedLight() == MAXIMUM_LIGHT_SUPPORT) return null;
+        ColorPointLight light = new ColorPointLight(this, pos, color, radius, uv ? getOffset(UV_LIGHT.size()) : -1, uv);
         if (uv){
             UV_LIGHT.add(light);
             lightUBO.bufferSubData(light.offset, light.getData());
@@ -294,22 +298,26 @@ public enum LightManager {
     }
 
     void removeLight(ColorPointLight removed) {
-        int index = UV_LIGHT.indexOf(removed);
-        if (index >= 0) {
-            for (int i = index + 1; i < UV_LIGHT.size(); i++) {
-                UV_LIGHT.get(i).offset = getOffset(i - 1);
+        if (removed.uv) {
+            int index = UV_LIGHT.indexOf(removed);
+            if (index >= 0) {
+                for (int i = index + 1; i < UV_LIGHT.size(); i++) {
+                    UV_LIGHT.get(i).offset = getOffset(i - 1);
+                }
+                UV_LIGHT.remove(index);
+                if (index < UV_LIGHT.size()) {
+                    Minecraft.getInstance().execute(() -> {
+                        BUFFER.clear();
+                        for (int i = index; i < UV_LIGHT.size(); i++) {
+                            UV_LIGHT.get(i).uploadBuffer(BUFFER);
+                        }
+                        BUFFER.flip();
+                        lightUBO.bufferSubData(getOffset(index), BUFFER);
+                    });
+                }
             }
-            UV_LIGHT.remove(index);
-            if (index < UV_LIGHT.size()) {
-                Minecraft.getInstance().execute(() -> {
-                    BUFFER.clear();
-                    for (int i = index; i < UV_LIGHT.size(); i++) {
-                        UV_LIGHT.get(i).uploadBuffer(BUFFER);
-                    }
-                    BUFFER.flip();
-                    lightUBO.bufferSubData(getOffset(index), BUFFER);
-                });
-            }
+        } else {
+            NO_UV_LIGHT.remove(removed);
         }
     }
 
@@ -476,7 +484,7 @@ public enum LightManager {
         if (function != null) {
             ColorPointLight.Template template = function.apply(itemStack);
             if (template!=null){
-                return new ColorPointLight(pos,template,false);
+                return new ColorPointLight(pos, template,false);
             }
         }
         return null;
@@ -508,7 +516,7 @@ public enum LightManager {
      * @return instance created. null -- if no more available space. control enable/disable yourself
      */
     public ColorPointLight addPlayerItemLight(Vector3f pos, int color, float radius, UUID playerUUID) {
-        if (NO_UV_LIGHT_PLAYER.size() == MAXIMUM_PLAYER_LIGHT_SUPPORT) return null;
+        if (maxFixedLight() == MAXIMUM_LIGHT_SUPPORT) return null;
         ColorPointLight light = new ColorPointLight(this,pos,color,radius,-1,false);
         NO_UV_LIGHT_PLAYER.put(playerUUID,light);
         return light;

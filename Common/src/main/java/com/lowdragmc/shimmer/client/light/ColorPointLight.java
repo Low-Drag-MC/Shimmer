@@ -28,7 +28,7 @@ public class ColorPointLight {
      */
     final boolean uv;
 
-    protected ColorPointLight(Vec3 pos , Template template,boolean uv) {
+    protected ColorPointLight(Vec3 pos , Template template, boolean uv) {
         a = template.a;
         r = template.r;
         g = template.g;
@@ -40,7 +40,7 @@ public class ColorPointLight {
         this.uv = uv;
     }
 
-    protected ColorPointLight(BlockPos pos , Template template,boolean uv) {
+    protected ColorPointLight(BlockPos pos , Template template, boolean uv) {
         a = template.a;
         r = template.r;
         g = template.g;
@@ -52,7 +52,7 @@ public class ColorPointLight {
         this.uv = uv;
     }
 
-    protected ColorPointLight(LightManager lightManager, Vector3f pos, int color, float radius, int offset,boolean uv) {
+    protected ColorPointLight(LightManager lightManager, Vector3f pos, int color, float radius, int offset, boolean uv) {
         x = pos.x();
         y = pos.y();
         z = pos.z();
@@ -99,7 +99,7 @@ public class ColorPointLight {
     }
 
     public void update() {
-        if (lightManager != null && offset >= 0) {
+        if (lightManager != null && offset >= 0 && uv) {
             Minecraft.getInstance().execute(() -> lightManager.lightUBO.bufferSubData(offset, getData()));
         }
     }
