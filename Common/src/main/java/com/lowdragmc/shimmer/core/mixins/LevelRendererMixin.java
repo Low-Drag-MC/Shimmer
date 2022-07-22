@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.core.mixins;
 
+import com.lowdragmc.shimmer.client.Aurrora;
 import com.lowdragmc.shimmer.client.light.ColorPointLight;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
@@ -10,12 +11,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.phys.Vec3;
 import org.lwjgl.opengl.GL30;
 import org.spongepowered.asm.mixin.Final;
@@ -41,6 +44,8 @@ public abstract class LevelRendererMixin {
     @Shadow @Nullable private ClientLevel level;
 
     @Shadow @Final private ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum;
+
+    @Shadow @Final private Minecraft minecraft;
 
     @Inject(method = "renderLevel",
             at = @At(
@@ -130,5 +135,11 @@ public abstract class LevelRendererMixin {
     ))
     private PostChain redirectInitTransparency(TextureManager textureManager, ResourceManager resourceManager, RenderTarget renderTarget, ResourceLocation resourceLocation) throws IOException {
         return ReloadShaderManager.backupNewPostChain(textureManager,resourceManager,renderTarget,resourceLocation);
+    }
+
+    @Inject(method = "renderSky", at=@At(value = "TAIL" ))
+    private void injectRenderSky(PoseStack poseStack, Matrix4f matrix4f, float $$2, Camera camera, boolean $$4, Runnable $$5, CallbackInfo ci){
+        if (level.dimensionTypeRegistration().is(DimensionType.OVERWORLD_LOCATION))
+        Aurrora.render(poseStack,level,minecraft);
     }
 }
