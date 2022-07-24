@@ -223,7 +223,7 @@ public enum LightManager {
     }
 
     public void renderLevelPost() {
-        envUBO.bufferSubData(0, new int[]{0,0});
+        envUBO.bufferSubData(0, new int[8]);
     }
 
     public void reloadShaders() {
@@ -237,6 +237,7 @@ public enum LightManager {
 
             envUBO = new ShaderUBO();
             envUBO.createBufferData(32, GL30.GL_STREAM_DRAW); // stream -- modified each frame
+            envUBO.bufferSubData(0,new int[8]);
 
             lightUBO.blockBinding(uboOffset);
             envUBO.blockBinding(uboOffset+1);

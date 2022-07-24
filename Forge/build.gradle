@@ -109,6 +109,7 @@ dependencies {
 
     // Rubidium
     implementation fg.deobf("curse.maven:rubidium-574856:3749094")
+    implementation fg.deobf("curse.maven:flywheel-486392:3871082")
     //Modern UI
     runtimeLibrary "icyllis.modernui:ModernUI-Core:3.4.4.103"
     runtimeOnly fg.deobf("icyllis.modernui:ModernUI-Forge:${minecraft_version}-3.4.4.103")
