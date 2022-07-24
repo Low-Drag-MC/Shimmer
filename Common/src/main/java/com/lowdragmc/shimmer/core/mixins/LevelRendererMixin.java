@@ -5,6 +5,7 @@ import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import com.lowdragmc.shimmer.core.IRenderChunk;
+import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
@@ -58,7 +59,7 @@ public abstract class LevelRendererMixin {
                                         double pCamY, double pCamZ,
                                         Matrix4f pProjectionMatrix,
                                         CallbackInfo ci) {
-        if (PostProcessing.CHUNK_TYPES.contains(pRenderType)) {
+        if (PostProcessing.CHUNK_TYPES.contains(pRenderType) && Services.PLATFORM.isBloomEnable()) {
             GL30.glDrawBuffers(new int[] {GL30.GL_COLOR_ATTACHMENT0, GL30.GL_COLOR_ATTACHMENT1});
         }
     }

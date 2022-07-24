@@ -91,4 +91,14 @@ public class ForgePlatformHelper implements IPlatformHelper {
     public boolean isLoadingStateValid() {
         return ModLoader.isLoadingStateValid();
     }
+
+    @Override
+    public boolean isColoredLightEnable() {
+        return ForgeShimmerConfig.getColoredLightEnable().get();
+    }
+
+    @Override
+    public boolean isBloomEnable() {
+        return ForgeShimmerConfig.getBloomEnable().get();
+    }
 }

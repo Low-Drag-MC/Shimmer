@@ -168,11 +168,15 @@ public enum LightManager {
 
     public void renderLevelPre(int blockLightSize, float camX, float camY, float camZ) {
         updateNoUVLight();
-        lightUBO.bufferSubData(getOffset(UV_LIGHT.size()), BUFFER);
+        if (Services.PLATFORM.isColoredLightEnable()){
+            lightUBO.bufferSubData(getOffset(UV_LIGHT.size()), BUFFER);
 
-        envUBO.bufferSubData(0, new int[]{UV_LIGHT.size() + blockLightSize});
-        envUBO.bufferSubData(4,new int[]{NO_UV_LIGHT_COUNT});
-        envUBO.bufferSubData(16, new float[]{camX, camY, camZ});
+            envUBO.bufferSubData(0, new int[]{UV_LIGHT.size() + blockLightSize});
+            envUBO.bufferSubData(4,new int[]{NO_UV_LIGHT_COUNT});
+            envUBO.bufferSubData(16, new float[]{camX, camY, camZ});
+        }else {
+            envUBO.bufferSubData(0,new int[4]);
+        }
     }
 
     private int NO_UV_LIGHT_COUNT = 0;

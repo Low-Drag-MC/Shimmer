@@ -1,9 +1,11 @@
 package com.lowdragmc.shimmer.client;
 
+import com.lowdragmc.shimmer.ForgeShimmerConfig;
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
 import net.minecraftforge.api.distmarker.Dist;
@@ -54,6 +56,20 @@ public class ForgeEventListener {
                             return 1;
                         })
                 )
+                .then(Commands.literal("colored_light")
+                        .then(Commands.argument("switch_state", BoolArgumentType.bool()).executes(
+                                context -> {
+                                    ForgeShimmerConfig.getColoredLightEnable().set(context.getArgument("switch_state", Boolean.class));
+                                    return 1;
+                                }
+                        )))
+                .then(Commands.literal("bloom")
+                        .then(Commands.argument("switch_state", BoolArgumentType.bool()).executes(
+                                context -> {
+                                    ForgeShimmerConfig.getBloomEnable().set(context.getArgument("switch_state", Boolean.class));
+                                    return 1;
+                                }
+                        )))
         );
     }
 }

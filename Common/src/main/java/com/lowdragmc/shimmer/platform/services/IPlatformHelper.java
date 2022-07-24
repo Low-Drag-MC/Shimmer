@@ -72,4 +72,12 @@ public interface IPlatformHelper {
     default boolean isLoadingStateValid() {
         return true;
     }
+
+    default boolean isColoredLightEnable() {
+        return true;
+    }
+
+    default boolean isBloomEnable(){
+        return true;
+    }
 }

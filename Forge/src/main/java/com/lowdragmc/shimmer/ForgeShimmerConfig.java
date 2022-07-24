@@ -8,6 +8,8 @@ public class ForgeShimmerConfig {
     private static ForgeConfigSpec.IntValue UBO_OFFSET;
     private static ForgeConfigSpec.BooleanValue BLOCK_BLOOM;
     private static ForgeConfigSpec.BooleanValue LIGHT_MAP;
+    private static ForgeConfigSpec.BooleanValue COLORED_LIGHT_ENABLE;
+    private static ForgeConfigSpec.BooleanValue BLOOM_ENABLE;
 
     public static ForgeConfigSpec.IntValue getUboOffset() {
         if (UBO_OFFSET == null) {
@@ -31,6 +33,22 @@ public class ForgeShimmerConfig {
             registerConfig();
         }
         return LIGHT_MAP;
+    }
+
+    public static ForgeConfigSpec.BooleanValue getColoredLightEnable(){
+        if (COLORED_LIGHT_ENABLE == null){
+            logAccessUnInit("COLORED_LIGHT_ENABLE");
+            registerConfig();
+        }
+        return COLORED_LIGHT_ENABLE;
+    }
+
+    public static ForgeConfigSpec.BooleanValue getBloomEnable(){
+        if (BLOOM_ENABLE == null){
+            logAccessUnInit("BLOOM_ENABLE");
+            registerConfig();
+        }
+        return BLOOM_ENABLE;
     }
 
     private static void logAccessUnInit(String configValueName){
@@ -64,6 +82,8 @@ public class ForgeShimmerConfig {
                         "true for light map ON",
                         "If using the light map, the light is more realistic and avoid lights through the wall. The light is smoother when closed. It is a tradeoff.")
                 .define("Using Light Map",true);
+        COLORED_LIGHT_ENABLE = builder.define("enable colored light", true);
+        BLOOM_ENABLE = builder.define("enable bloom effect",true);
     }
 
 }
