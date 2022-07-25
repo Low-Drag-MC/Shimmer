@@ -1,5 +1,7 @@
 #version 150
 
+// #define ADDITIVE
+
 //shimmer light
 struct Light {
     vec4 color;
@@ -29,7 +31,13 @@ vec3 collect_light(vec3 fragPos, vec4 vertex_color, int begin, int end) {
     for (int i= begin; i<end;i++){
         Light l = lights[i];
         float intensity = smoothstep(0., 1., 1. - distance(l.position, fragPos) / l.radius);
+
+        #ifdef ADDITIVE
         lightColor += l.color.rgb * l.color.a * intensity;
+        #else
+        lightColor = max(lightColor, l.color.rgb * l.color.a * intensity);
+        #endif
+
     }
     return lightColor;
 }

@@ -191,7 +191,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
     public void renderBlockPost() {
         PostChain postChain = getPostChain();
-        if (postChain != null && Services.PLATFORM.useBlockBloom()) {
+        if (postChain != null && Services.PLATFORM.useBlockBloom() && allowPost()) {
             RenderTarget mainTarget = mc.getMainRenderTarget();
             renderPost(postChain, new MRTTarget((IMainTarget) mainTarget), mainTarget);
             ((IMainTarget) mainTarget).clearBloomTexture(Minecraft.ON_OSX);
@@ -231,7 +231,11 @@ public class PostProcessing implements ResourceManagerReloadListener {
             PostChain postChain = getPostChain();
             if (postChain == null) return;
 
-            renderPost(postChain, postTarget, mainTarget);
+            if (allowPost()) {
+                renderPost(postChain, postTarget, mainTarget);
+            } else {
+                RenderUtils.fastBlit(postTarget, mainTarget);
+            }
 
             postTarget.clear(Minecraft.ON_OSX);
             mainTarget.bindWrite(false);
@@ -239,6 +243,10 @@ public class PostProcessing implements ResourceManagerReloadListener {
             BlendModeMixin.setLastApplied(lastBlendMode);
             GlStateManager._disableBlend();
         }
+    }
+
+    public boolean allowPost() {
+        return !(this == PostProcessing.BLOOM_UNREAL || this == PostProcessing.BLOOM_UNITY) || Services.PLATFORM.isBloomEnable();
     }
 
     public void renderParticlePost() {
@@ -252,7 +260,12 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
             if (postChain == null) return;
 
-            renderPost(postChain, postTarget, mainTarget);
+            if (allowPost()) {
+                renderPost(postChain, postTarget, mainTarget);
+            } else {
+                RenderUtils.fastBlit(postTarget, mainTarget);
+            }
+
             postTarget.clear(Minecraft.ON_OSX);
             mainTarget.bindWrite(false);
         }

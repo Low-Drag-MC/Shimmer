@@ -7,5 +7,4 @@ import net.minecraft.core.particles.ParticleOptions;
 public interface IParticleEngine {
     Particle createPostParticle(PostProcessing postProcessing, ParticleOptions pParticleData, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed);
 
-
 }
