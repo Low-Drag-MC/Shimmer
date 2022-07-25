@@ -15,7 +15,6 @@
     "MainTargetMixin",
     "ModelBlockRendererMixin",
     "ParticleDescriptionMixin",
-    "ParticleEngineMixin",
     "PostChainMixin",
     "PostPassMixin",
     "ProgramMixin",
