@@ -101,4 +101,9 @@ public class ForgePlatformHelper implements IPlatformHelper {
     public boolean isBloomEnable() {
         return ForgeShimmerConfig.getBloomEnable().get();
     }
+
+    @Override
+    public boolean isAdditiveBlend() {
+        return ForgeShimmerConfig.getAdditiveBlend().get();
+    }
 }

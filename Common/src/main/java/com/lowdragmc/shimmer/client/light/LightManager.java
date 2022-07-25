@@ -60,8 +60,15 @@ public enum LightManager {
     ShaderUBO lightUBO;
     ShaderUBO envUBO;
 
+    private static String getShimmerImport() {
+        if (Services.PLATFORM.isAdditiveBlend()) {
+            return  "\n#define ADDITIVE\n#moj_import <shimmer.glsl>\n\n";
+        }
+        return "\n#moj_import <shimmer.glsl>\n\n";
+    }
+
     private static String ChunkInjection(String s) {
-        s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
+        s = s.replace("void main()", getShimmerImport() + "void main()");
         return new StringBuffer(s).insert(s.lastIndexOf('}'),
                 Services.PLATFORM.useLightMap() ? "vertexColor = color_light_uv(pos, vertexColor,UV2);\n" : "vertexColor = color_light(pos, vertexColor);\n"
         ).toString();
@@ -69,19 +76,19 @@ public enum LightManager {
 
     private static String PositionInjection(String s) {
         //TODO fix armor lighting. what the hell!!!!!
-        s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
+        s = s.replace("void main()", getShimmerImport() + "void main()");
         return new StringBuffer(s).insert(s.lastIndexOf('}'),
                 Services.PLATFORM.useLightMap() ? "vertexColor = color_light_uv(Position, vertexColor,UV2);\n" : "vertexColor = color_light(Position, vertexColor);\n"
         ).toString();
     }
 
     private static String EntityInjectionLightMapColor(String s) {
-        s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
+        s = s.replace("void main()", getShimmerImport() + "void main()");
         return new StringBuffer(s).insert(s.lastIndexOf('}'), "lightMapColor = color_light(IViewRotMat * Position, lightMapColor);\n").toString();
     }
 
     private static String EntityInjectionVertexColor(String s) {
-        s = s.replace("void main()", "#moj_import <shimmer.glsl>\n\nvoid main()");
+        s = s.replace("void main()", getShimmerImport() + "void main()");
         return new StringBuffer(s).insert(s.lastIndexOf('}'), "vertexColor = color_light(IViewRotMat * Position, vertexColor);\n").toString();
     }
 
@@ -97,10 +104,13 @@ public enum LightManager {
                 lightShader = "";
             }
         }
+        if (Services.PLATFORM.isAdditiveBlend()) {
+            return  "\n#define ADDITIVE\n" + lightShader;
+        }
         return lightShader;
     }
 
-    public static String RbVFSHInjection(String s) {
+    public static String RbVVSHInjection(String s) {
         s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), getLightShader()).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf('}'), Services.PLATFORM.useLightMap() ? """
                     v_Color = rb_color_light_uv(position, v_Color, v_LightCoord);

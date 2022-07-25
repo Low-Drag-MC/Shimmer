@@ -70,6 +70,14 @@ public class ForgeEventListener {
                                     return 1;
                                 }
                         )))
+                .then(Commands.literal("additive_blend")
+                        .then(Commands.argument("switch_state", BoolArgumentType.bool()).executes(
+                                context -> {
+                                    ForgeShimmerConfig.getAdditiveBlend().set(context.getArgument("switch_state", Boolean.class));
+                                    ReloadShaderManager.reloadShader();
+                                    return 1;
+                                }
+                        )))
         );
     }
 }

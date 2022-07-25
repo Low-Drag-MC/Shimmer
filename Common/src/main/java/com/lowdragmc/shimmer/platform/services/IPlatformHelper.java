@@ -80,4 +80,8 @@ public interface IPlatformHelper {
     default boolean isBloomEnable(){
         return true;
     }
+
+    default boolean isAdditiveBlend(){
+        return false;
+    }
 }

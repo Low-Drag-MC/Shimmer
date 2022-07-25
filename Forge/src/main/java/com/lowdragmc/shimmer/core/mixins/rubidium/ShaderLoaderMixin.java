@@ -27,7 +27,7 @@ public abstract class ShaderLoaderMixin {
                 shader = PostProcessing.RbBloomMRTFSHInjection(shader);
             }
             if (type == ShaderType.VERTEX) {
-                shader = LightManager.RbVFSHInjection(shader);
+                shader = LightManager.RbVVSHInjection(shader);
             }
             cir.setReturnValue(new GlShader(type, name, shader));
         }

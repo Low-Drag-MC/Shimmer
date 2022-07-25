@@ -10,6 +10,7 @@ public class ForgeShimmerConfig {
     private static ForgeConfigSpec.BooleanValue LIGHT_MAP;
     private static ForgeConfigSpec.BooleanValue COLORED_LIGHT_ENABLE;
     private static ForgeConfigSpec.BooleanValue BLOOM_ENABLE;
+    private static ForgeConfigSpec.BooleanValue ADDITIVE_BLEND;
 
     public static ForgeConfigSpec.IntValue getUboOffset() {
         if (UBO_OFFSET == null) {
@@ -51,6 +52,14 @@ public class ForgeShimmerConfig {
         return BLOOM_ENABLE;
     }
 
+    public static ForgeConfigSpec.BooleanValue getAdditiveBlend(){
+        if (ADDITIVE_BLEND == null){
+            logAccessUnInit("ADDITIVE_BLEND");
+            registerConfig();
+        }
+        return ADDITIVE_BLEND;
+    }
+
     private static void logAccessUnInit(String configValueName){
         ShimmerConstants.LOGGER.error("trying to access uninitialized shimmer config value:{}," +
             "see stacktrace at debug log file",configValueName);
@@ -84,6 +93,10 @@ public class ForgeShimmerConfig {
                 .define("Using Light Map",true);
         COLORED_LIGHT_ENABLE = builder.define("enable colored light", true);
         BLOOM_ENABLE = builder.define("enable bloom effect",true);
+        ADDITIVE_BLEND = builder.comment(
+                        "using additive blend for colored lights ",
+                        "true - vivid, false - realistic")
+                .define("additive effect",false);
     }
 
 }
