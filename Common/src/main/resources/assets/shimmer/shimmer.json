@@ -30,7 +30,10 @@
       "radius": 7
     }
   ],
-  "BloomBlock": [
+  "Bloom": [
+    {
+      "particle": "minecraft:flame"
+    },
     {
       "fluid": "minecraft:lava"
     },

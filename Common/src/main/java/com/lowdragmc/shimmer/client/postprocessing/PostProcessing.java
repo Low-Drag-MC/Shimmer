@@ -364,11 +364,16 @@ public class PostProcessing implements ResourceManagerReloadListener {
 
     public static Set<BlockState> BLOOM_BLOCK = new HashSet<>();
     public static Set<Fluid> BLOOM_FLUID = new HashSet<>();
+    public static Set<ResourceLocation> BLOOM_PARTICLE = new HashSet<>();
     private static final ThreadLocal<Boolean> BLOCK_BLOOM = ThreadLocal.withInitial(()->false);
     private static final ThreadLocal<Boolean> FLUID_BLOOM = ThreadLocal.withInitial(()->false);
 
     public static void loadConfig() {
+        BLOOM_BLOCK.clear();
+        BLOOM_FLUID.clear();
+        BLOOM_PARTICLE.clear();
         JsonElement jsonElement = Configuration.config.get("BloomBlock");
+        if (jsonElement == null) jsonElement = Configuration.config.get("Bloom");
         if (jsonElement != null && jsonElement.isJsonArray()) {
             JsonArray bloomBlocks = jsonElement.getAsJsonArray();
             for (JsonElement block : bloomBlocks) {
@@ -390,6 +395,9 @@ public class PostProcessing implements ResourceManagerReloadListener {
                     if (!Registry.FLUID.containsKey(location)) continue;
                     Fluid ff = Registry.FLUID.get(location);
                     BLOOM_FLUID.add(ff);
+                } else if (jsonObj.has("particle")) {
+                    ResourceLocation location = new ResourceLocation(jsonObj.get("particle").getAsString());
+                    BLOOM_PARTICLE.add(location);
                 }
             }
         }

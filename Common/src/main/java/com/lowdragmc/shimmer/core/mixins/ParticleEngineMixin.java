@@ -56,10 +56,14 @@ public class ParticleEngineMixin {
     @Inject(method = "createParticle", at = @At(value = "HEAD"), cancellable = true)
     private void injectCreateParticle(ParticleOptions particleOptions, double x, double y, double z, double sx, double sy, double sz, CallbackInfoReturnable<Particle> cir) {
         ResourceLocation name = Registry.PARTICLE_TYPE.getKey(particleOptions.getType());
-        if (!ShimmerMixinPlugin.IS_OPT_LOAD && PARTICLE_EFFECT.containsKey(name) && this instanceof IParticleEngine particleEngine) {
-            PostProcessing postProcessing = PostProcessing.getPost(PARTICLE_EFFECT.get(name));
-            if (postProcessing != null) {
-                cir.setReturnValue(particleEngine.createPostParticle(postProcessing, particleOptions, x, y, z, sx, sy, sz));
+        if (!ShimmerMixinPlugin.IS_OPT_LOAD && this instanceof IParticleEngine particleEngine) {
+            if (PARTICLE_EFFECT.containsKey(name)) {
+                PostProcessing postProcessing = PostProcessing.getPost(PARTICLE_EFFECT.get(name));
+                if (postProcessing != null) {
+                    cir.setReturnValue(particleEngine.createPostParticle(postProcessing, particleOptions, x, y, z, sx, sy, sz));
+                }
+            } else if (PostProcessing.BLOOM_PARTICLE.contains(name)) {
+                cir.setReturnValue(particleEngine.createPostParticle(PostProcessing.getBlockBloom(), particleOptions, x, y, z, sx, sy, sz));
             }
         }
     }
