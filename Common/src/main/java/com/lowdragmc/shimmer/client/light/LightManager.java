@@ -398,63 +398,65 @@ public enum LightManager {
     }
 
     public void loadConfig() {
-        JsonElement jsonElement = Configuration.config.has("LightBlock") ? Configuration.config.get("LightBlock") : null;
-        if (jsonElement != null && jsonElement.isJsonArray()) {
-            JsonArray blocks = jsonElement.getAsJsonArray();
-            for (JsonElement block : blocks) {
-                JsonObject jsonObj = block.getAsJsonObject();
-                int color = (JsonUtils.getIntOr("a", jsonObj, 0) << 24) |
-                        (JsonUtils.getIntOr("r", jsonObj, 0) << 16) |
-                        (JsonUtils.getIntOr("g", jsonObj, 0) << 8) |
-                        JsonUtils.getIntOr("b", jsonObj, 0);
-                float radius = jsonObj.get("radius").getAsFloat();
-                if (jsonObj.has("block")) {
-                    ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
-                    if (!Registry.BLOCK.containsKey(location)) continue;
-                    Block bb = Registry.BLOCK.get(location);
-                    if (jsonObj.has("state") && jsonObj.get("state").isJsonObject()) {
-                        Set<BlockState> available = Utils.getAllPossibleStates(jsonObj, bb);
-                        if (!available.isEmpty()) {
-                            registerBlockLight(bb, (bs, pos) -> {
-                                if (available.contains(bs)) {
-                                    return new ColorPointLight.Template(radius, color);
-                                }
-                                return null;
-                            });
+        for (JsonObject config:Configuration.config){
+            JsonElement jsonElement = config.has("LightBlock") ? config.get("LightBlock") : null;
+            if (jsonElement != null && jsonElement.isJsonArray()) {
+                JsonArray blocks = jsonElement.getAsJsonArray();
+                for (JsonElement block : blocks) {
+                    JsonObject jsonObj = block.getAsJsonObject();
+                    int color = (JsonUtils.getIntOr("a", jsonObj, 0) << 24) |
+                            (JsonUtils.getIntOr("r", jsonObj, 0) << 16) |
+                            (JsonUtils.getIntOr("g", jsonObj, 0) << 8) |
+                            JsonUtils.getIntOr("b", jsonObj, 0);
+                    float radius = jsonObj.get("radius").getAsFloat();
+                    if (jsonObj.has("block")) {
+                        ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
+                        if (!Registry.BLOCK.containsKey(location)) continue;
+                        Block bb = Registry.BLOCK.get(location);
+                        if (jsonObj.has("state") && jsonObj.get("state").isJsonObject()) {
+                            Set<BlockState> available = Utils.getAllPossibleStates(jsonObj, bb);
+                            if (!available.isEmpty()) {
+                                registerBlockLight(bb, (bs, pos) -> {
+                                    if (available.contains(bs)) {
+                                        return new ColorPointLight.Template(radius, color);
+                                    }
+                                    return null;
+                                });
+                            }
+                        } else {
+                            registerBlockLight(bb, color, radius);
                         }
-                    } else {
-                        registerBlockLight(bb, color, radius);
+                    } else if (jsonObj.has("fluid")) {
+                        ResourceLocation location = new ResourceLocation(jsonObj.get("fluid").getAsString());
+                        if (!Registry.FLUID.containsKey(location)) continue;
+                        Fluid ff = Registry.FLUID.get(location);
+                        registerFluidLight(ff, color, radius);
                     }
-                } else if (jsonObj.has("fluid")) {
-                    ResourceLocation location = new ResourceLocation(jsonObj.get("fluid").getAsString());
-                    if (!Registry.FLUID.containsKey(location)) continue;
-                    Fluid ff = Registry.FLUID.get(location);
-                    registerFluidLight(ff, color, radius);
                 }
             }
-        }
 
-        jsonElement = Configuration.config.has("LightItem") ? Configuration.config.get("LightItem") : null;
-        if (jsonElement != null && jsonElement.isJsonArray()) {
-            JsonArray items = jsonElement.getAsJsonArray();
-            for (JsonElement element : items) {
-                JsonObject jsonObj = element.getAsJsonObject();
-                int color = (JsonUtils.getIntOr("a", jsonObj, 0) << 24) |
-                        (JsonUtils.getIntOr("r", jsonObj, 0) << 16) |
-                        (JsonUtils.getIntOr("g", jsonObj, 0) << 8) |
-                        JsonUtils.getIntOr("b", jsonObj, 0);
-                float radius = jsonObj.get("radius").getAsFloat();
-                if (jsonObj.has("item_id")) {
-                    ResourceLocation itemResourceLocation = new ResourceLocation(jsonObj.get("item_id").getAsString());
-                    if (Registry.ITEM.containsKey(itemResourceLocation)){
-                        Item item = Registry.ITEM.get(itemResourceLocation);
+            jsonElement = config.has("LightItem") ? config.get("LightItem") : null;
+            if (jsonElement != null && jsonElement.isJsonArray()) {
+                JsonArray items = jsonElement.getAsJsonArray();
+                for (JsonElement element : items) {
+                    JsonObject jsonObj = element.getAsJsonObject();
+                    int color = (JsonUtils.getIntOr("a", jsonObj, 0) << 24) |
+                            (JsonUtils.getIntOr("r", jsonObj, 0) << 16) |
+                            (JsonUtils.getIntOr("g", jsonObj, 0) << 8) |
+                            JsonUtils.getIntOr("b", jsonObj, 0);
+                    float radius = jsonObj.get("radius").getAsFloat();
+                    if (jsonObj.has("item_id")) {
+                        ResourceLocation itemResourceLocation = new ResourceLocation(jsonObj.get("item_id").getAsString());
+                        if (Registry.ITEM.containsKey(itemResourceLocation)){
+                            Item item = Registry.ITEM.get(itemResourceLocation);
+                            ColorPointLight.Template template = new ColorPointLight.Template(radius,color);
+                            registerItemLight(item, itemStack -> template);
+                        }
+                    } else if (jsonObj.has("item_tag")) {
+                        ResourceLocation tag = new ResourceLocation(jsonObj.get("item_tag").getAsString());
                         ColorPointLight.Template template = new ColorPointLight.Template(radius,color);
-                        registerItemLight(item, itemStack -> template);
+                        registerTagLight(tag, itemStack -> template);
                     }
-                } else if (jsonObj.has("item_tag")) {
-                    ResourceLocation tag = new ResourceLocation(jsonObj.get("item_tag").getAsString());
-                    ColorPointLight.Template template = new ColorPointLight.Template(radius,color);
-                    registerTagLight(tag, itemStack -> template);
                 }
             }
         }

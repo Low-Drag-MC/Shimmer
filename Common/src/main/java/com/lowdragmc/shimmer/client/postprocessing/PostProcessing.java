@@ -372,32 +372,34 @@ public class PostProcessing implements ResourceManagerReloadListener {
         BLOOM_BLOCK.clear();
         BLOOM_FLUID.clear();
         BLOOM_PARTICLE.clear();
-        JsonElement jsonElement = Configuration.config.get("BloomBlock");
-        if (jsonElement == null) jsonElement = Configuration.config.get("Bloom");
-        if (jsonElement != null && jsonElement.isJsonArray()) {
-            JsonArray bloomBlocks = jsonElement.getAsJsonArray();
-            for (JsonElement block : bloomBlocks) {
-                JsonObject jsonObj = block.getAsJsonObject();
-                if (jsonObj.has("block")) {
-                    ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
-                    if (!Registry.BLOCK.containsKey(location)) continue;
-                    Block bb = Registry.BLOCK.get(location);
-                    if (jsonObj.has("state") && jsonObj.get("state").isJsonObject()) {
-                        Set<BlockState> available = Utils.getAllPossibleStates(jsonObj, bb);
-                        if (!available.isEmpty()) {
-                            BLOOM_BLOCK.addAll(available);
+        for (JsonObject config : Configuration.config){
+            JsonElement jsonElement  = config.get("BloomBlock");
+            if (jsonElement == null) jsonElement = config.get("Bloom");
+            if (jsonElement != null && jsonElement.isJsonArray()) {
+                JsonArray bloomBlocks = jsonElement.getAsJsonArray();
+                for (JsonElement block : bloomBlocks) {
+                    JsonObject jsonObj = block.getAsJsonObject();
+                    if (jsonObj.has("block")) {
+                        ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
+                        if (!Registry.BLOCK.containsKey(location)) continue;
+                        Block bb = Registry.BLOCK.get(location);
+                        if (jsonObj.has("state") && jsonObj.get("state").isJsonObject()) {
+                            Set<BlockState> available = Utils.getAllPossibleStates(jsonObj, bb);
+                            if (!available.isEmpty()) {
+                                BLOOM_BLOCK.addAll(available);
+                            }
+                        } else {
+                            BLOOM_BLOCK.addAll(bb.getStateDefinition().getPossibleStates());
                         }
-                    } else {
-                        BLOOM_BLOCK.addAll(bb.getStateDefinition().getPossibleStates());
+                    } else if (jsonObj.has("fluid")) {
+                        ResourceLocation location = new ResourceLocation(jsonObj.get("fluid").getAsString());
+                        if (!Registry.FLUID.containsKey(location)) continue;
+                        Fluid ff = Registry.FLUID.get(location);
+                        BLOOM_FLUID.add(ff);
+                    } else if (jsonObj.has("particle")) {
+                        ResourceLocation location = new ResourceLocation(jsonObj.get("particle").getAsString());
+                        BLOOM_PARTICLE.add(location);
                     }
-                } else if (jsonObj.has("fluid")) {
-                    ResourceLocation location = new ResourceLocation(jsonObj.get("fluid").getAsString());
-                    if (!Registry.FLUID.containsKey(location)) continue;
-                    Fluid ff = Registry.FLUID.get(location);
-                    BLOOM_FLUID.add(ff);
-                } else if (jsonObj.has("particle")) {
-                    ResourceLocation location = new ResourceLocation(jsonObj.get("particle").getAsString());
-                    BLOOM_PARTICLE.add(location);
                 }
             }
         }
