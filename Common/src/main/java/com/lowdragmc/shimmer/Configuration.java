@@ -2,9 +2,15 @@ package com.lowdragmc.shimmer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author KilaBash
@@ -12,17 +18,25 @@ import java.io.File;
  * @implNote Configs
  */
 public class Configuration {
-    public static JsonObject config;
+    private static final ResourceLocation configLocation = new ResourceLocation(ShimmerConstants.MOD_ID,"shimmer.json");
+    public static List<JsonObject> config = new ArrayList<>();
 
     public static void load() {
-        // compatible with runData
-        if (Minecraft.getInstance() != null && Minecraft.getInstance().gameDirectory != null) {
-            File path = new File(Minecraft.getInstance().gameDirectory, "config/shimmer.json");
-            FileUtility.extractJarFiles(String.format("/assets/%s/%s", ShimmerConstants.MOD_ID, "shimmer.json"), new File(Minecraft.getInstance().gameDirectory, "config/shimmer.json"), false);
-            JsonElement jsonElement = FileUtility.loadJson(path);
-            if (jsonElement instanceof JsonObject) {
-                config = (JsonObject) jsonElement;
+        config.clear();
+        try {
+            List<Resource> resources = Minecraft.getInstance().getResourceManager().getResources(configLocation);
+            for (var resource : resources){
+                try (InputStreamReader reader = new InputStreamReader(resource.getInputStream())) {
+                    JsonElement jsonElement = JsonParser.parseReader(reader);
+                    if (jsonElement instanceof JsonObject jsonObject){
+                        config.add(jsonObject);
+                    }else {
+                        ShimmerConstants.LOGGER.info("failed to parse resource:{}",resource.getLocation());
+                    }
+                }
             }
+        }catch (IOException ignored){
+            ShimmerConstants.LOGGER.info("failed to get config resources");
         }
     }
 
