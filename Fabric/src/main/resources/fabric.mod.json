@@ -4,10 +4,11 @@
     "version": "${version}",
 
     "name": "Shimmer",
-    "description": "Shimemr",
+    "description": "Shimmer",
     "authors": [
-      "KillaBash",
-      "HypherionSA"
+      "KilaBash",
+      "HypherionSA",
+      "zomb_676"
     ],
     "contact": {
       "sources": "https://github.com/Low-Drag-MC/Shimmer/"

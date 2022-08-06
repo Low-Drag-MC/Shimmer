@@ -9,8 +9,8 @@ version="${file.jarVersion}"
 displayName="Shimmer"
 displayURL="https://github.com/Low-Drag-MC/Shimmer"
 logoFile="icon.png"
-credits="zomb_676, hypherionsa"
-authors="KilaBash"
+credits="hypherionsa"
+authors="KilaBash, zomb_676"
 description='''Shimemr, make rendering vivid'''
 
 [[dependencies.shimmer]]
