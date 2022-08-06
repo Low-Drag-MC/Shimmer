@@ -171,6 +171,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
         if (postTarget == null) {
             postTarget = new CopyDepthTarget(mc.getMainRenderTarget(), Minecraft.ON_OSX);
             postTarget.setClearColor(0,0,0,0);
+            postTarget.clear(Minecraft.ON_OSX);
         }
         return postTarget;
     }
