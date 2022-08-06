@@ -58,7 +58,6 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
         );
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
-        onResourceManagerReload(null);
     }
 
     @Override
