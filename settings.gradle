@@ -1,16 +1,14 @@
 pluginManagement {
     repositories {
+        maven { url "https://maven.fabricmc.net/" }
+        maven { url "https://maven.architectury.dev/" }
+        maven { url "https://maven.minecraftforge.net/" }
         gradlePluginPortal()
-        maven {
-            name = 'Fabric'
-            url = 'https://maven.fabricmc.net/'
-        }
-        maven {
-            name = 'Sponge Snapshots'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
-        }
     }
 }
 
-rootProject.name = 'Shimmer'
-include("Common", "Fabric", "Forge")
+include("Common")
+include("Fabric")
+include("Forge")
+
+rootProject.name = "Shimmer"

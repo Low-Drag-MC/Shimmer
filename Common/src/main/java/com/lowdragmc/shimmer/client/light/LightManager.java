@@ -398,7 +398,7 @@ public enum LightManager {
     }
 
     public void loadConfig() {
-        for (JsonObject config:Configuration.config){
+        for (JsonObject config: Configuration.config){
             JsonElement jsonElement = config.has("LightBlock") ? config.get("LightBlock") : null;
             if (jsonElement != null && jsonElement.isJsonArray()) {
                 JsonArray blocks = jsonElement.getAsJsonArray();

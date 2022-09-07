@@ -1,83 +1,75 @@
 plugins {
-    id "io.github.pacifistmc.forgix" version "1.2.2"
+    id "architectury-plugin" version "3.4-SNAPSHOT"
+    id "dev.architectury.loom" version "0.12.0-SNAPSHOT" apply false
 }
 
-forgix {
-    // Documentation on how to configure Forgix can be found here
-    // https://github.com/PacifistMC/Forgix#configuration
-
-    group = "com.lowdragmc.shimmer"
-    mergedJarName = "Shimmer-${project.minecraft_version}-${project.version}.${project.version_patch}.jar"
-    outputDir = "artifacts"
-
-    forge {
-        projectName = "Forge"
-    }
-
-    fabric {
-        projectName = "Fabric"
-    }
+architectury {
+    minecraft = rootProject.minecraft_version
 }
 
 subprojects {
+    apply plugin: "dev.architectury.loom"
 
-    def version_base = "${project.version}"
-    version = "${version_base}.${project.version_patch}"
-
-    group = project.group
-
-    // Jenkins - If needed in the future
-    if (System.getenv('BUILD_NUMBER') != null) {
-        version = version_base + "." + System.getenv('BUILD_NUMBER') + "d"
-    }
-
-    apply plugin: 'java'
-
-    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-    //java.withSourcesJar()
-    //java.withJavadocJar()
-
-    jar {
-        manifest {
-            attributes([
-                'Specification-Title'     : mod_name,
-                'Specification-Vendor'    : mod_author,
-                'Specification-Version'   : project.jar.archiveVersion,
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
-                'Implementation-Vendor'   : mod_author,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'Timestampe'              : System.currentTimeMillis(),
-                'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
-                'Build-On-Minecraft'      : minecraft_version
-            ])
-        }
+    loom {
+        silentMojangMappingsLicense()
     }
 
     repositories {
-        mavenCentral()
         maven {
-            name = 'Sponge / Mixin'
-            url = 'https://repo.spongepowered.org/repository/maven-public/'
+            url 'https://maven.parchmentmc.org/'
+            content {
+                includeGroup 'org.parchmentmc.data'
+            }
+        }
+        repositories {
+            maven {
+                url "https://cursemaven.com"
+                content {
+                    includeGroup "curse.maven"
+                }
+            }
         }
         maven {
-            url 'https://cfa2.cursemaven.com'
+            name = "Modrinth"
+            url = "https://api.modrinth.com/maven"
+            content {
+                includeGroup "maven.modrinth"
+            }
         }
     }
 
+    dependencies {
+        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        mappings loom.layered() {
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-${parchment_version}@zip" as String)
+        }
+    }
+}
 
-    tasks.withType(JavaCompile).configureEach {
-        it.options.encoding = 'UTF-8'
-        it.options.release = 17
+allprojects {
+    apply plugin: "java"
+    apply plugin: "architectury-plugin"
+    apply plugin: "maven-publish"
+
+    archivesBaseName = rootProject.mod_name
+    version = "${rootProject.version}.${rootProject.version_patch}"
+    group = rootProject.maven_group
+
+    repositories {
+        // Add repositories to retrieve artifacts from in here.
+        // You should only use this when depending on other mods because
+        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+        // for more information about repositories.
     }
 
-    // Disables Gradle's custom module metadata from being published to maven. The
-    // metadata includes mapped dependencies which are not reasonably consumable by
-    // other mod developers.
-    tasks.withType(GenerateModuleMetadata) {
-        enabled = false
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+        options.release = 17
     }
 
-    build.finalizedBy(mergeJars)
-    assemble.finalizedBy(mergeJars)
+    java {
+        withSourcesJar()
+    }
 }

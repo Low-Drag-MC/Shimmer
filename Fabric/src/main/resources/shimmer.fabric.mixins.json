@@ -1,16 +1,16 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.lowdragmc.shimmer.core.mixins",
+  "package": "com.lowdragmc.shimmer.fabric.core.mixins",
   "compatibilityLevel": "JAVA_17",
-  "plugin": "com.lowdragmc.shimmer.core.mixins.ShimmerFabricMixinPlugin",
+  "plugin": "com.lowdragmc.shimmer.fabric.core.mixins.ShimmerFabricMixinPlugin",
   "client": [
-    "MinecraftMixin",
-    "ParticleEngineMixin",
-    "ResourceLocationMixin",
-    "ShaderInstanceMixin",
-    "MutableQuadViewImplMixin",
-    "QuadViewImplMixin"
+		"MinecraftMixin",
+		"ParticleEngineMixin",
+		"ResourceLocationMixin",
+		"ShaderInstanceMixin",
+		"MutableQuadViewImplMixin",
+		"QuadViewImplMixin"
   ],
   "server": [
   ],
@@ -18,13 +18,13 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "sodium.BlockRendererMixin",
-    "sodium.ChunkRenderRebuildTaskMixin",
-    "sodium.FluidRendererMixin",
-    "sodium.RenderSectionManagerAccessor",
-    "sodium.RenderSectionMixin",
-    "sodium.ShaderChunkRendererMixin",
-    "sodium.ShaderLoaderMixin",
-    "sodium.SodiumWorldRendererMixin"
+		"sodium.BlockRendererMixin",
+		"sodium.ChunkRenderRebuildTaskMixin",
+		"sodium.FluidRendererMixin",
+		"sodium.RenderSectionManagerAccessor",
+		"sodium.RenderSectionMixin",
+		"sodium.ShaderChunkRendererMixin",
+		"sodium.ShaderLoaderMixin",
+		"sodium.SodiumWorldRendererMixin"
   ]
 }

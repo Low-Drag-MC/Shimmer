@@ -20,5 +20,7 @@ build
 # other
 eclipse
 run
+.vscode
 
+#forgix
 artifacts

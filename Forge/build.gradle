@@ -1,162 +1,100 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-    }
-}
-apply plugin: 'java'
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'maven-publish'
-
-archivesBaseName = "${mod_name}-forge-${minecraft_version}"
-
-mixin {
-    add sourceSets.main, "${mod_id}.refmap.json"
-
-    config "${mod_id}.mixins.json"
-    config "${mod_id}.forge.mixins.json"
+plugins {
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-minecraft {
-    mappings channel: 'official', version: minecraft_version
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
 
-    if (project.hasProperty('forge_ats_enabled') && project.findProperty('forge_ats_enabled').toBoolean()) {
-        // This location is hardcoded in Forge and can not be changed.
-        // https://github.com/MinecraftForge/MinecraftForge/blob/be1698bb1554f9c8fa2f58e32b9ab70bc4385e60/fmlloader/src/main/java/net/minecraftforge/fml/loading/moddiscovery/ModFile.java#L123
-        accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-        project.logger.debug('Forge Access Transformers are enabled for this project.')
-    }
+loom {
+    accessWidenerPath = project(":Common").loom.accessWidenerPath
 
-    runs {
-        client {
-            workingDirectory project.file('run')
-            ideaModule "${rootProject.name}.${project.name}.main"
-            taskName 'Client'
-            args "-mixins.config=${mod_id}.mixins.json", "-mixins.config=${mod_id}.forge.mixins.json"
-            mods {
-                modClientRun {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                }
-            }
-        }
+    forge {
+        convertAccessWideners = true
+        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
-        server {
-            workingDirectory project.file('run')
-            ideaModule "${rootProject.name}.${project.name}.main"
-            taskName 'Server'
-            args "-mixins.config=${mod_id}.mixins.json", "-mixins.config=${mod_id}.forge.mixins.json"
-            mods {
-                modServerRun {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-            ideaModule "${rootProject.name}.${project.name}.main"
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-            taskName 'Data'
-            args "-mixins.config=${mod_id}.mixins.json", "-mixins.config=${mod_id}.forge.mixins.json"
-            mods {
-                modDataRun {
-                    source sourceSets.main
-                    source project(":Common").sourceSets.main
-                }
-            }
-        }
+        mixinConfig "${mod_id}.mixins.json"
+        mixinConfig "${mod_id}.forge.mixins.json"
     }
 }
 
-sourceSets.main.resources.srcDir 'src/generated/resources'
+archivesBaseName = "${rootProject.archivesBaseName}-forge"
+
+configurations {
+    common
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
+}
 
 repositories {
     maven {
-        name 'IzzelAliz Maven'
-        url 'https://maven.izzel.io/releases/'
-    }
-}
-
-configurations {
-    library
-    implementation.extendsFrom library
-}
-
-configurations {
-    runtimeLibrary
-    implementation.extendsFrom runtimeLibrary
-}
-
-minecraft.runs.all {
-    lazyToken('minecraft_classpath') {
-        configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
-        configurations.runtimeLibrary.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
+        name "tterrag maven"
+        url "https://maven.tterrag.com/"
     }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    compileOnly project(":Common")
+    forge "net.minecraftforge:forge:${rootProject.forge_version}"
 
-    // Rubidium
-    implementation fg.deobf("curse.maven:rubidium-574856:3749094")
-    implementation fg.deobf("curse.maven:flywheel-486392:3871082")
-    //Modern UI
-    runtimeLibrary "icyllis.modernui:ModernUI-Core:3.4.4.103"
-    runtimeOnly fg.deobf("icyllis.modernui:ModernUI-Forge:${minecraft_version}-3.4.4.103")
+    common(project(path: ":Common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":Common", configuration: "transformProductionForge")) { transitive = false }
 
-    if (System.getProperty('idea.sync.active') != 'true') {
-        annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
-    }
-}
+    modCompileOnly("curse.maven:rubidium-574856:3749094")
+    modRuntimeOnly("curse.maven:flywheel-486392:3871082")
 
-tasks.withType(JavaCompile) {
-    source(project(":Common").sourceSets.main.allSource)
 }
 
 processResources {
-    from project(":Common").sourceSets.main.resources
+    inputs.property "version", project.version
 
-    filesMatching('*.mixins.json') {
-        expand "refmap_target": "${mod_id}."
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
     }
 }
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
-    archiveBaseName.set(project.archivesBaseName)
-    archiveVersion.set("${project.version}")
-    archiveClassifier.set('sources')
+shadowJar {
+    exclude "fabric.mod.json"
+    exclude "architectury.common.json"
+
+    configurations = [project.configurations.shadowCommon]
+    classifier "dev-shadow"
 }
 
-jar.finalizedBy('reobfJar')
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    classifier null
+}
+
+jar {
+    classifier "dev"
+}
+
+sourcesJar {
+    def commonSources = project(":Common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
+    }
+}
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
-            artifact jar
-            artifact sourcesJar
+        mavenForge(MavenPublication) {
+            artifactId = rootProject.archivesBaseName + "-" + project.name
+            from components.java
         }
     }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
-        maven {
-            url "https://maven.firstdarkdev.xyz/${maven_path}"
-            credentials {
-                username System.getenv("MAVEN_USER")
-                password System.getenv("MAVEN_PASS")
-            }
-        }
+        // Add repositories to publish to here.
     }
 }

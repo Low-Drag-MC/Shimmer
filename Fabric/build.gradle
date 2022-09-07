@@ -1,18 +1,32 @@
 plugins {
-    id 'fabric-loom' version '0.10-SNAPSHOT'
-    id 'maven-publish'
-    id 'idea'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-archivesBaseName = "${mod_name}-fabric-${minecraft_version}"
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+loom {
+    accessWidenerPath = project(":Common").loom.accessWidenerPath
+}
+
+archivesBaseName = "${rootProject.archivesBaseName}-fabric"
+
+configurations {
+    common
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
+}
 
 dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    implementation project(":Common")
-    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+
+    common(project(path: ":Common", configuration: "namedElements")) { transitive false }
+    shadowCommon(project(path: ":Common", configuration: "transformProductionFabric")) { transitive false }
 
     // Sodium
     modImplementation ("curse.maven:sodium-394468:3669187") {
@@ -20,66 +34,57 @@ dependencies {
     }
     // This is a dependency of Sodium....
     implementation 'org.joml:joml:1.10.4'
-}
 
-loom {
-    accessWidenerPath = project(":Common").file("src/main/resources/shimmer.accesswidener")
-    runs {
-        client {
-            client()
-            setConfigName("Fabric Client")
-            ideConfigGenerated(true)
-            runDir("run")
-        }
-        server {
-            server()
-            setConfigName("Fabric Server")
-            ideConfigGenerated(true)
-            runDir("run")
-        }
-    }
 }
-
 
 processResources {
-    from project(":Common").sourceSets.main.resources
     inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
         expand "version": project.version
     }
-
-    filesMatching('*.mixins.json') {
-        expand "refmap_target": "${archivesBaseName}-"
-    }
 }
 
-tasks.withType(JavaCompile) {
-    source(project(":Common").sourceSets.main.allSource)
+shadowJar {
+    exclude "architectury.common.json"
+
+    configurations = [project.configurations.shadowCommon]
+    classifier "dev-shadow"
+}
+
+remapJar {
+    injectAccessWidener = true
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    classifier null
 }
 
 jar {
-    from("LICENSE") {
-        rename { "${it}_${mod_name}" }
+    classifier "dev"
+}
+
+sourcesJar {
+    def commonSources = project(":Common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+components.java {
+    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+        skip()
     }
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
+        mavenFabric(MavenPublication) {
+            artifactId = rootProject.archivesBaseName + "-" + project.name
             from components.java
         }
     }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
-        maven {
-            url "https://maven.firstdarkdev.xyz/${maven_path}"
-            credentials {
-                username System.getenv("MAVEN_USER")
-                password System.getenv("MAVEN_PASS")
-            }
-        }
+        // Add repositories to publish to here.
     }
 }

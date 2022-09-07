@@ -1,58 +1,27 @@
-plugins {
-    id 'java'
-    id 'org.spongepowered.gradle.vanilla' version '0.2.1-SNAPSHOT'
-    id 'maven-publish'
+architectury {
+    common(rootProject.enabled_platforms.split(","))
 }
 
-archivesBaseName = "${mod_name}-common-${minecraft_version}"
-
-minecraft {
-    accessWideners(project.file("src/main/resources/shimmer.accesswidener"))
-    version(minecraft_version)
-    runs {
-        if (project.hasProperty('common_runs_enabled') ? project.findProperty('common_runs_enabled').toBoolean() : true) {
-
-            server(project.hasProperty('common_server_run_name') ? project.findProperty('common_server_run_name') : 'vanilla_server') {
-                workingDirectory(this.file("run"))
-            }
-            client(project.hasProperty('common_client_run_name') ? project.findProperty('common_client_run_name') : 'vanilla_client') {
-                workingDirectory(this.file("run"))
-            }
-        }
-    }
+loom {
+    accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
 }
 
 dependencies {
-    compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.4'
-    compileOnly("org.ow2.asm:asm-tree:9.3")
-}
-
-processResources {
-
-    def buildProps = project.properties.clone()
-
-    filesMatching(['pack.mcmeta']) {
-
-        expand buildProps
-    }
+    // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
+    // Do NOT use other classes from fabric loader
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
+        mavenCommon(MavenPublication) {
+            artifactId = rootProject.archivesBaseName
             from components.java
         }
     }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
-        maven {
-            url "https://maven.firstdarkdev.xyz/${maven_path}"
-            credentials {
-                username System.getenv("MAVEN_USER")
-                password System.getenv("MAVEN_PASS")
-            }
-        }
+        // Add repositories to publish to here.
     }
 }

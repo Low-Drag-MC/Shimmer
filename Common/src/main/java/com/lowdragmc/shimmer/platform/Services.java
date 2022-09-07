@@ -2,8 +2,7 @@ package com.lowdragmc.shimmer.platform;
 
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.platform.services.IPlatformHelper;
-
-import java.util.ServiceLoader;
+import net.minecraft.client.ClientBrandRetriever;
 
 /**
  * @author HypherionSA
@@ -11,14 +10,25 @@ import java.util.ServiceLoader;
  */
 public class Services {
 
-    public static final IPlatformHelper PLATFORM = load(IPlatformHelper.class);
+    public static final IPlatformHelper PLATFORM = load();
 
-    public static <T> T load(Class<T> clazz) {
-
-        final T loadedService = ServiceLoader.load(clazz)
-                .findFirst()
-                .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
-        ShimmerConstants.LOGGER.debug("Loaded {} for service {}", loadedService, clazz);
+    private static IPlatformHelper load() {
+        String loaderName = ClientBrandRetriever.getClientModName().toLowerCase().trim();
+        var classLocation = switch (loaderName) {
+            case "forge" -> "com.lowdragmc.shimmer.forge.platform.ForgePlatformHelper";
+            case "fabric" -> "com.lowdragmc.shimmer.fabric.platform.FabricPlatformHelper";
+            case "vanilla" -> throw new RuntimeException("run on vanilla?");
+            default -> throw new RuntimeException("unknown loader " + loaderName);
+        };
+        ShimmerConstants.LOGGER.debug("detect loader " + loaderName);
+        IPlatformHelper loadedService;
+        try {
+            loadedService = (IPlatformHelper) Class.forName(classLocation).getConstructor().newInstance();
+        } catch (Exception e) {
+            ShimmerConstants.LOGGER.error("failed to init PlatformHelper");
+            throw new RuntimeException(e);
+        }
+        ShimmerConstants.LOGGER.debug("Loaded {} for service", loadedService);
         return loadedService;
     }
 }

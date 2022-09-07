@@ -5,7 +5,7 @@ issueTrackerURL="https://github.com/Low-Drag-MC/Shimmer/issues"
 
 [[mods]]
 modId="shimmer"
-version="${file.jarVersion}"
+version="${version}"
 displayName="Shimmer"
 displayURL="https://github.com/Low-Drag-MC/Shimmer"
 logoFile="icon.png"

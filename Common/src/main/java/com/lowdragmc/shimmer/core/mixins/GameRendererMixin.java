@@ -1,10 +1,10 @@
 package com.lowdragmc.shimmer.core.mixins;
 
-import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
+import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.VertexFormat;

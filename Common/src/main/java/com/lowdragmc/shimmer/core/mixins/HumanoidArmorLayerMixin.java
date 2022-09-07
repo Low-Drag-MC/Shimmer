@@ -1,9 +1,9 @@
 package com.lowdragmc.shimmer.core.mixins;
 
-import com.lowdragmc.shimmer.client.ResourceUtils;
-import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
+import com.lowdragmc.shimmer.client.ResourceUtils;
+import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;

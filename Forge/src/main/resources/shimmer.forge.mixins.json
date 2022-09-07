@@ -1,26 +1,25 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.lowdragmc.shimmer.core.mixins",
+  "package": "com.lowdragmc.shimmer.forge.core.mixins",
   "compatibilityLevel": "JAVA_17",
-  "plugin": "com.lowdragmc.shimmer.core.mixins.ShimmerForgeMixinPlugin",
+  "plugin": "com.lowdragmc.shimmer.forge.core.mixins.ShimmerForgeMixinPlugin",
   "client": [
-    "ForgeParticleEngineMixin",
-    "ForgeShaderInstanceMixin",
-    "LightUtilMixin"
+		"ForgeParticleEngineMixin",
+		"ForgeShaderInstanceMixin",
+		"LightUtilMixin"
   ],
   "mixins": [
-    "rubidium.BlockRendererMixin",
-    "rubidium.ChunkRenderRebuildTaskMixin",
-    "rubidium.FluidRendererMixin",
-    "rubidium.RenderSectionManagerAccessor",
-    "rubidium.RenderSectionMixin",
-    "rubidium.ShaderChunkRendererMixin",
-    "rubidium.ShaderLoaderMixin",
-    "rubidium.SodiumWorldRendererMixin"
+		"rubidium.BlockRendererMixin",
+		"rubidium.ChunkRenderRebuildTaskMixin",
+		"rubidium.FluidRendererMixin",
+		"rubidium.RenderSectionManagerAccessor",
+		"rubidium.RenderSectionMixin",
+		"rubidium.ShaderChunkRendererMixin",
+		"rubidium.ShaderLoaderMixin",
+		"rubidium.SodiumWorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "refmap": "${refmap_target}refmap.json"
+  }
 }

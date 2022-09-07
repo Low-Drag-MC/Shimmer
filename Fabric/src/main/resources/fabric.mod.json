@@ -20,17 +20,16 @@
     "environment": "*",
     "entrypoints": {
       "main": [
-        "com.lowdragmc.shimmer.ShimmerMod"
+				"com.lowdragmc.shimmer.fabric.ShimmerMod"
       ],
       "client": [
-        "com.lowdragmc.shimmer.client.ShimmerModClient"
+				"com.lowdragmc.shimmer.fabric.client.ShimmerModClient"
       ]
     },
     "mixins": [
       "shimmer.mixins.json",
       "shimmer.fabric.mixins.json"
     ],
-    "accessWidener": "shimmer.accesswidener",
     "depends": {
       "fabricloader": ">=0.13.3",
       "fabric": "*",
