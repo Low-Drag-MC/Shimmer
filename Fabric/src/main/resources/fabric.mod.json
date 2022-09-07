@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "shimmer",
-    "version": "${version}",
+    "version": "${versions}",
 
     "name": "Shimmer",
     "description": "Shimmer",
