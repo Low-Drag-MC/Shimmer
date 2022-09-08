@@ -1,5 +1,5 @@
 plugins {
-    id("com.github.johnrengelman.shadow").version("7.1.2")
+    id("com.github.johnrengelman.shadow")
 }
 
 architectury {
@@ -8,7 +8,7 @@ architectury {
 }
 
 dependencies {
-    forge("net.minecraftforge:forge:${rootProject.ext["forge_version"]}")
+    forge("net.minecraftforge:forge:$forge_version")
 }
 
 loom {
@@ -18,14 +18,12 @@ loom {
         convertAccessWideners.set(true)
         extraAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
 
-        mixinConfig("${rootProject.ext["mod_id"]}.mixins.json")
-        mixinConfig("${rootProject.ext["mod_id"]}.forge.mixins.json")
+        mixinConfig("$mod_id.mixins.json")
+        mixinConfig("$mod_id.forge.mixins.json")
 
     }
 
 }
-
-extra["archivesBaseName"] = "${rootProject.ext["archivesBaseName"]}-forge"
 
 val common by configurations.creating
 val shadowCommon by configurations.creating
@@ -38,7 +36,7 @@ configurations {
 }
 
 dependencies {
-    forge("net.minecraftforge:forge:${rootProject.ext["forge_version"]}")
+    forge("net.minecraftforge:forge:$forge_version")
 
     common(project(path = ":Common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":Common", configuration = "transformProductionForge")) { isTransitive = false }
@@ -82,7 +80,7 @@ tasks.sourcesJar {
     from(commonSources.get().archiveFile.map(project::zipTree))
 }
 
-components.getByName("java") {
+components.getByName<SoftwareComponent>("java") {
     (this as AdhocComponentWithVariants).apply {
         withVariantsFromConfiguration(project.configurations.shadowRuntimeElements.get()) {
             skip()

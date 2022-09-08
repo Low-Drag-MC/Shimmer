@@ -7,6 +7,8 @@ pluginManagement {
     }
     plugins{
         id("architectury-plugin") version ("3.4-SNAPSHOT") apply false
+        id("dev.architectury.loom") version ("0.12.0-SNAPSHOT") apply false
+        id("com.github.johnrengelman.shadow").version("7.1.2").apply(false)
     }
 }
 

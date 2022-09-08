@@ -1,5 +1,5 @@
 plugins {
-    id("com.github.johnrengelman.shadow").version("7.1.2")
+    id("com.github.johnrengelman.shadow")
 }
 
 architectury {
@@ -10,8 +10,6 @@ architectury {
 loom {
     accessWidenerPath.set(project(":Common").loom.accessWidenerPath)
 }
-
-extra["archivesBaseName"] = "${rootProject.ext["archivesBaseName"]}-fabric"
 
 val common by configurations.creating
 val shadowCommon by configurations.creating
@@ -24,8 +22,8 @@ configurations{
 }
 
 dependencies {
-    modImplementation("net.fabricmc:fabric-loader:${rootProject.ext["fabric_loader_version"]}")
-    modApi("net.fabricmc.fabric-api:fabric-api:${rootProject.ext["fabric_api_version"]}")
+    modImplementation("net.fabricmc:fabric-loader:$fabric_loader_version")
+    modApi("net.fabricmc.fabric-api:fabric-api:$fabric_api_version")
 
     common(project(path = ":Common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":Common", configuration = "transformProductionFabric")) { isTransitive = false }
@@ -70,7 +68,7 @@ tasks.sourcesJar {
     from(commonSources.archiveFile.map(project::zipTree))
 }
 
-components.getByName("java") {
+components.getByName<SoftwareComponent>("java") {
     (this as AdhocComponentWithVariants).apply {
         withVariantsFromConfiguration(project.configurations.shadowRuntimeElements.get()) {
             skip()
