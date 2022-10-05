@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.platform.services;
 
+import com.lowdragmc.shimmer.ShimmerLoadConfigEvent;
 import com.lowdragmc.shimmer.client.postprocessing.PostParticle;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.mojang.blaze3d.pipeline.RenderTarget;
@@ -25,15 +26,6 @@ public interface IPlatformHelper {
      * @return True if the mod is loaded, false otherwise.
      */
     boolean isModLoaded(String modId);
-
-    default boolean isClassFound(String className) {
-        try {
-            Class.forName(className, false, getClass().getClassLoader());
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
 
     /**
      * Check if the game is currently in a development environment.
@@ -73,15 +65,15 @@ public interface IPlatformHelper {
         return true;
     }
 
-    default boolean isColoredLightEnable() {
-        return true;
-    }
+    boolean isColoredLightEnable();
 
-    default boolean isBloomEnable(){
-        return true;
-    }
+    boolean isBloomEnable();
 
-    default boolean isAdditiveBlend(){
-        return false;
-    }
+    boolean isAdditiveBlend();
+
+    ShimmerLoadConfigEvent postLoadConfigurationEvent(ShimmerLoadConfigEvent event);
+
+    int getBloomColorAttachmentNumber();
+
+    boolean isEnableInsetShaderInfo();
 }

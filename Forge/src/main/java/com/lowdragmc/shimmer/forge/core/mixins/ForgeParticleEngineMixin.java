@@ -1,12 +1,15 @@
 package com.lowdragmc.shimmer.forge.core.mixins;
 
 import com.google.common.collect.Maps;
+import com.llamalad7.mixinextras.injector.ModifyReceiver;
+import com.lowdragmc.shimmer.TracedGLState;
 import com.lowdragmc.shimmer.client.postprocessing.IPostParticleType;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.core.IParticleDescription;
 import com.lowdragmc.shimmer.core.IParticleEngine;
 import com.lowdragmc.shimmer.core.mixins.ShimmerMixinPlugin;
 import com.lowdragmc.shimmer.platform.Services;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -26,12 +29,12 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import org.lwjgl.opengl.GL43;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
@@ -51,11 +54,16 @@ import java.util.concurrent.Executor;
  */
 @Mixin(ParticleEngine.class)
 public abstract class ForgeParticleEngineMixin implements IParticleEngine {
-    @Shadow @Nullable protected abstract <T extends ParticleOptions> Particle makeParticle(T pParticleData, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed);
+    @Shadow
+    @Nullable
+    protected abstract <T extends ParticleOptions> Particle makeParticle(T pParticleData, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed);
 
-    @Shadow public abstract void add(Particle pEffect);
+    @Shadow
+    public abstract void add(Particle pEffect);
 
-    @Shadow @Final private Map<ParticleRenderType, Queue<Particle>> particles;
+    @Shadow
+    @Final
+    private Map<ParticleRenderType, Queue<Particle>> particles;
 
     private final Map<ResourceLocation, String> PARTICLE_EFFECT = Maps.newHashMap();
 
@@ -71,26 +79,35 @@ public abstract class ForgeParticleEngineMixin implements IParticleEngine {
         }
     }
 
-    @Redirect(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/culling/Frustum;)V",
+    @ModifyReceiver(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/culling/Frustum;)V",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/particle/ParticleRenderType;begin(Lcom/mojang/blaze3d/vertex/BufferBuilder;Lnet/minecraft/client/renderer/texture/TextureManager;)V"))
-    private void injectRenderPre(ParticleRenderType particlerendertype, BufferBuilder bufferBuilder, TextureManager textureManager){
+    private ParticleRenderType injectRenderPre(ParticleRenderType particlerendertype, BufferBuilder bufferBuilder, TextureManager textureManager) {
         if (particlerendertype instanceof IPostParticleType && this.particles.get(particlerendertype).size() > 0) {
             PostProcessing postProcessing = ((IPostParticleType) particlerendertype).getPost();
             postProcessing.getPostTarget().bindWrite(false);
             postProcessing.hasParticle();
         }
-        particlerendertype.begin(bufferBuilder, textureManager);
+        return particlerendertype;
     }
 
-    @Redirect(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/culling/Frustum;)V",
+
+    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/culling/Frustum;)V",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/particle/ParticleRenderType;end(Lcom/mojang/blaze3d/vertex/Tesselator;)V"))
-    private void injectRenderPost(ParticleRenderType particlerendertype, Tesselator tesselator){
-        particlerendertype.end(tesselator);
-        if (particlerendertype instanceof IPostParticleType) {
-            Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
+                    target = "Lnet/minecraft/client/particle/ParticleRenderType;end(Lcom/mojang/blaze3d/vertex/Tesselator;)V",
+                    shift = At.Shift.AFTER))
+    private void injectRenderPost(CallbackInfo ci) {
+        RenderTarget mainRenderTarget = Minecraft.getInstance().getMainRenderTarget();
+        if (TracedGLState.bindFrameBuffer != mainRenderTarget.frameBufferId){
+            mainRenderTarget.bindWrite(false);
         }
+    }
+
+    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/culling/Frustum;)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleRenderType;end(Lcom/mojang/blaze3d/vertex/Tesselator;)V",
+                    shift = At.Shift.AFTER))
+    private void inj(CallbackInfo ci) {
+        GL43.glPopDebugGroup();
     }
 
     @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/LightTexture;Lnet/minecraft/client/Camera;FLnet/minecraft/client/renderer/culling/Frustum;)V",

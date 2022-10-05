@@ -9,6 +9,7 @@
 		"BlendModeMixin",
 		"BlockLightEngineMixin",
 		"GameRendererMixin",
+		"GLStateManagerMixin",
 		"HumanoidArmorLayerMixin",
 		"LevelRendererMixin",
 		"LiquidBlockRendererMixin",

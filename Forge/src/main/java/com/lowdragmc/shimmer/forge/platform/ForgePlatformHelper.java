@@ -1,8 +1,10 @@
 package com.lowdragmc.shimmer.forge.platform;
 
+import com.lowdragmc.shimmer.ShimmerLoadConfigEvent;
 import com.lowdragmc.shimmer.forge.ForgeShimmerConfig;
 import com.lowdragmc.shimmer.client.postprocessing.PostParticle;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
+import com.lowdragmc.shimmer.forge.ForgeShimmerLoadConfigEvent;
 import com.lowdragmc.shimmer.platform.services.IPlatformHelper;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.particle.Particle;
@@ -10,9 +12,11 @@ import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfig;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.loading.FMLLoader;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
 
 /**
@@ -106,4 +110,22 @@ public class ForgePlatformHelper implements IPlatformHelper {
     public boolean isAdditiveBlend() {
         return ForgeShimmerConfig.getAdditiveBlend().get();
     }
+
+    @Override
+    public ShimmerLoadConfigEvent postLoadConfigurationEvent(ShimmerLoadConfigEvent event) {
+        MinecraftForge.EVENT_BUS.post(new ForgeShimmerLoadConfigEvent(event));
+        return event;
+    }
+
+    @Override
+    public int getBloomColorAttachmentNumber() {
+        return ForgeShimmerConfig.getBloomColorAttachmentNumber().get() + GL30.GL_COLOR_ATTACHMENT0;
+    }
+
+    @Override
+    public boolean isEnableInsetShaderInfo() {
+        return ForgeShimmerConfig.getInsertShaderInfo().get() || isDevelopmentEnvironment();
+    }
+
+
 }

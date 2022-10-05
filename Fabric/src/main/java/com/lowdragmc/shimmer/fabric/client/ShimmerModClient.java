@@ -5,6 +5,8 @@ import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
+import com.lowdragmc.shimmer.fabric.FabricShimmerConfig;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -15,6 +17,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 import javax.annotation.Nullable;
 
+import static net.fabricmc.fabric.api.client.command.v1.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v1.ClientCommandManager.literal;
 
 /**
@@ -55,6 +58,28 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                             ReloadShaderManager.cleanResource();
                             return 1;
                         }))
+                .then(literal("colored_light")
+                        .then(argument("switch_state", BoolArgumentType.bool()).executes(
+                                context -> {
+                                    FabricShimmerConfig.CONFIG.BLOCK_BLOOM.set(context.getArgument("switch_state", Boolean.class));
+                                    return 1;
+                                }
+                        )))
+                .then(literal("bloom")
+                        .then(argument("switch_state", BoolArgumentType.bool()).executes(
+                                context -> {
+                                    FabricShimmerConfig.CONFIG.ENABLE_BLOOM_EFFECT.set(context.getArgument("switch_state", Boolean.class));
+                                    return 1;
+                                }
+                        )))
+                .then(literal("additive_blend")
+                        .then(argument("switch_state", BoolArgumentType.bool()).executes(
+                                context -> {
+                                    FabricShimmerConfig.CONFIG.ADDITIVE_EFFECT.set(context.getArgument("switch_state", Boolean.class));
+                                    ReloadShaderManager.reloadShader();
+                                    return 1;
+                                }
+                        )))
         );
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);

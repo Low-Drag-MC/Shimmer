@@ -41,8 +41,11 @@ dependencies {
     common(project(path = ":Common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":Common", configuration = "transformProductionForge")) { isTransitive = false }
 
-    modImplementation("curse.maven:rubidium-574856:3749094")
-    modRuntimeOnly("curse.maven:flywheel-486392:3871082")
+    include(mixinExtras)
+    forgeRuntimeLibrary(mixinExtras)
+
+    modCompileOnly("curse.maven:rubidium-574856:3749094")
+    modCompileOnly("curse.maven:flywheel-486392:3934664")
 
 }
 

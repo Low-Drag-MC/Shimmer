@@ -1,6 +1,7 @@
 package com.lowdragmc.shimmer.core.mixins;
 
 import com.lowdragmc.shimmer.core.IMainTarget;
+import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.MainTarget;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -30,7 +31,7 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
     public void clearBloomTexture(boolean pClearError) {
         if (colorBloomTextureId > -1) {
             this.bindWrite(true);
-            GL20.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT1);
+            GL20.glDrawBuffers(Services.PLATFORM.getBloomColorAttachmentNumber());
             GlStateManager._clearColor(0, 0, 0, 0);
             GlStateManager._clear(GL11.GL_COLOR_BUFFER_BIT, pClearError);
             GL20.glDrawBuffers(GL30.GL_COLOR_ATTACHMENT0);
@@ -60,7 +61,7 @@ public abstract class MainTargetMixin extends RenderTarget implements IMainTarge
     public void createBuffersTail(int pWidth, int pHeight, boolean pClearError) {
         GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.frameBufferId);
         GlStateManager._bindTexture(this.colorBloomTextureId);
-        GlStateManager._glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT1, GL11.GL_TEXTURE_2D, this.colorBloomTextureId, 0);
+        GlStateManager._glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, Services.PLATFORM.getBloomColorAttachmentNumber(), GL11.GL_TEXTURE_2D, this.colorBloomTextureId, 0);
     }
 
     @Override

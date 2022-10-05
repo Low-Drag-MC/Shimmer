@@ -12,6 +12,8 @@ public class ForgeShimmerConfig {
     private static ForgeConfigSpec.BooleanValue COLORED_LIGHT_ENABLE;
     private static ForgeConfigSpec.BooleanValue BLOOM_ENABLE;
     private static ForgeConfigSpec.BooleanValue ADDITIVE_BLEND;
+    private static ForgeConfigSpec.IntValue BLOOM_COLOR_ATTACHMENT_NUMBER;
+    private static ForgeConfigSpec.BooleanValue INSERT_SHADER_INFO;
 
     public static ForgeConfigSpec.IntValue getUboOffset() {
         if (UBO_OFFSET == null) {
@@ -61,6 +63,22 @@ public class ForgeShimmerConfig {
         return ADDITIVE_BLEND;
     }
 
+    public static ForgeConfigSpec.IntValue getBloomColorAttachmentNumber() {
+        if (BLOOM_COLOR_ATTACHMENT_NUMBER == null){
+            logAccessUnInit("BLOOM_COLOR_ATTACHMENT_NUMBER");
+            registerConfig();
+        }
+        return BLOOM_COLOR_ATTACHMENT_NUMBER;
+    }
+
+    public static ForgeConfigSpec.BooleanValue getInsertShaderInfo(){
+        if (INSERT_SHADER_INFO == null){
+            logAccessUnInit("INSERT_SHADER_INFO");
+            registerConfig();
+        }
+        return INSERT_SHADER_INFO;
+    }
+
     private static void logAccessUnInit(String configValueName){
         ShimmerConstants.LOGGER.error("trying to access uninitialized shimmer config value:{}," +
             "see stacktrace at debug log file",configValueName);
@@ -98,6 +116,17 @@ public class ForgeShimmerConfig {
                         "using additive blend for colored lights ",
                         "true - vivid, false - realistic")
                 .define("additive effect",false);
+        BLOOM_COLOR_ATTACHMENT_NUMBER = builder.comment(
+        """
+                the color attachment number used for store bloom information
+                range from 1 (0 for vanilla use) to GL_MAX_COLOR_ATTACHMENTS-1, at least 8-1
+                """
+        ).defineInRange("bloom color attachment number", 1, 1, 16);
+        INSERT_SHADER_INFO = builder.comment(
+        """
+                whether inset shader name into shader source file or not
+                """
+        ).define("inset shader", false);
     }
 
 }

@@ -27,4 +27,6 @@ val semantics_version = "$minecraft_version-$version_major.$version_patch"
 val maven_path = "snapshots"
 val maven_group = "com.lowdragmc.shimmer"
 
+val mixinExtras = "com.github.LlamaLad7:MixinExtras:0.0.12"
+
 val Project.archiveBaseName get() = "$mod_name-${project.name.toLowerCase()}"

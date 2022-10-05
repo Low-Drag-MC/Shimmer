@@ -20,6 +20,7 @@ subprojects {
     }
 
     repositories {
+        maven("https://jitpack.io")
         maven {
             url = uri("https://maven.parchmentmc.org/")
             content {
@@ -47,6 +48,8 @@ subprojects {
             officialMojangMappings()
             parchment("org.parchmentmc.data:parchment-$parchment_version@zip")
         })
+        "implementation"(mixinExtras)
+        "annotationProcessor"(mixinExtras)
     }
 
     extensions.getByType<BasePluginExtension>().apply {
@@ -71,6 +74,22 @@ subprojects {
                     }
                 }
             }
+        }
+    }
+
+    tasks.create("checkMixinPlugin"){
+        val jarTask = tasks.withType<Jar> {
+            finalizedBy(this@create)
+        }
+        dependsOn(jarTask)
+        doLast {
+            this.inputs.files.files.forEach(::check)
+        }
+    }
+
+    tasks.withType<Jar>{
+        doFirst{
+            this.inputs.files.files.forEach(::check)
         }
     }
 

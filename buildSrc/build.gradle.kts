@@ -14,4 +14,6 @@ dependencies {
     //only apply to self, otherwise other projects can't apply plugins as plugins are already in classpath
     compileOnlyApi("architectury-plugin:architectury-plugin.gradle.plugin:3.4-SNAPSHOT")
     compileOnlyApi("dev.architectury:architectury-loom:0.12.0-SNAPSHOT")
+    implementation("org.ow2.asm:asm:9.4")
+    implementation("org.ow2.asm:asm-tree:9.4")
 }

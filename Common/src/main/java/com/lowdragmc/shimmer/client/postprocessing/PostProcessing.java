@@ -329,6 +329,11 @@ public class PostProcessing implements ResourceManagerReloadListener {
             public PostProcessing getPost() {
                 return PostProcessing.this;
             }
+
+            @Override
+            public String toString() {
+                return "POST_WRAPPED_" + type.toString();
+            }
         });
     }
 

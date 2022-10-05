@@ -28,6 +28,10 @@ dependencies {
     common(project(path = ":Common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":Common", configuration = "transformProductionFabric")) { isTransitive = false }
 
+    include(mixinExtras)
+    modApi("me.shedaniel.cloth:cloth-config-fabric:6.4.90")
+    include("me.shedaniel.cloth:cloth-config-fabric:6.4.90")
+
     // Sodium
     modImplementation("curse.maven:sodium-394468:3669187") {
         exclude(group = "net.fabricmc.fabric-api")

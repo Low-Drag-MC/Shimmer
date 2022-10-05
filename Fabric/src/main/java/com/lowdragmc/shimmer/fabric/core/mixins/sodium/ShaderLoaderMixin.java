@@ -1,15 +1,12 @@
 package com.lowdragmc.shimmer.fabric.core.mixins.sodium;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import me.jellysquid.mods.sodium.client.gl.shader.*;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import static me.jellysquid.mods.sodium.client.gl.shader.ShaderLoader.getShaderSource;
 
 /**
  * @author KilaBash
@@ -19,17 +16,18 @@ import static me.jellysquid.mods.sodium.client.gl.shader.ShaderLoader.getShaderS
 @Mixin(ShaderLoader.class)
 public abstract class ShaderLoaderMixin {
 
-    @Inject(method = "loadShader", at = @At(value = "HEAD"), cancellable = true, remap = false)
-    private static void injectLoadShader(ShaderType type, ResourceLocation name, ShaderConstants constants, CallbackInfoReturnable<GlShader> cir) {
-        if (name.getPath().contains("block_layer_opaque")) {
-            String shader = ShaderParser.parseShader(getShaderSource(name), constants);
+    @SuppressWarnings("mapping")
+    @ModifyExpressionValue(method = "loadShader",
+        at = @At(value = "INVOKE",target = "Lme/jellysquid/mods/sodium/client/gl/shader/ShaderParser;parseShader(Ljava/lang/String;Lme/jellysquid/mods/sodium/client/gl/shader/ShaderConstants;)Ljava/lang/String;"))
+    private static String transformShader(String shader,ShaderType type, ResourceLocation name){
+        if (name.getPath().contains("block_layer_opaque")){
             if (type == ShaderType.FRAGMENT) {
                 shader = PostProcessing.RbBloomMRTFSHInjection(shader);
             }
             if (type == ShaderType.VERTEX) {
                 shader = LightManager.RbVVSHInjection(shader);
             }
-            cir.setReturnValue(new GlShader(type, name, shader));
         }
+        return shader;
     }
 }

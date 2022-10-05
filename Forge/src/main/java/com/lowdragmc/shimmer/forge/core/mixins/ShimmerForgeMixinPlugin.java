@@ -1,6 +1,6 @@
 package com.lowdragmc.shimmer.forge.core.mixins;
 
-import com.lowdragmc.shimmer.platform.Services;
+import com.lowdragmc.shimmer.core.mixins.ShimmerMixinPlugin;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -15,9 +15,9 @@ import java.util.Set;
  */
 public class ShimmerForgeMixinPlugin implements IMixinConfigPlugin {
 
-    public static final boolean IS_OPT_LOAD = Services.PLATFORM.isClassFound("net.optifine.reflect.ReflectorClass");
+    public static final boolean IS_OPT_LOAD = ShimmerMixinPlugin.isClassFound("optifine.OptiFineTranformationService");
 
-    public static final boolean IS_RUBIDIUM_LOAD = Services.PLATFORM.isClassFound("me.jellysquid.mods.sodium.mixin.SodiumMixinPlugin");
+    public static final boolean IS_RUBIDIUM_LOAD = ShimmerMixinPlugin.isClassFound("me.jellysquid.mods.sodium.mixin.SodiumMixinPlugin");
 
     @Override
     public void onLoad(String mixinPackage) {

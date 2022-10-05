@@ -1,6 +1,6 @@
 package com.lowdragmc.shimmer.core.mixins;
 
-import com.lowdragmc.shimmer.platform.Services;
+import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -14,7 +14,21 @@ import java.util.Set;
  * Added to stop Rubidium & Sodium mixins from trying to load if the mod is not installed. Prevents log spam of Mixin Errors
  */
 public class ShimmerMixinPlugin implements IMixinConfigPlugin {
-    public static final boolean IS_OPT_LOAD = Services.PLATFORM.isClassFound("net.optifine.reflect.ReflectorClass");
+
+    static{
+        MixinExtrasBootstrap.init();
+    }
+
+    public static final boolean IS_OPT_LOAD = isClassFound("net.optifine.reflect.ReflectorClass");
+
+    public static boolean isClassFound(String className) {
+        try {
+            Class.forName(className, false, Thread.currentThread().getContextClassLoader());
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
 
     @Override
     public void onLoad(String mixinPackage) {
