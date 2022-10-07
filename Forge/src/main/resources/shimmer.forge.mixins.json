@@ -7,7 +7,8 @@
   "client": [
 		"ForgeParticleEngineMixin",
 		"ForgeShaderInstanceMixin",
-		"LightUtilMixin"
+		"LightUtilMixin",
+		"flywheel.LevelRenderMixin"
   ],
   "mixins": [
 		"rubidium.BlockRendererMixin",
