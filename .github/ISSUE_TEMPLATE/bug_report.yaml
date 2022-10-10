@@ -13,6 +13,16 @@ body:
       placeholder: eg. 1.18.2
     validations:
       required: true
+  - type: dropdown
+    id: ModLoader
+    attributes:
+      label: ModLoader
+      options:
+        - Forge
+        - Fabric
+      multiple : true
+    validations :
+      required : true
   - type: input
     id: mod-version
     attributes:
@@ -23,22 +33,25 @@ body:
   - type: input
     id: modList
     attributes:
-      label: Modpack info or mod list
+      label: Modpack info or mod list(please reduce mod range)
       description: |
         If playing a modpack, post the link to it!
         if not , use a paste site such as [gist](https://gist.github.com/) / [pastebin](https://pastebin.com/) / etc."
         to list all the mods you use
+        please try to reduce the mod range before you open this issue
+    validations:
+      required: true
   - type: input
     id: log-file
     attributes:
-      label: "The latest.log file"
+      label: "The latest.log file and hs_err_pidXXX if exists"
       description: "Please use a paste site such as [gist](https://gist.github.com/) / [pastebin](https://pastebin.com/) / etc."
     validations:
       required: true
   - type: textarea
     id: rendering-related-mod
     attributes:
-      label:  optifine , Rubidium , flywheel or any rendering related mods. mod versrion is required.
+      label:  optifine , Rubidium , flywheel or any rendering related mods. mod version is required.
   - type: textarea
     id: issue-description
     attributes:

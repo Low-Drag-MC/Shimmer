@@ -79,7 +79,3 @@ components.getByName<SoftwareComponent>("java") {
         }
     }
 }
-
-base{
-    archivesName.set("")
-}
