@@ -119,12 +119,14 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public int getBloomColorAttachmentNumber() {
-        return ForgeShimmerConfig.getBloomColorAttachmentNumber().get() + GL30.GL_COLOR_ATTACHMENT0;
+        //TODO config hasn't load when we need it, need change
+        return 1 + GL30.GL_COLOR_ATTACHMENT0;
     }
 
     @Override
     public boolean isEnableInsetShaderInfo() {
-        return ForgeShimmerConfig.getInsertShaderInfo().get() || isDevelopmentEnvironment();
+        //TODO config hasn't load when we need it, need change
+        return isDevelopmentEnvironment();
     }
 
 

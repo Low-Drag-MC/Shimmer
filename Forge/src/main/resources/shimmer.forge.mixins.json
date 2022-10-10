@@ -7,7 +7,7 @@
   "client": [
 		"ForgeParticleEngineMixin",
 		"ForgeShaderInstanceMixin",
-		"LightUtilMixin",
+		"QuadLighterMixin",
 		"flywheel.LevelRenderMixin"
   ],
   "mixins": [

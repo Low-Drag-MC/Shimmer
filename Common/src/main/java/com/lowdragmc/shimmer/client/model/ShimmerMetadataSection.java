@@ -7,12 +7,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
-import net.minecraft.server.packs.resources.Resource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public record ShimmerMetadataSection(boolean bloom) {
     public static final String SECTION_NAME = ShimmerConstants.MOD_ID;
@@ -24,10 +25,11 @@ public record ShimmerMetadataSection(boolean bloom) {
             return METADATA_CACHE.get(res);
         }
         ShimmerMetadataSection ret;
-        try (Resource resource = Minecraft.getInstance().getResourceManager()
-                .getResource(res)) {
-            ret = resource.getMetadata(Serializer.INSTANCE);
-        } catch (Exception e) {
+        try {
+            var metadata = Minecraft.getInstance().getResourceManager().getResource(res)
+                    .orElseThrow().metadata();
+            ret = metadata.getSection(Serializer.INSTANCE).orElse(null);
+        }catch (IOException | NoSuchElementException e){
             ret = null;
         }
         METADATA_CACHE.put(res, ret);

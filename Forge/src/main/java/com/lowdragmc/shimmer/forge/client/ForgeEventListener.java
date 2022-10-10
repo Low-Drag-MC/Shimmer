@@ -11,7 +11,7 @@ import net.minecraft.commands.Commands;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -24,8 +24,8 @@ import net.minecraftforge.fml.common.Mod;
 @OnlyIn(Dist.CLIENT)
 public class ForgeEventListener {
     @SubscribeEvent
-    public static void onWorldUnload(WorldEvent.Unload event) {
-        if (event.getWorld() == Minecraft.getInstance().level) {
+    public static void onWorldUnload(LevelEvent.Unload event) {
+        if (event.getLevel() == Minecraft.getInstance().level) {
             LightManager.clear();
         }
     }

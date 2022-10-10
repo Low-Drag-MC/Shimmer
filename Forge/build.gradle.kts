@@ -44,8 +44,11 @@ dependencies {
     include(mixinExtras)
     forgeRuntimeLibrary(mixinExtras)
 
-    modCompileOnly("curse.maven:rubidium-574856:3749094")
-    modCompileOnly("curse.maven:flywheel-486392:3934664")
+    modCompileOnly("curse.maven:rubidium-574856:3973894")
+//    modCompileOnly("curse.maven:flywheel-486392:3934664") //hasn't released on curseforge
+
+//    forgeRuntimeLibrary("icyllis.modernui:ModernUI-Core:$modernui_version")
+//    modImplementation("icyllis.modernui:ModernUI-Forge:${minecraft_version}-${modernui_version}")
 
 }
 

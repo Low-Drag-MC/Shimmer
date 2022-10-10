@@ -111,11 +111,17 @@ public enum LightManager {
     }
 
     public static String RbVVSHInjection(String s) {
+        s = new StringBuffer(s).insert(s.lastIndexOf("out vec2 v_TexCoord;"), """
+                 out float isBloom;
+                 """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), getLightShader()).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf('}'), Services.PLATFORM.useLightMap() ? """
-                    v_Color = rb_color_light_uv(position, v_Color, v_LightCoord);
+                    v_Color = color_light_uv(position, v_Color, _vert_tex_light_coord);
                 """ : """
                     v_Color = color_light(position, v_Color);
+                """).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf("}"), """
+                isBloom = float(_vert_tex_light_coord.x);
                 """).toString();
         return s;
     }

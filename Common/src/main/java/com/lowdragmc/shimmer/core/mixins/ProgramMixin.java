@@ -34,7 +34,7 @@ public abstract class ProgramMixin {
     private static final Pattern REGEX_VERSION = Pattern.compile("(#(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*version(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*(\\d+))\\b");
 
     @ModifyExpressionValue(method = "compileShaderInternal", at = @At(value = "INVOKE"
-            , target = "Lcom/mojang/blaze3d/platform/TextureUtil;readResourceAsString(Ljava/io/InputStream;)Ljava/lang/String;"))
+            , target = "Lorg/apache/commons/io/IOUtils;toString(Ljava/io/InputStream;Ljava/nio/charset/Charset;)Ljava/lang/String;"))
     private static String transformShader(String shader,Program.Type type, String shaderName, InputStream pShaderDataSame, String pShaderSourceName, GlslPreprocessor processor){
 
         if (Services.PLATFORM.isEnableInsetShaderInfo()){

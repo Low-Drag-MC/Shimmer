@@ -8,7 +8,7 @@ import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import com.lowdragmc.shimmer.fabric.FabricShimmerConfig;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
@@ -17,8 +17,8 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 import javax.annotation.Nullable;
 
-import static net.fabricmc.fabric.api.client.command.v1.ClientCommandManager.argument;
-import static net.fabricmc.fabric.api.client.command.v1.ClientCommandManager.literal;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 /**
  * @author HypherionSA
@@ -34,53 +34,53 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
         /*if (((Object)(MultiLayerModel.Loader.INSTANCE)) instanceof IMultiLayerModelLoader) {
             ((IMultiLayerModelLoader)(Object)(MultiLayerModel.Loader.INSTANCE)).update();
         }*/
-
-        ClientCommandManager.DISPATCHER.register(literal("shimmer")
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
+            dispatcher.register(literal("shimmer")
                 .then(literal("reload_postprocessing")
-                        .executes(context -> {
-                            for (PostProcessing post : PostProcessing.values()) {
-                                post.onResourceManagerReload(null);
-                            }
-                            return 1;
-                        }))
+                    .executes(context -> {
+                        for (PostProcessing post : PostProcessing.values()) {
+                            post.onResourceManagerReload(null);
+                        }
+                        return 1;
+                    }))
                 .then(literal("clear_lights")
-                        .executes(context -> {
-                            LightManager.clear();
-                            return 1;
-                        }))
+                    .executes(context -> {
+                        LightManager.clear();
+                        return 1;
+                    }))
                 .then(literal("reload_shader")
-                        .executes(context -> {
+                    .executes(context -> {
+                        ReloadShaderManager.reloadShader();
+                        return 1;
+                    }))
+                .then(literal("confirm_clear_resource")
+                    .executes(context -> {
+                        ReloadShaderManager.cleanResource();
+                        return 1;
+                    }))
+                .then(literal("colored_light")
+                    .then(argument("switch_state", BoolArgumentType.bool()).executes(
+                        context -> {
+                            FabricShimmerConfig.CONFIG.BLOCK_BLOOM.set(context.getArgument("switch_state", Boolean.class));
+                            return 1;
+                        }
+                    )))
+                .then(literal("bloom")
+                    .then(argument("switch_state", BoolArgumentType.bool()).executes(
+                        context -> {
+                            FabricShimmerConfig.CONFIG.ENABLE_BLOOM_EFFECT.set(context.getArgument("switch_state", Boolean.class));
+                            return 1;
+                        }
+                    )))
+                .then(literal("additive_blend")
+                    .then(argument("switch_state", BoolArgumentType.bool()).executes(
+                        context -> {
+                            FabricShimmerConfig.CONFIG.ADDITIVE_EFFECT.set(context.getArgument("switch_state", Boolean.class));
                             ReloadShaderManager.reloadShader();
                             return 1;
-                        }))
-                .then(literal("confirm_clear_resource")
-                        .executes(context -> {
-                            ReloadShaderManager.cleanResource();
-                            return 1;
-                        }))
-                .then(literal("colored_light")
-                        .then(argument("switch_state", BoolArgumentType.bool()).executes(
-                                context -> {
-                                    FabricShimmerConfig.CONFIG.BLOCK_BLOOM.set(context.getArgument("switch_state", Boolean.class));
-                                    return 1;
-                                }
-                        )))
-                .then(literal("bloom")
-                        .then(argument("switch_state", BoolArgumentType.bool()).executes(
-                                context -> {
-                                    FabricShimmerConfig.CONFIG.ENABLE_BLOOM_EFFECT.set(context.getArgument("switch_state", Boolean.class));
-                                    return 1;
-                                }
-                        )))
-                .then(literal("additive_blend")
-                        .then(argument("switch_state", BoolArgumentType.bool()).executes(
-                                context -> {
-                                    FabricShimmerConfig.CONFIG.ADDITIVE_EFFECT.set(context.getArgument("switch_state", Boolean.class));
-                                    ReloadShaderManager.reloadShader();
-                                    return 1;
-                                }
-                        )))
-        );
+                        }
+                    )))
+            ));
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
     }

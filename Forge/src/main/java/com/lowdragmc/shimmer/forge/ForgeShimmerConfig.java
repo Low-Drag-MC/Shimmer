@@ -63,6 +63,7 @@ public class ForgeShimmerConfig {
         return ADDITIVE_BLEND;
     }
 
+    //TODO config hasn't load when we need it, need change
     public static ForgeConfigSpec.IntValue getBloomColorAttachmentNumber() {
         if (BLOOM_COLOR_ATTACHMENT_NUMBER == null){
             logAccessUnInit("BLOOM_COLOR_ATTACHMENT_NUMBER");
@@ -71,6 +72,7 @@ public class ForgeShimmerConfig {
         return BLOOM_COLOR_ATTACHMENT_NUMBER;
     }
 
+    //TODO config hasn't load when we need it, need change
     public static ForgeConfigSpec.BooleanValue getInsertShaderInfo(){
         if (INSERT_SHADER_INFO == null){
             logAccessUnInit("INSERT_SHADER_INFO");

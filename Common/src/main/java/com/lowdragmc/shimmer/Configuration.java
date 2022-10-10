@@ -26,15 +26,15 @@ public class Configuration {
         config.clear();
         String causedSource = null;
         try {
-            List<Resource> resources = Minecraft.getInstance().getResourceManager().getResources(configLocation);
+            List<Resource> resources = Minecraft.getInstance().getResourceManager().getResourceStack(configLocation);
             for (var resource : resources){
-                causedSource = resource.getLocation().toString();
-                try (InputStreamReader reader = new InputStreamReader(resource.getInputStream())) {
+                causedSource = resource.sourcePackId();
+                try (InputStreamReader reader = new InputStreamReader(resource.open())) {
                     JsonElement jsonElement = JsonParser.parseReader(reader);
                     if (jsonElement instanceof JsonObject jsonObject){
                         config.add(jsonObject);
                     }else {
-                        ShimmerConstants.LOGGER.info("failed to parse resource:{}",resource.getLocation());
+                        ShimmerConstants.LOGGER.info("failed to parse resource:{}",resource.sourcePackId());
                     }
                 }
             }

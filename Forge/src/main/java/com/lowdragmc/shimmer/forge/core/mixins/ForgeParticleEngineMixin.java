@@ -1,6 +1,7 @@
 package com.lowdragmc.shimmer.forge.core.mixins;
 
 import com.google.common.collect.Maps;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.lowdragmc.shimmer.TracedGLState;
 import com.lowdragmc.shimmer.client.postprocessing.IPostParticleType;
@@ -12,7 +13,6 @@ import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
@@ -26,10 +26,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
-import org.lwjgl.opengl.GL43;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,11 +35,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import javax.annotation.Nullable;
-import java.io.Reader;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
@@ -111,16 +106,13 @@ public abstract class ForgeParticleEngineMixin implements IParticleEngine {
         }
     }
 
-    @Inject(method = "loadParticleDescription",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleDescription;getTextures()Ljava/util/List;"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void injectLoad(ResourceManager $$0, ResourceLocation $$1, Map<ResourceLocation, List<ResourceLocation>> $$2,
-                            CallbackInfo ci,
-                            ResourceLocation $$3,
-                            Resource $$4, Reader $$5, ParticleDescription $$6) {
-        if ($$6 instanceof IParticleDescription particleDescription && particleDescription.getEffect() != null) {
-            PARTICLE_EFFECT.put($$1, particleDescription.getEffect());
+    @ModifyExpressionValue(method = "loadParticleDescription",
+        at= @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleDescription;fromJson(Lcom/google/gson/JsonObject;)Lnet/minecraft/client/particle/ParticleDescription;"))
+    private ParticleDescription injectLoad(ParticleDescription particleDescription,ResourceManager manager, ResourceLocation registryName){
+        if (particleDescription instanceof IParticleDescription description && description.getEffect() != null) {
+            PARTICLE_EFFECT.put(registryName, description.getEffect());
         }
+        return particleDescription;
     }
 
     @Inject(method = "reload", at = @At(value = "HEAD"))

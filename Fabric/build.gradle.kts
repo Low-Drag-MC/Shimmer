@@ -29,11 +29,11 @@ dependencies {
     shadowCommon(project(path = ":Common", configuration = "transformProductionFabric")) { isTransitive = false }
 
     include(mixinExtras)
-    modApi("me.shedaniel.cloth:cloth-config-fabric:6.4.90")
-    include("me.shedaniel.cloth:cloth-config-fabric:6.4.90")
+    modApi("me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version")
+    include("me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version")
 
     // Sodium
-    modImplementation("curse.maven:sodium-394468:3669187") {
+     modImplementation("curse.maven:sodium-394468:3957319") {
         exclude(group = "net.fabricmc.fabric-api")
     }
     // This is a dependency of Sodium....
@@ -78,4 +78,8 @@ components.getByName<SoftwareComponent>("java") {
             skip()
         }
     }
+}
+
+base{
+    archivesName.set("")
 }

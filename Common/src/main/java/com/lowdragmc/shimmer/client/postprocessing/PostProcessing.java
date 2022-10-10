@@ -52,6 +52,7 @@ import java.util.function.Consumer;
  * @date 2022/05/02
  * @implNote Custom PostProcessing
  */
+@SuppressWarnings("unused")
 public class PostProcessing implements ResourceManagerReloadListener {
     public static final Set<RenderType> CHUNK_TYPES = Sets.newHashSet(RenderType.solid(), RenderType.cutoutMipped(), RenderType.cutout());
 
@@ -154,11 +155,14 @@ public class PostProcessing implements ResourceManagerReloadListener {
     }
 
     public static String RbBloomMRTFSHInjection(String s) {
+        s = new StringBuffer(s).insert(s.lastIndexOf("in vec4 v_Color;"), """
+                        in float isBloom;
+                        """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), """
                         out vec4 bloomColor;
                         """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
-                    if (v_LightCoord.x > .97) {
+                    if (isBloom > 255.) {
                         bloomColor = fragColor * smoothstep(u_FogEnd,u_FogStart,v_FragDistance);
                     } else {
                         bloomColor = vec4(0.);
