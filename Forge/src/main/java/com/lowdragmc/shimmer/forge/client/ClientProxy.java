@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.forge.client;
 
+import com.lowdragmc.shimmer.client.auxiliaryScreen.HsbColorWidget;
 import com.lowdragmc.shimmer.forge.CommonProxy;
 import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.lowdragmc.shimmer.Configuration;
@@ -39,6 +40,7 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
             event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceManager, new ResourceLocation(ShimmerConstants.MOD_ID, "fast_blit"), DefaultVertexFormat.POSITION), shaderInstance -> RenderUtils.blitShader = shaderInstance);
             event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceManager, new ResourceLocation(ShimmerConstants.MOD_ID, "rendertype_armor_cutout_no_cull"), DefaultVertexFormat.NEW_ENTITY),
                     shaderInstance -> ShimmerRenderTypes.EmissiveArmorRenderType.emissiveArmorGlintShader = shaderInstance);
+            event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceManager,new ResourceLocation(ShimmerConstants.MOD_ID,"hsb_block"), HsbColorWidget.HSB_VERTEX_FORMAT), shaderInstance -> HsbColorWidget.hsbShader = shaderInstance);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

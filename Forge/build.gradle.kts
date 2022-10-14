@@ -44,9 +44,8 @@ dependencies {
     include(mixinExtras)
     forgeRuntimeLibrary(mixinExtras)
 
-    modCompileOnly("curse.maven:rubidium-574856:3749094")
+    modImplementation("curse.maven:rubidium-574856:4024781")
     modCompileOnly("curse.maven:flywheel-486392:3934664")
-
 }
 
 tasks.processResources {

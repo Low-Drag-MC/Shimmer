@@ -1,4 +1,5 @@
 import org.gradle.api.Project
+import java.util.*
 
 //Mod options
 val mod_name = "Shimmer"
@@ -7,7 +8,7 @@ val mod_id = "shimmer"
 
 //Common
 val minecraft_version = "1.18.2"
-val parchment_version = "1.18.2:2022.08.07"
+val parchment_version = "1.18.2:2022.09.04"
 val enabled_platforms = "fabric,forge"
 
 //Archiitectury
@@ -29,4 +30,4 @@ val maven_group = "com.lowdragmc.shimmer"
 
 val mixinExtras = "com.github.LlamaLad7:MixinExtras:0.0.12"
 
-val Project.archiveBaseName get() = "$mod_name-${project.name.toLowerCase()}"
+val Project.archiveBaseName get() = "$mod_name-${project.name.toLowerCase(Locale.getDefault())}"

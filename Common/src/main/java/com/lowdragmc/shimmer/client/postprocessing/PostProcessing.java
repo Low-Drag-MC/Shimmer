@@ -1,9 +1,6 @@
 package com.lowdragmc.shimmer.client.postprocessing;
 
 import com.google.common.collect.*;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.lowdragmc.shimmer.client.rendertarget.CopyDepthTarget;
 import com.lowdragmc.shimmer.client.rendertarget.MRTTarget;
 import com.lowdragmc.shimmer.client.rendertarget.ProxyTarget;
@@ -16,11 +13,13 @@ import com.lowdragmc.shimmer.core.IMainTarget;
 import com.lowdragmc.shimmer.core.IParticleEngine;
 import com.lowdragmc.shimmer.core.mixins.BlendModeMixin;
 import com.lowdragmc.shimmer.core.mixins.ShimmerMixinPlugin;
+import com.lowdragmc.shimmer.event.ShimmerReloadEvent;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.shaders.BlendMode;
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
@@ -28,14 +27,12 @@ import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
@@ -337,6 +334,10 @@ public class PostProcessing implements ResourceManagerReloadListener {
         });
     }
 
+	public static List<IPostParticleType> getBlockBloomPostParticleTypes(){
+		return List.copyOf(getBlockBloom().particleTypeMap.values());
+	}
+
     @Override
     public void onResourceManagerReload(@Nullable ResourceManager pResourceManager) {
         if (postChain != null) {
@@ -378,37 +379,42 @@ public class PostProcessing implements ResourceManagerReloadListener {
         BLOOM_BLOCK.clear();
         BLOOM_FLUID.clear();
         BLOOM_PARTICLE.clear();
-        for (JsonObject config : Configuration.config){
-            JsonElement jsonElement  = config.get("BloomBlock");
-            if (jsonElement == null) jsonElement = config.get("Bloom");
-            if (jsonElement != null && jsonElement.isJsonArray()) {
-                JsonArray bloomBlocks = jsonElement.getAsJsonArray();
-                for (JsonElement block : bloomBlocks) {
-                    JsonObject jsonObj = block.getAsJsonObject();
-                    if (jsonObj.has("block")) {
-                        ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
-                        if (!Registry.BLOCK.containsKey(location)) continue;
-                        Block bb = Registry.BLOCK.get(location);
-                        if (jsonObj.has("state") && jsonObj.get("state").isJsonObject()) {
-                            Set<BlockState> available = Utils.getAllPossibleStates(jsonObj, bb);
-                            if (!available.isEmpty()) {
-                                BLOOM_BLOCK.addAll(available);
-                            }
-                        } else {
-                            BLOOM_BLOCK.addAll(bb.getStateDefinition().getPossibleStates());
-                        }
-                    } else if (jsonObj.has("fluid")) {
-                        ResourceLocation location = new ResourceLocation(jsonObj.get("fluid").getAsString());
-                        if (!Registry.FLUID.containsKey(location)) continue;
-                        Fluid ff = Registry.FLUID.get(location);
-                        BLOOM_FLUID.add(ff);
-                    } else if (jsonObj.has("particle")) {
-                        ResourceLocation location = new ResourceLocation(jsonObj.get("particle").getAsString());
-                        BLOOM_PARTICLE.add(location);
-                    }
-                }
-            }
-        }
+
+		for (var config : Configuration.configs){
+			for (var bloom : config.blooms){
+				if (bloom.particleName != null) {
+					if (!ResourceLocation.isValidResourceLocation(bloom.particleName)){
+						ShimmerConstants.LOGGER.error("invalid particle name " + bloom.particleName + " form" + config.configSource);
+						continue;
+					}
+					var particleLocation = new ResourceLocation(bloom.particleName);
+					BLOOM_PARTICLE.add(particleLocation);
+				}else if (bloom.fluidName != null){
+					Pair<ResourceLocation, Fluid> fluid = bloom.fluid();
+					if (fluid == null || fluid.right() == null) continue;
+					BLOOM_FLUID.add(fluid.right());
+				}else {
+					var blockPair = bloom.block();
+					if (blockPair == null || blockPair.left() == null) continue;
+					var block =  blockPair.right();
+
+					if (bloom.hasState()){
+
+						if (Utils.checkBlockProperties(config.configSource,bloom.state,blockPair.left())) continue;
+
+						List<BlockState> availableStates = Utils.getAvailableStates(bloom.state, block);
+						BLOOM_BLOCK.addAll(availableStates);
+
+					}else {
+						BLOOM_BLOCK.addAll(block.getStateDefinition().getPossibleStates());
+					}
+				}
+			}
+		}
+
+	    Services.PLATFORM.postReloadEvent(new ShimmerReloadEvent(ShimmerReloadEvent.ReloadType.BLOOM));
+
+
     }
 
     public static boolean isBlockBloom() {

@@ -1,12 +1,21 @@
 package com.lowdragmc.shimmer.fabric.platform;
 
-import com.lowdragmc.shimmer.ShimmerLoadConfigEvent;
+import com.lowdragmc.shimmer.event.ShimmerLoadConfigEvent;
+import com.lowdragmc.shimmer.event.ShimmerReloadEvent;
 import com.lowdragmc.shimmer.fabric.FabricShimmerConfig;
-import com.lowdragmc.shimmer.fabric.FabricShimmerLoadConfigCallback;
+import com.lowdragmc.shimmer.fabric.event.FabricShimmerLoadConfigCallback;
+import com.lowdragmc.shimmer.fabric.event.FabricShimmerReloadCallback;
 import com.lowdragmc.shimmer.platform.services.IPlatformHelper;
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.material.Fluid;
 import org.lwjgl.opengl.GL30;
+
+import java.nio.file.Path;
 
 /**
  * @author HypherionSA
@@ -79,13 +88,37 @@ public class FabricPlatformHelper implements IPlatformHelper {
         return FabricShimmerLoadConfigCallback.EVENT.invoker().addConfigurationList(event);
     }
 
-    @Override
-    public int getBloomColorAttachmentNumber() {
-        return FabricShimmerConfig.CONFIG.BLOOM_COLOR_ATTACHMENT_NUMBER.get() + GL30.GL_COLOR_ATTACHMENT0;
-    }
+	public ShimmerReloadEvent postReloadEvent(ShimmerReloadEvent event){
+		return FabricShimmerReloadCallback.EVENT.invoker().onReload(event);
+	}
 
-    @Override
-    public boolean isEnableInsetShaderInfo() {
-        return FabricShimmerConfig.CONFIG.INSERT_SHADER_INFO.get() || isDevelopmentEnvironment();
-    }
+	@Override
+	public int getBloomColorAttachmentNumber() {
+		return FabricShimmerConfig.CONFIG.BLOOM_COLOR_ATTACHMENT_NUMBER.get() + GL30.GL_COLOR_ATTACHMENT0;
+	}
+
+	@Override
+	public boolean isEnableInsetShaderInfo() {
+		return FabricShimmerConfig.CONFIG.INSERT_SHADER_INFO.get() || isDevelopmentEnvironment();
+	}
+
+	@Override
+	public ResourceLocation getFluidTextureLocation(Fluid fluid, boolean isStill) {
+		FluidRenderHandler handler = FluidRenderHandlerRegistry.INSTANCE.get(fluid);
+		TextureAtlasSprite[] sprites = handler.getFluidSprites(null, null, fluid.defaultFluidState());
+		TextureAtlasSprite sprite = isStill ? sprites[0] : sprites[1];
+		return sprite.getName();
+	}
+
+	@Override
+	public int getFluidColor(Fluid fluid){
+		FluidRenderHandler handler = FluidRenderHandlerRegistry.INSTANCE.get(fluid);
+		return handler.getFluidColor(null,null,fluid.defaultFluidState());
+	}
+
+	@Override
+	public Path getConfigDir(){
+		return FabricLoader.getInstance().getConfigDir();
+	}
+
 }

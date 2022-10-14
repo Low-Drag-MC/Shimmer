@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.forge.client;
 
+import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.forge.ForgeShimmerConfig;
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.light.LightManager;
@@ -78,6 +79,11 @@ public class ForgeEventListener {
                                     return 1;
                                 }
                         )))
+                .then(Commands.literal("auxiliary_screen")
+                        .executes(context -> {
+                            Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
+                            return 1;
+                        }))
         );
     }
 }

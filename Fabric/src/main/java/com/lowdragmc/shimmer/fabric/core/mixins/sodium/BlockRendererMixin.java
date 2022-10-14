@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.fabric.core.mixins.sodium;
 
+import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.core.IBakedQuad;
 import me.jellysquid.mods.sodium.client.model.IndexBufferBuilder;
@@ -29,22 +30,16 @@ import java.util.List;
  * @date 2022/05/31
  * @implNote ModelBlockRendererMixin, reglowstone.pngcode uv2 for bloom info
  */
-@Mixin(BlockRenderer.class)
+@Mixin(value = BlockRenderer.class, remap = false)
 public abstract class BlockRendererMixin {
-    @Inject(method = "renderQuadList", at = @At(value = "INVOKE", target = "Lme/jellysquid/mods/sodium/client/render/pipeline/BlockRenderer;renderQuad(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;Lme/jellysquid/mods/sodium/client/render/chunk/format/ModelVertexSink;Lme/jellysquid/mods/sodium/client/model/IndexBufferBuilder;Lnet/minecraft/world/phys/Vec3;Lme/jellysquid/mods/sodium/client/model/quad/blender/ColorSampler;Lnet/minecraft/client/renderer/block/model/BakedQuad;Lme/jellysquid/mods/sodium/client/model/light/data/QuadLightData;Lme/jellysquid/mods/sodium/client/render/chunk/compile/buffers/ChunkModelBuilder;)V"),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private void injectRender(BlockAndTintGetter world, BlockState state,
-                              BlockPos pos, BlockPos origin,
-                              LightPipeline lighter, Vec3 offset,
-                              ChunkModelBuilder buffers, List<BakedQuad> quads,
-                              ModelQuadFacing facing, CallbackInfo ci,
-                              ColorSampler<BlockState> colorizer,
-                              ModelVertexSink vertices, IndexBufferBuilder indices, int i, int quadsSize,
-                              BakedQuad quad,
-                              QuadLightData light) {
-        if (((IBakedQuad)quad).isBloom() || PostProcessing.isBlockBloom()) {
-            // 0xf000f0 -> 0x1f001f0
+    @ModifyReceiver(method = "renderQuadList",
+            at = @At(value = "INVOKE",
+                    target = "Lme/jellysquid/mods/sodium/client/render/pipeline/BlockRenderer;renderQuad(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;Lme/jellysquid/mods/sodium/client/render/chunk/format/ModelVertexSink;Lme/jellysquid/mods/sodium/client/model/IndexBufferBuilder;Lnet/minecraft/world/phys/Vec3;Lme/jellysquid/mods/sodium/client/model/quad/blender/ColorSampler;Lnet/minecraft/client/renderer/block/model/BakedQuad;Lme/jellysquid/mods/sodium/client/model/light/data/QuadLightData;Lme/jellysquid/mods/sodium/client/render/chunk/compile/buffers/ChunkModelBuilder;)V"))
+    private BlockRenderer injectRender(BlockRenderer blockRenderer,BlockAndTintGetter world, BlockState state, BlockPos pos, BlockPos origin, ModelVertexSink vertices, IndexBufferBuilder indices, Vec3 blockOffset, ColorSampler<BlockState> colorSampler, BakedQuad bakedQuad, QuadLightData light, ChunkModelBuilder model){
+        if (((IBakedQuad)bakedQuad).isBloom() || PostProcessing.isBlockBloom()) {
+//          0xf000f0 -> 0x1f001f0
             Arrays.fill(light.lm, 0xf200f2);
         }
+        return blockRenderer;
     }
 }

@@ -40,6 +40,7 @@ subprojects {
                 includeGroup("maven.modrinth")
             }
         }
+        maven("https://maven.blamejared.com")
     }
 
     dependencies {

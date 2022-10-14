@@ -1,10 +1,15 @@
 package com.lowdragmc.shimmer.platform.services;
 
-import com.lowdragmc.shimmer.ShimmerLoadConfigEvent;
+import com.lowdragmc.shimmer.event.ShimmerLoadConfigEvent;
+import com.lowdragmc.shimmer.event.ShimmerReloadEvent;
 import com.lowdragmc.shimmer.client.postprocessing.PostParticle;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.material.Fluid;
+
+import java.nio.file.Path;
 
 /**
  * @author HypherionSA
@@ -73,7 +78,15 @@ public interface IPlatformHelper {
 
     ShimmerLoadConfigEvent postLoadConfigurationEvent(ShimmerLoadConfigEvent event);
 
+	ShimmerReloadEvent postReloadEvent(ShimmerReloadEvent event);
+
     int getBloomColorAttachmentNumber();
 
     boolean isEnableInsetShaderInfo();
+
+	ResourceLocation getFluidTextureLocation(Fluid fluid, boolean isStill);
+
+	int getFluidColor(Fluid fluid);
+
+	Path getConfigDir();
 }

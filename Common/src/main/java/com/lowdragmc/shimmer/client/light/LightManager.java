@@ -1,8 +1,7 @@
 package com.lowdragmc.shimmer.client.light;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.FileUtility;
@@ -10,9 +9,11 @@ import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.client.shader.ShaderUBO;
+import com.lowdragmc.shimmer.config.ShimmerConfig;
+import com.lowdragmc.shimmer.event.ShimmerReloadEvent;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.math.Vector3f;
-import com.mojang.realmsclient.util.JsonUtils;
+import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -398,71 +399,66 @@ public enum LightManager {
     }
 
     public void loadConfig() {
-        for (JsonObject config: Configuration.config){
-            JsonElement jsonElement = config.has("LightBlock") ? config.get("LightBlock") : null;
-            if (jsonElement != null && jsonElement.isJsonArray()) {
-                JsonArray blocks = jsonElement.getAsJsonArray();
-                for (JsonElement block : blocks) {
-                    JsonObject jsonObj = block.getAsJsonObject();
-                    int color = (JsonUtils.getIntOr("a", jsonObj, 0) << 24) |
-                            (JsonUtils.getIntOr("r", jsonObj, 0) << 16) |
-                            (JsonUtils.getIntOr("g", jsonObj, 0) << 8) |
-                            JsonUtils.getIntOr("b", jsonObj, 0);
-                    float radius = jsonObj.get("radius").getAsFloat();
-                    if (jsonObj.has("block")) {
-                        ResourceLocation location = new ResourceLocation(jsonObj.get("block").getAsString());
-                        if (!Registry.BLOCK.containsKey(location)) continue;
-                        Block bb = Registry.BLOCK.get(location);
-                        if (jsonObj.has("state") && jsonObj.get("state").isJsonObject()) {
-                            Set<BlockState> available = Utils.getAllPossibleStates(jsonObj, bb);
-                            if (!available.isEmpty()) {
-                                registerBlockLight(bb, (bs, pos) -> {
-                                    if (available.contains(bs)) {
-                                        return new ColorPointLight.Template(radius, color);
-                                    }
-                                    return null;
-                                });
-                            }
-                        } else {
-                            registerBlockLight(bb, color, radius);
-                        }
-                    } else if (jsonObj.has("fluid")) {
-                        ResourceLocation location = new ResourceLocation(jsonObj.get("fluid").getAsString());
-                        if (!Registry.FLUID.containsKey(location)) continue;
-                        Fluid ff = Registry.FLUID.get(location);
-                        registerFluidLight(ff, color, radius);
-                    }
-                }
-            }
+	    ITEM_MAP.clear();
+	    TAG_MAP.clear();
+	    BLOCK_MAP.clear();;
+		FLUID_MAP.clear();
 
-            jsonElement = config.has("LightItem") ? config.get("LightItem") : null;
-            if (jsonElement != null && jsonElement.isJsonArray()) {
-                JsonArray items = jsonElement.getAsJsonArray();
-                for (JsonElement element : items) {
-                    JsonObject jsonObj = element.getAsJsonObject();
-                    int color = (JsonUtils.getIntOr("a", jsonObj, 0) << 24) |
-                            (JsonUtils.getIntOr("r", jsonObj, 0) << 16) |
-                            (JsonUtils.getIntOr("g", jsonObj, 0) << 8) |
-                            JsonUtils.getIntOr("b", jsonObj, 0);
-                    float radius = jsonObj.get("radius").getAsFloat();
-                    if (jsonObj.has("item_id")) {
-                        ResourceLocation itemResourceLocation = new ResourceLocation(jsonObj.get("item_id").getAsString());
-                        if (Registry.ITEM.containsKey(itemResourceLocation)){
-                            Item item = Registry.ITEM.get(itemResourceLocation);
-                            ColorPointLight.Template template = new ColorPointLight.Template(radius,color);
-                            registerItemLight(item, itemStack -> template);
-                        }
-                    } else if (jsonObj.has("item_tag")) {
-                        ResourceLocation tag = new ResourceLocation(jsonObj.get("item_tag").getAsString());
-                        ColorPointLight.Template template = new ColorPointLight.Template(radius,color);
-                        registerTagLight(tag, itemStack -> template);
-                    }
-                }
-            }
-        }
+		for (var config : Configuration.configs){
+			for (var blockLight : config.blockLights){
+				if (blockLight.blockName != null){
+
+					var blockPair = blockLight.block();
+					if (blockPair == null || blockPair.left() == null) continue;
+					var block = blockPair.right();
+
+					if (blockLight.hasState()){
+
+						if (Utils.checkBlockProperties(config.configSource, blockLight.state, blockPair.first())) continue;
+
+						List<BlockState> validStates = Utils.getAvailableStates(blockLight.state, block);
+						var light = new ColorPointLight.Template(blockLight.radius,blockLight.color());
+						registerBlockLight(block,(blockState,pos) -> validStates.contains(blockState) ? light : null);
+					}else {
+						registerBlockLight(block,blockLight.color(),blockLight.radius);
+					}
+				}else {
+					Pair<ResourceLocation, Fluid> fluidPair = blockLight.fluid();
+					if (fluidPair.right() == null) continue;
+
+					registerFluidLight(fluidPair.right(),blockLight.color(),blockLight.radius);
+				}
+			}
+
+			for (var  itemLight : config.itemLights){
+				var template = new ColorPointLight.Template(itemLight.radius, itemLight.color());
+				if (itemLight.itemName != null){
+					if (!ResourceLocation.isValidResourceLocation(itemLight.itemName)){
+						ShimmerConstants.LOGGER.error("invalid item name " + itemLight.itemName + " form" + config.configSource);
+						continue;
+					}
+					var itemLocation = new ResourceLocation(itemLight.itemName);
+					if (!Registry.ITEM.containsKey(itemLocation)){
+						ShimmerConstants.LOGGER.error("can't find item " + itemLocation + " from" + config.configSource);
+						continue;
+					}
+					var item = Registry.ITEM.get(itemLocation);
+					registerItemLight(item, itemStack -> template);
+				}else {
+					if (!ResourceLocation.isValidResourceLocation(itemLight.itemTag)){
+						ShimmerConstants.LOGGER.error("invalid item tag name " + itemLight.itemTag + " form" + config.configSource);
+						continue;
+					}
+					registerTagLight(new ResourceLocation(itemLight.itemTag),itemStack -> template);
+				}
+			}
+		}
+
+		Services.PLATFORM.postReloadEvent(new ShimmerReloadEvent(ShimmerReloadEvent.ReloadType.COLORED_LIGHT));
+
     }
 
-    public int getLight(BlockGetter instance, BlockPos pPos) {
+	public int getLight(BlockGetter instance, BlockPos pPos) {
         BlockState blockState = instance.getBlockState(pPos);
         FluidState fluidState = blockState.getFluidState();
         int light = 0;
