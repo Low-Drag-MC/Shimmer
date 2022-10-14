@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.core.mixins;
 
+import com.lowdragmc.shimmer.client.auxiliaryScreen.HsbColorWidget;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
@@ -54,13 +55,25 @@ public abstract class GameRendererMixin {
     @Inject(method = "reloadShaders", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;shutdownShaders()V", shift = At.Shift.AFTER))
     private void reloadShaders(ResourceManager resourceManager, CallbackInfo ci) {
         if (Services.PLATFORM.getPlatformName().equalsIgnoreCase("fabric")) {
-            Pair<ShaderInstance, Consumer<ShaderInstance>> blitShader = RenderUtils.registerShaders(resourceManager);
-            this.shaders.put(blitShader.getFirst().getName(), blitShader.getFirst());
-            blitShader.getSecond().accept(blitShader.getFirst());
 
-            Pair<ShaderInstance, Consumer<ShaderInstance>> armorShader = ShimmerRenderTypes.registerShaders(resourceManager);
-            this.shaders.put(armorShader.getFirst().getName(), armorShader.getFirst());
-            armorShader.getSecond().accept(armorShader.getFirst());
+	        {
+		        Pair<ShaderInstance, Consumer<ShaderInstance>> blitShader = RenderUtils.registerShaders(resourceManager);
+		        this.shaders.put(blitShader.getFirst().getName(), blitShader.getFirst());
+		        blitShader.getSecond().accept(blitShader.getFirst());
+	        }
+
+	        {
+		        Pair<ShaderInstance, Consumer<ShaderInstance>> armorShader = ShimmerRenderTypes.registerShaders(resourceManager);
+		        this.shaders.put(armorShader.getFirst().getName(), armorShader.getFirst());
+		        armorShader.getSecond().accept(armorShader.getFirst());
+	        }
+
+	        {
+		        Pair<ShaderInstance, Consumer<ShaderInstance>> hsbShader = HsbColorWidget.registerShaders(resourceManager);
+		        this.shaders.put(hsbShader.getFirst().getName(), hsbShader.getFirst());
+		        hsbShader.getSecond().accept(hsbShader.getFirst());
+	        }
+
         }
     }
 

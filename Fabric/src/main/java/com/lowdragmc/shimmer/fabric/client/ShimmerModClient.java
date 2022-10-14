@@ -1,6 +1,7 @@
 package com.lowdragmc.shimmer.fabric.client;
 
 import com.lowdragmc.shimmer.Configuration;
+import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
@@ -11,6 +12,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -29,7 +31,7 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
     @Override
     public void onInitializeClient() {
         LightManager.injectShaders();
-        PostProcessing.injectShaders();
+	    PostProcessing.injectShaders();
 
         /*if (((Object)(MultiLayerModel.Loader.INSTANCE)) instanceof IMultiLayerModelLoader) {
             ((IMultiLayerModelLoader)(Object)(MultiLayerModel.Loader.INSTANCE)).update();
@@ -73,14 +75,19 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                         }
                     )))
                 .then(literal("additive_blend")
-                    .then(argument("switch_state", BoolArgumentType.bool()).executes(
-                        context -> {
-                            FabricShimmerConfig.CONFIG.ADDITIVE_EFFECT.set(context.getArgument("switch_state", Boolean.class));
-                            ReloadShaderManager.reloadShader();
-                            return 1;
-                        }
-                    )))
-            ));
+                        .then(argument("switch_state", BoolArgumentType.bool()).executes(
+                                context -> {
+                                    FabricShimmerConfig.CONFIG.ADDITIVE_EFFECT.set(context.getArgument("switch_state", Boolean.class));
+                                    ReloadShaderManager.reloadShader();
+                                    return 1;
+                                }
+                        )))
+		        .then(literal("auxiliary_screen")
+				        .executes(context -> {
+					        Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
+					        return 1;
+				        }))
+        ));
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
     }

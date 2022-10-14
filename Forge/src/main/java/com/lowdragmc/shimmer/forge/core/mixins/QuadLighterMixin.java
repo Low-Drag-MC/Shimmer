@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(QuadLighter.class)
 public class QuadLighterMixin {
 
-    @Shadow @Final private int[] lightmap;
+    @Shadow(remap = false) @Final private int[] lightmap;
 
     @ModifyReceiver(method = "process",
             at = @At(value = "INVOKE",

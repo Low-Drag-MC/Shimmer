@@ -1,4 +1,4 @@
-package com.lowdragmc.shimmer;
+package com.lowdragmc.shimmer.event;
 
 /**
  * marker interface for all shimmer events

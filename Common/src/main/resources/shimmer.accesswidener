@@ -2,6 +2,7 @@ accessWidener v1 named
 
 accessible class com/mojang/blaze3d/pipeline/MainTarget$Dimension
 accessible class net/minecraft/client/renderer/LevelRenderer$RenderChunkInfo
+accessible class net/minecraft/client/gui/components/CycleButton$ValueListSupplier
 accessible class net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$RenderChunk$RebuildTask
 accessible class net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$RenderChunk$RebuildTask$CompileResults
 
@@ -9,3 +10,4 @@ accessible method net/minecraft/client/renderer/RenderType create (Ljava/lang/St
 
 accessible field net/minecraft/client/renderer/LevelRenderer$RenderChunkInfo chunk Lnet/minecraft/client/renderer/chunk/ChunkRenderDispatcher$RenderChunk;
 accessible field com/mojang/blaze3d/vertex/PoseStack poseStack Ljava/util/Deque;
+accessible field net/minecraft/client/particle/ParticleEngine textureAtlas Lnet/minecraft/client/renderer/texture/TextureAtlas;

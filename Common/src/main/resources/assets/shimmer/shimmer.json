@@ -18,7 +18,15 @@
       "b": 13,
       "a": 255,
       "radius": 10
-    }
+    },
+		{
+			"block": "minecraft:lantern",
+			"r": 255,
+			"g": 212,
+			"b": 141,
+			"a": 255,
+			"radius": 15
+		}
   ],
   "LightItem": [
     {

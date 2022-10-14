@@ -1,6 +1,6 @@
-package com.lowdragmc.shimmer.forge;
+package com.lowdragmc.shimmer.forge.event;
 
-import com.lowdragmc.shimmer.ShimmerLoadConfigEvent;
+import com.lowdragmc.shimmer.event.ShimmerLoadConfigEvent;
 import net.minecraftforge.eventbus.api.Event;
 
 

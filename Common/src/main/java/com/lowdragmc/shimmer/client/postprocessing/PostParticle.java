@@ -67,7 +67,7 @@ public class PostParticle extends Particle {
     @Override
     @Nonnull
     public String toString() {
-        return "bloom_" + parent.toString();
+        return "post" + "_" + postProcessing.name + "_" + parent.toString();
     }
 
     @Override

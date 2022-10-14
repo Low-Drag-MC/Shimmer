@@ -70,28 +70,6 @@ public abstract class ParticleEngineMixin implements IParticleEngine {
         }
     }
 
-    @Redirect(method = "render",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/particle/ParticleRenderType;begin(Lcom/mojang/blaze3d/vertex/BufferBuilder;Lnet/minecraft/client/renderer/texture/TextureManager;)V"))
-    private void injectRenderPre(ParticleRenderType particlerendertype, BufferBuilder bufferBuilder, TextureManager textureManager){
-        if (particlerendertype instanceof IPostParticleType && this.particles.get(particlerendertype).size() > 0) {
-            PostProcessing postProcessing = ((IPostParticleType) particlerendertype).getPost();
-            postProcessing.getPostTarget().bindWrite(false);
-            postProcessing.hasParticle();
-        }
-        particlerendertype.begin(bufferBuilder, textureManager);
-    }
-
-    @Redirect(method = "render",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/particle/ParticleRenderType;end(Lcom/mojang/blaze3d/vertex/Tesselator;)V"))
-    private void injectRenderPost(ParticleRenderType particlerendertype, Tesselator tesselator){
-        particlerendertype.end(tesselator);
-        if (particlerendertype instanceof IPostParticleType) {
-            Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
-        }
-    }
-
     @Inject(method = "render",
             at = @At(value = "RETURN"), remap = false)
     private void injectRenderReturn(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, LightTexture lightTexture, Camera camera, float partialTicks, CallbackInfo ci) {
