@@ -73,7 +73,7 @@ public abstract class ParticleEngineMixin implements IParticleEngine {
     }
 
     @Inject(method = "render",
-            at = @At(value = "RETURN"), remap = false)
+            at = @At(value = "RETURN"))
     private void injectRenderReturn(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, LightTexture lightTexture, Camera camera, float partialTicks, CallbackInfo ci) {
         for (PostProcessing postProcessing : PostProcessing.values()) {
             postProcessing.renderParticlePost();
