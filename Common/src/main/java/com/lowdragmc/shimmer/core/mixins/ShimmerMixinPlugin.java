@@ -13,22 +13,12 @@ import java.util.Set;
  * @date 2022/06/07
  * Added to stop Rubidium & Sodium mixins from trying to load if the mod is not installed. Prevents log spam of Mixin Errors
  */
-public class ShimmerMixinPlugin implements IMixinConfigPlugin {
+public class ShimmerMixinPlugin implements IMixinConfigPlugin , MixinPluginShared {
 
     static{
         MixinExtrasBootstrap.init();
     }
 
-    public static final boolean IS_OPT_LOAD = isClassFound("net.optifine.reflect.ReflectorClass");
-
-    public static boolean isClassFound(String className) {
-        try {
-            Class.forName(className, false, Thread.currentThread().getContextClassLoader());
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -42,7 +32,13 @@ public class ShimmerMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return !IS_OPT_LOAD;
+        if (IS_OPT_LOAD){
+            return false;
+        }
+        if (IS_DASH_LOADER && mixinClassName.contains("reloadShader")){
+            return false;
+        }
+        return true;
     }
 
     @Override
