@@ -6,6 +6,7 @@ import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
+import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
 import com.lowdragmc.shimmer.fabric.FabricShimmerConfig;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.fabricmc.api.ClientModInitializer;
@@ -13,6 +14,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -33,9 +35,6 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
         LightManager.injectShaders();
 	    PostProcessing.injectShaders();
 
-        /*if (((Object)(MultiLayerModel.Loader.INSTANCE)) instanceof IMultiLayerModelLoader) {
-            ((IMultiLayerModelLoader)(Object)(MultiLayerModel.Loader.INSTANCE)).update();
-        }*/
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
             dispatcher.register(literal("shimmer")
                 .then(literal("reload_postprocessing")
@@ -52,8 +51,13 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                     }))
                 .then(literal("reload_shader")
                     .executes(context -> {
-                        ReloadShaderManager.reloadShader();
-                        return 1;
+                        if (MixinPluginShared.IS_DASH_LOADER){
+                            context.getSource().sendFailure(Component.literal("disabled when dash loader is installed"));
+                            return 0;
+                        }else {
+                            ReloadShaderManager.reloadShader();
+                            return 1;
+                        }
                     }))
                 .then(literal("confirm_clear_resource")
                     .executes(context -> {

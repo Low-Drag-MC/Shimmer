@@ -1,6 +1,6 @@
 package com.lowdragmc.shimmer.fabric.core.mixins;
 
-import com.lowdragmc.shimmer.core.mixins.ShimmerMixinPlugin;
+import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -13,10 +13,7 @@ import java.util.Set;
  * @date 2022/07/01
  * Added to stop Rubidium & Sodium mixins from trying to load if the mod is not installed. Prevents log spam of Mixin Errors
  */
-public class ShimmerFabricMixinPlugin implements IMixinConfigPlugin {
-    public static final boolean IS_OPT_LOAD = ShimmerMixinPlugin.isClassFound("optifine.OptiFineTranformationService");
-
-    public static final boolean IS_SODIUM_LOAD = ShimmerMixinPlugin.isClassFound("me.jellysquid.mods.sodium.mixin.SodiumMixinPlugin");
+public class ShimmerFabricMixinPlugin implements IMixinConfigPlugin , MixinPluginShared {
 
     @Override
     public void onLoad(String mixinPackage) {
