@@ -1,6 +1,7 @@
 package com.lowdragmc.shimmer.forge.client;
 
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
+import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.forge.ForgeShimmerConfig;
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.light.LightManager;
@@ -9,6 +10,7 @@ import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
@@ -82,6 +84,16 @@ public class ForgeEventListener {
                 .then(Commands.literal("auxiliary_screen")
                         .executes(context -> {
                             Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
+                            return 1;
+                        }))
+                .then(Commands.literal("eyedropper")
+                        .executes(context -> {
+                            if (Eyedropper.getState()){
+                                context.getSource().sendSystemMessage(Component.literal("exit eyedropper mode"));
+                            }else {
+                                context.getSource().sendSystemMessage(Component.literal("enter eyedropper mode, backend: " + Eyedropper.mode.modeName()));
+                            }
+                            Eyedropper.switchState();
                             return 1;
                         }))
         );

@@ -33,6 +33,7 @@ public abstract class ProgramMixin {
     private Program.Type type;
     private static final Pattern REGEX_VERSION = Pattern.compile("(#(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*version(?:/\\*(?:[^*]|\\*+[^*/])*\\*+/|\\h)*(\\d+))\\b");
 
+    @SuppressWarnings("mapping")
     @ModifyExpressionValue(method = "compileShaderInternal", at = @At(value = "INVOKE"
             , target = "Lorg/apache/commons/io/IOUtils;toString(Ljava/io/InputStream;Ljava/nio/charset/Charset;)Ljava/lang/String;"))
     private static String transformShader(String shader,Program.Type type, String shaderName, InputStream pShaderDataSame, String pShaderSourceName, GlslPreprocessor processor){

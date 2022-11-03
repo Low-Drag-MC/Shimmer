@@ -9,6 +9,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.lwjgl.opengl.GL43;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -65,5 +66,11 @@ public class RenderUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void warpGLDebugLabel(String message,Runnable block){
+        GL43.glPushDebugGroup(GL43.GL_DEBUG_SOURCE_APPLICATION, 0,message);
+        block.run();
+        GL43.glPopDebugGroup();
     }
 }

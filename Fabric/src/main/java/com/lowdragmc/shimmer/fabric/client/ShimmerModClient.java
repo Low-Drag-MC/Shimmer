@@ -2,6 +2,7 @@ package com.lowdragmc.shimmer.fabric.client;
 
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
+import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
@@ -91,6 +92,16 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
 					        Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
 					        return 1;
 				        }))
+                .then(literal("eyedropper")
+                        .executes(context -> {
+                            if (!Eyedropper.getState()){
+                                context.getSource().sendSystemMessage(Component.literal("enter eyedropper mode, backend: " + Eyedropper.mode.modeName()));
+                            }else {
+                                context.getSource().sendSystemMessage(Component.literal("exit eyedropper mode"));
+                            }
+                            Eyedropper.switchState();
+                            return 1;
+                        }))
         ));
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);

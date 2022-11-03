@@ -1,10 +1,12 @@
 package com.lowdragmc.shimmer.core.mixins;
 
+import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.HsbColorWidget;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
+import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.GameRenderer;
@@ -19,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * @author KilaBash
@@ -30,7 +33,11 @@ public abstract class GameRendererMixin {
 
     @Shadow @Final private Map<String, ShaderInstance> shaders;
 
-    @Inject(method = "resize", at = @At(value = "RETURN"))
+	@Shadow @Final private ResourceManager resourceManager;
+
+	@Shadow public abstract void setRenderHand(boolean renderHand);
+
+	@Inject(method = "resize", at = @At(value = "RETURN"))
     private void injectResize(int width, int height, CallbackInfo ci) {
         PostProcessing.resize(width, height);
     }
@@ -46,27 +53,20 @@ public abstract class GameRendererMixin {
     @Inject(method = "reloadShaders", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;shutdownShaders()V", shift = At.Shift.AFTER))
     private void reloadShaders(ResourceManager resourceManager, CallbackInfo ci) {
         if (Services.PLATFORM.getPlatformName().equalsIgnoreCase("fabric")) {
-
-	        {
-		        Pair<ShaderInstance, Consumer<ShaderInstance>> blitShader = RenderUtils.registerShaders(resourceManager);
-		        this.shaders.put(blitShader.getFirst().getName(), blitShader.getFirst());
-		        blitShader.getSecond().accept(blitShader.getFirst());
+			this.setupShader(RenderUtils::registerShaders,resourceManager);
+			this.setupShader(ShimmerRenderTypes::registerShaders,resourceManager);
+			this.setupShader(HsbColorWidget::registerShaders,resourceManager);
+	        if (ShaderSSBO.support()) {
+		        this.setupShader(Eyedropper::registerShaders,resourceManager);
 	        }
-
-	        {
-		        Pair<ShaderInstance, Consumer<ShaderInstance>> armorShader = ShimmerRenderTypes.registerShaders(resourceManager);
-		        this.shaders.put(armorShader.getFirst().getName(), armorShader.getFirst());
-		        armorShader.getSecond().accept(armorShader.getFirst());
-	        }
-
-	        {
-		        Pair<ShaderInstance, Consumer<ShaderInstance>> hsbShader = HsbColorWidget.registerShaders(resourceManager);
-		        this.shaders.put(hsbShader.getFirst().getName(), hsbShader.getFirst());
-		        hsbShader.getSecond().accept(hsbShader.getFirst());
-	        }
-
         }
     }
+
+	private void setupShader(Function<ResourceManager,Pair<ShaderInstance, Consumer<ShaderInstance>>> function,ResourceManager manager){
+		var shader = function.apply(manager);
+		this.shaders.put(shader.getFirst().getName(),shader.getFirst());
+		shader.getSecond().accept(shader.getFirst());
+	}
 
 
 }

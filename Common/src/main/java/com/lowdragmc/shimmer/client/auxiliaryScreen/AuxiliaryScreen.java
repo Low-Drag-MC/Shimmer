@@ -4,6 +4,9 @@ import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
+import com.lowdragmc.shimmer.config.BlockLight;
+import com.lowdragmc.shimmer.config.Bloom;
+import com.lowdragmc.shimmer.config.ItemLight;
 import com.lowdragmc.shimmer.config.ShimmerConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -15,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AuxiliaryScreen extends Screen {
 
@@ -27,6 +31,7 @@ public class AuxiliaryScreen extends Screen {
 	private Button exportButton;
 	private Button addButton;
 	private Button clearButton;
+	private Button importColorButton;
 
 	private static final CycleButton.Builder<KeyType> cycleButtonBuilder =
 			CycleButton.<KeyType>builder(key -> Component.literal(key.toString().toLowerCase()))
@@ -55,7 +60,7 @@ public class AuxiliaryScreen extends Screen {
 		previewWidget = new PreviewWidget(20, 160, 90, 90, Component.literal("preview"));
 
 		inputText.addCompleteListener(previewWidget::onContentNeedChange);
-		inputText.addCandicateListener(previewWidget::onCandicateChange);
+		inputText.addCandidateListener(previewWidget::onCandicateChange);
 
 		addRenderableWidget(colorPicker);
 		addRenderableWidget(inputText);
@@ -87,6 +92,7 @@ public class AuxiliaryScreen extends Screen {
 						config = new ShimmerConfig();
 						config.configSource = "AuxiliaryScreen";
 						config.init();
+						config.enable = new AtomicBoolean(true);
 						Configuration.auxiliaryConfig = config;
 					}
 
@@ -96,31 +102,31 @@ public class AuxiliaryScreen extends Screen {
 
 					switch (mode.getValue()) {
 						case COLORED_BLOCK -> {
-							var light = config.new BlockLight();
+							var light = new BlockLight();
 							light.setRGB(rgb);
 							light.radius = radius;
 							light.blockName = content;
 							config.blockLights.add(light);
 						}
 						case LIGHT_ITEM -> {
-							var light = config.new ItemLight();
+							var light = new ItemLight();
 							light.setRGB(rgb);
 							light.radius = radius;
 							light.itemName = content;
 							config.itemLights.add(light);
 						}
 						case BLOOM_PARTICLE -> {
-							var bloom = config.new Bloom();
+							var bloom = new Bloom();
 							bloom.particleName = content;
 							config.blooms.add(bloom);
 						}
 						case BLOOM_FLUID -> {
-							var bloom = config.new Bloom();
+							var bloom = new Bloom();
 							bloom.fluidName = content;
 							config.blooms.add(bloom);
 						}
 						case BLOOM_BLOCK -> {
-							var bloom = config.new Bloom();
+							var bloom = new Bloom();
 							bloom.blockName = content;
 							config.blooms.add(bloom);
 						}
@@ -143,6 +149,10 @@ public class AuxiliaryScreen extends Screen {
 		addRenderableWidget(addButton);
 		addRenderableWidget(exportButton);
 		addRenderableWidget(clearButton);
+
+//		importColorButton = new Button(, , );
+
+//		addRenderableWidget(importColorButton);
 	}
 
 	@Override

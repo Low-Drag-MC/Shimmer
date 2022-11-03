@@ -43,11 +43,11 @@ public class SuggestionEditBoxWidget extends EditBox {
 	 */
 	private static Map<KeyType, Set<ResourceLocation>> cache;
 	String lastContent;
-	String candicate;
-	String lastCandicate;
+	String candidate;
+	String lastCandidate;
 	boolean isComplete = false;
 	List<BiConsumer<KeyType, ResourceLocation>> completeListeners = new ArrayList<>();
-	List<BiConsumer<KeyType, ResourceLocation>> candicateListeners = new ArrayList<>();
+	List<BiConsumer<KeyType, ResourceLocation>> candidateListeners = new ArrayList<>();
 	KeyType type = KeyType.DEFAULT;
 
 	/**
@@ -58,10 +58,10 @@ public class SuggestionEditBoxWidget extends EditBox {
 	}
 
 	/**
-	 * @param consumer callbacks called when candicate change
+	 * @param consumer callbacks called when candidate change
 	 */
-	public void addCandicateListener(BiConsumer<KeyType, ResourceLocation> consumer) {
-		candicateListeners.add(consumer);
+	public void addCandidateListener(BiConsumer<KeyType, ResourceLocation> consumer) {
+		candidateListeners.add(consumer);
 	}
 
 	/**
@@ -81,13 +81,13 @@ public class SuggestionEditBoxWidget extends EditBox {
 		} else {
 			isComplete = false;
 		}
-		//check candicate change
-		if (!Objects.equals(candicate, lastCandicate)) {
-			lastCandicate = candicate;
-			if (lastCandicate != null && ResourceLocation.isValidResourceLocation(lastCandicate)) {
-				ResourceLocation resourceLocation = new ResourceLocation(lastCandicate);
+		//check candidate change
+		if (!Objects.equals(candidate, lastCandidate)) {
+			lastCandidate = candidate;
+			if (lastCandidate != null && ResourceLocation.isValidResourceLocation(lastCandidate)) {
+				ResourceLocation resourceLocation = new ResourceLocation(lastCandidate);
 				if (allSuggestion.contains(resourceLocation)) {
-					candicateListeners.forEach(item -> item.accept(type, resourceLocation));
+					candidateListeners.forEach(item -> item.accept(type, resourceLocation));
 				}
 			}
 		}
@@ -119,16 +119,16 @@ public class SuggestionEditBoxWidget extends EditBox {
 			if (suggestions.isEmpty()) return;
 
 			//calculate render suggestion range
-			var begin = suggestions.contains(lastCandicate) ? Math.max(0, suggestions.indexOf(lastCandicate) - 3) : 0;
+			var begin = suggestions.contains(lastCandidate) ? Math.max(0, suggestions.indexOf(lastCandidate) - 3) : 0;
 			var max = Math.min(begin + showNumbers, suggestions.size());
 
 			//render suggestion background
 			int gap = Minecraft.getInstance().font.lineHeight + 8;
 			fill(poseStack, height, gap * (max - begin + 1), 0x7F000000);
 
-			//select candicate
-			if (candicate == null || (!suggestions.contains(lastContent)) && !suggestions.contains(candicate))
-				candicate = suggestions.get(0);
+			//select candidate
+			if (candidate == null || (!suggestions.contains(lastContent)) && !suggestions.contains(candidate))
+				candidate = suggestions.get(0);
 
 			var font = Minecraft.getInstance().font;
 			int currentHeight = 0;
@@ -136,8 +136,8 @@ public class SuggestionEditBoxWidget extends EditBox {
 			//render suggestions
 			for (int i = begin; i < max; i++) {
 				String str = suggestions.get(i);
-				//candicate color differ
-				int color = Objects.equals(str, candicate) ? 0xffcecf67 : 0xffffffff;
+				//candidate color differ
+				int color = Objects.equals(str, candidate) ? 0xffcecf67 : 0xffffffff;
 				drawString(poseStack, font, font.plainSubstrByWidth(str,200), x + 5 , y + height + currentHeight, color);
 				currentHeight += gap;
 			}
@@ -152,10 +152,10 @@ public class SuggestionEditBoxWidget extends EditBox {
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (super.keyPressed(keyCode, scanCode, modifiers)) return true;
 		switch (keyCode) {
-			case GLFW.GLFW_KEY_UP -> candicate = suggestions.get(Math.max(0, suggestions.indexOf(candicate) - 1));
+			case GLFW.GLFW_KEY_UP -> candidate = suggestions.get(Math.max(0, suggestions.indexOf(candidate) - 1));
 			case GLFW.GLFW_KEY_DOWN ->
-					candicate = suggestions.get(Math.min(suggestions.indexOf(candicate) + 1, suggestions.size() - 1));
-			case GLFW.GLFW_KEY_TAB -> this.setValue(candicate);
+					candidate = suggestions.get(Math.min(suggestions.indexOf(candidate) + 1, suggestions.size() - 1));
+			case GLFW.GLFW_KEY_TAB -> this.setValue((getValue().isEmpty() || !getValue().contains(":") ? candidate + ":" : candidate));
 			default -> {
 				return false;
 			}
