@@ -1,0 +1,11 @@
+{
+	"vertex": "shimmer:fast_blit",
+	"fragment": "shimmer:pick_color",
+	"attributes": [ "Position" ],
+	"samplers": [
+		{ "name": "DiffuseSampler" }
+	],
+	"uniforms": [
+		{ "name": "ScreenSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] }
+	]
+}

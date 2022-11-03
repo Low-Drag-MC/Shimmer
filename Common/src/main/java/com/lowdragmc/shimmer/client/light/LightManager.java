@@ -409,7 +409,7 @@ public enum LightManager {
 				if (blockLight.blockName != null){
 
 					var blockPair = blockLight.block();
-					if (blockPair == null || blockPair.left() == null) continue;
+					if (blockPair == null || blockPair.left() == null || blockPair.right() == null) continue;
 					var block = blockPair.right();
 
 					if (blockLight.hasState()){

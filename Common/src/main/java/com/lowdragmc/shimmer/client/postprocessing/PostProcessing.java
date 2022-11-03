@@ -395,7 +395,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
 					BLOOM_FLUID.add(fluid.right());
 				}else {
 					var blockPair = bloom.block();
-					if (blockPair == null || blockPair.left() == null) continue;
+					if (blockPair == null || blockPair.left() == null || blockPair.right() == null) continue;
 					var block =  blockPair.right();
 
 					if (bloom.hasState()){

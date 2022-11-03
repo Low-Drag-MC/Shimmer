@@ -23,7 +23,7 @@ val forge_version = "1.18.2-40.1.69"
 
 //Project
 val version_major = 0.1
-val version_patch = 11
+val version_patch = 14
 val semantics_version = "$minecraft_version-$version_major.$version_patch"
 val maven_path = "snapshots"
 val maven_group = "com.lowdragmc.shimmer"

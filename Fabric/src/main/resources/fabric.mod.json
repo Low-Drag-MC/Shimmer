@@ -11,13 +11,14 @@
       "zomb_676"
     ],
     "contact": {
-      "sources": "https://github.com/Low-Drag-MC/Shimmer/"
+      "sources": "https://github.com/Low-Drag-MC/Shimmer/",
+      "issues": "https://github.com/Low-Drag-MC/Shimmer/issues/"
     },
 
     "license": "MIT",
     "icon": "assets/shimmer/icon.png",
 
-    "environment": "*",
+    "environment": "client",
     "entrypoints": {
       "main": [
 				"com.lowdragmc.shimmer.fabric.ShimmerMod"
@@ -32,6 +33,7 @@
     ],
     "depends": {
       "fabricloader": ">=0.13.3",
+      "fabric-api": "0.58.0+1.18.2",
       "minecraft": "1.18.x",
       "java": ">=17"
     }

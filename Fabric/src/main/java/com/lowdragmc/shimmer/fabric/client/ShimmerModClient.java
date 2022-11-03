@@ -2,6 +2,7 @@ package com.lowdragmc.shimmer.fabric.client;
 
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
+import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
@@ -50,12 +51,14 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                         }))
                 .then(literal("reload_shader")
                         .executes(context -> {
-                            if (MixinPluginShared.IS_DASH_LOADER){
-                            context.getSource().sendError(new TextComponent("disabled when dash loader is installed"));
-                            return 0;
-                        }else {ReloadShaderManager.reloadShader();
-                            return 1;
-                        }}))
+                            if (MixinPluginShared.IS_DASH_LOADER) {
+                                context.getSource().sendError(new TextComponent("disabled when dash loader is installed"));
+                                return 0;
+                            } else {
+                                ReloadShaderManager.reloadShader();
+                                return 1;
+                            }
+                        }))
                 .then(literal("confirm_clear_resource")
                         .executes(context -> {
                             ReloadShaderManager.cleanResource();
@@ -83,11 +86,21 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                                     return 1;
                                 }
                         )))
-		        .then(literal("auxiliary_screen")
-				        .executes(context -> {
-					        Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
-					        return 1;
-				        }))
+                .then(literal("auxiliary_screen")
+                        .executes(context -> {
+                            Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
+                            return 1;
+                        }))
+                .then(literal("eyedropper")
+                        .executes(context -> {
+                            if (!Eyedropper.getState()) {
+                                context.getSource().sendFeedback(new TextComponent("enter eyedropper mode, backend: " + Eyedropper.mode.modeName()));
+                            } else {
+                                context.getSource().sendFeedback(new TextComponent("exit eyedropper mode"));
+                            }
+                            Eyedropper.switchState();
+                            return 1;
+                        }))
         );
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
