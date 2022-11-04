@@ -1,6 +1,7 @@
 package com.lowdragmc.shimmer.fabric.client;
 
 import com.lowdragmc.shimmer.Configuration;
+import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.client.light.LightManager;
@@ -11,6 +12,8 @@ import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
 import com.lowdragmc.shimmer.fabric.FabricShimmerConfig;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
@@ -92,19 +95,35 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
 					        Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
 					        return 1;
 				        }))
-                .then(literal("eyedropper")
-                        .executes(context -> {
-                            if (!Eyedropper.getState()){
-                                context.getSource().sendSystemMessage(Component.literal("enter eyedropper mode, backend: " + Eyedropper.mode.modeName()));
-                            }else {
-                                context.getSource().sendSystemMessage(Component.literal("exit eyedropper mode"));
-                            }
-                            Eyedropper.switchState();
-                            return 1;
-                        }))
-        ));
+                    .then(literal("eyedropper")
+                            .executes(context -> {
+                                if (!Eyedropper.getState()) {
+                                    context.getSource().sendSystemMessage(Component.literal("enter eyedropper mode, backend: " + Eyedropper.mode.modeName()));
+                                } else {
+                                    context.getSource().sendSystemMessage(Component.literal("exit eyedropper mode"));
+                                }
+                                Eyedropper.switchState();
+                                return 1;
+                            }))
+                    .then(literal("eyedropper").then(literal("backend")
+                            .then(literal("ShaderStorageBufferObject").executes(
+                                    context -> {
+                                        Eyedropper.switchMode(Eyedropper.ShaderStorageBufferObject);
+                                        return 1;
+                                    }
+                            )).then(literal("glGetTexImage").executes(
+                                    context -> {
+                                        Eyedropper.switchMode(Eyedropper.DOWNLOAD);
+                                        return 1;
+                                    }
+                            ))))
+            ));
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
+
+        KeyBindingHelper.registerKeyBinding(ShimmerConstants.recordScreenColor);
+
+        HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> Eyedropper.update(matrixStack));
     }
 
     @Override

@@ -10,7 +10,6 @@
 		"BlockLightEngineMixin",
 		"GameRendererMixin",
 		"GLStateManagerMixin",
-		"GuiMixin",
 		"HumanoidArmorLayerMixin",
 		"LevelRendererMixin",
 		"LiquidBlockRendererMixin",

@@ -457,6 +457,15 @@ public class HsbColorWidget extends AbstractWidget {
 		this.b = hsb[2];
 	}
 
+	public void setRGB(float[] rgb) {
+		var hsb = new float[3];
+		Utils.RGBtoHSB(rgb, hsb);
+		this.h = hsb[0] * 360;
+		this.s = hsb[1];
+		this.b = hsb[2];
+		refreshRGB();
+	}
+
 	public int rgb() {
 		return rgb;
 	}

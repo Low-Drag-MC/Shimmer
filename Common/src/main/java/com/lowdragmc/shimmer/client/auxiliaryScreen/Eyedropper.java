@@ -2,27 +2,27 @@ package com.lowdragmc.shimmer.client.auxiliaryScreen;
 
 
 import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
+import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Matrix4f;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.FastColor;
-import net.minecraft.world.item.DyeColor;
 import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL43;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -33,13 +33,7 @@ public enum Eyedropper {
 		public static ShaderSSBO ssbo;
 		public static ShaderInstance colorPickShader;
 		public static RenderTarget flipTarget;
-		private static float[] colorContainer = new float[3];
-		private static int bindingIndex = 5;
-
-		@Override
-		public String modeName() {
-			return "Shader Storage Buffer Object";
-		}
+		private static final int bindingIndex = 5;
 
 		@Override
 		public void updateCurrentColor() {
@@ -51,9 +45,7 @@ public enum Eyedropper {
 
 			RenderTarget mainRenderTarget = Minecraft.getInstance().getMainRenderTarget();
 
-			RenderUtils.warpGLDebugLabel("blit_move", () -> {
-				RenderUtils.fastBlit(mainRenderTarget, flipTarget);
-			});
+			RenderUtils.warpGLDebugLabel("blit_move", () -> RenderUtils.fastBlit(mainRenderTarget, flipTarget));
 
 			RenderUtils.warpGLDebugLabel("blit_back", () -> {
 				ssbo.bindBuffer();
@@ -67,7 +59,7 @@ public enum Eyedropper {
 
 				colorPickShader.apply();
 
-				colorPickShader.SCREEN_SIZE.set((float)window.getWidth(),(float)window.getHeight());
+				colorPickShader.SCREEN_SIZE.set((float) window.getWidth(), (float) window.getHeight());
 
 				GlStateManager._enableBlend();
 				RenderSystem.defaultBlendFunc();
@@ -89,11 +81,7 @@ public enum Eyedropper {
 				ssbo.unBindBuffer();
 			});
 
-			RenderUtils.warpGLDebugLabel("get_data", () -> {
-				ssbo.getSubData(0, colorContainer);
-			});
-
-			Eyedropper.colors = Arrays.copyOf(colorContainer, 3);
+			ssbo.getSubData(0, Eyedropper.currentColor);
 
 		}
 
@@ -102,7 +90,7 @@ public enum Eyedropper {
 			colorPickShader = shader;
 		}
 
-		public void updateFlipTarget() {
+		private void updateFlipTarget() {
 			var window = Minecraft.getInstance().getWindow();
 			if (flipTarget.width != window.getWidth() || flipTarget.height != window.getHeight()) {
 				flipTarget.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
@@ -110,7 +98,7 @@ public enum Eyedropper {
 		}
 
 		@Override
-		public Eyedropper init() {
+		public void init() {
 			ssbo = new ShaderSSBO();
 			ssbo.createBufferData(32, GL15.GL_DYNAMIC_READ);
 
@@ -121,26 +109,62 @@ public enum Eyedropper {
 			flipTarget = new RenderTarget(false) {
 			};
 			updateFlipTarget();
-			return this;
 		}
 
 		@Override
 		public void destroy() {
-			flipTarget.destroyBuffers();
-			flipTarget = null;
-			ssbo.close();
-			ssbo = null;
+			if (flipTarget != null) {
+				flipTarget.destroyBuffers();
+				flipTarget = null;
+			}
+			if (ssbo != null) {
+				ssbo.close();
+				ssbo = null;
+			}
+		}
+
+		@Override
+		public String modeName() {
+			return "ShaderStorageBufferObject";
 		}
 	},
 	DOWNLOAD {
-		@Override
-		public String modeName() {
-			return "glGetTexImage";
-		}
+
+		private static NativeImage nativeImage;
+		private static int lastWidth;
+		private static int lastHeight;
+		private static int openCount = 0;
+		private static int closeCount = 0;
 
 		@Override
 		public void updateCurrentColor() {
+			RenderTarget renderTarget = Minecraft.getInstance().getMainRenderTarget();
 
+			if (lastWidth != renderTarget.width || lastHeight != renderTarget.height) {
+				if (nativeImage != null) {
+					nativeImage.close();
+					closeCount++;
+				}
+				nativeImage = new NativeImage(renderTarget.width, renderTarget.height, false);
+				openCount++;
+				lastWidth = renderTarget.width;
+				lastHeight = renderTarget.height;
+			}
+
+			RenderSystem.bindTexture(renderTarget.getColorTextureId());
+			nativeImage.downloadTexture(0, true);
+			nativeImage.flipY();
+
+			Window window = Minecraft.getInstance().getWindow();
+
+			int rgba = nativeImage.getPixelRGBA(window.getWidth() / 2, window.getHeight() / 2);
+			currentColor[0] = NativeImage.getR(rgba) / 255f;
+			currentColor[1] = NativeImage.getG(rgba) / 255f;
+			currentColor[2] = NativeImage.getB(rgba) / 255f;
+
+			if (Math.abs(closeCount - openCount) >= 5) {
+				throw new RuntimeException();
+			}
 		}
 
 		@Override
@@ -149,80 +173,111 @@ public enum Eyedropper {
 		}
 
 		@Override
-		public Eyedropper init() {
-			return this;
+		public void init() {
 		}
 
 		@Override
 		public void destroy() {
+			if (nativeImage != null) {
+				nativeImage.close();
+				nativeImage = null;
+				closeCount++;
+			}
+			lastWidth = -1;
+			lastHeight = -1;
+		}
+
+		@Override
+		public String modeName() {
+			return "glGetTexImage";
 		}
 	};
 
 
-	protected static int eyedropperredColor;
-	protected static boolean dataAvailable = false;
+	private static boolean dataAvailable = false;
+	private static final float[] eyedropperColor = new float[3];
 
-	protected static int currentColor;
-	protected static float[] colors = new float[3];
+	private static float[] currentColor = new float[3];
 
 
 	public static Eyedropper mode = ShaderSSBO.support() ? ShaderStorageBufferObject : DOWNLOAD;
 
 	private static boolean enable = false;
+	private static boolean readyForRecord = true;
+
+	private static final String colorPreviewChar = Util.make(() -> {
+		var holder = "⬛";
+		if (Services.PLATFORM.isModLoaded("modernui")) {
+			holder = "\u200c" + holder + "\u200c";
+		}
+		return holder;
+	});
+
+	private static Component makeColorPreview(float[] color) {
+		return Component.literal(colorPreviewChar).withStyle((style) -> style.withColor(Utils.pack(color)));
+	}
 
 	protected abstract void updateCurrentColor();
 
-	public final void update(PoseStack matrixStack) {
+	public static void update(PoseStack matrixStack) {
 		if (enable) {
-			Font font = Minecraft.getInstance().font;
-			var window = Minecraft.getInstance().getWindow();
-			var scale = window.getGuiScale();
-			updateCurrentColor();
+			mode.updateCurrentColor();
+			mode.renderIndicator(matrixStack);
 
-//			renderIndicator();
+			if (ShimmerConstants.recordScreenColor.isDown() && readyForRecord) {
+				eyedropperColor[0] = currentColor[0];
+				eyedropperColor[1] = currentColor[1];
+				eyedropperColor[2] = currentColor[2];
+				dataAvailable = true;
+				readyForRecord = false;
+				Minecraft.getInstance().player.sendSystemMessage(Component.literal("set color " + formatRGB(eyedropperColor))
+						.append(makeColorPreview(eyedropperColor)));
+			} else if (!ShimmerConstants.recordScreenColor.isDown()) {
+				readyForRecord = true;
+			}
 
-			var message = MessageFormat.format("r:{0},g{1},b{2}", colors[0] * 255, colors[1] * 255, colors[2] * 255);
-
-			RenderUtils.warpGLDebugLabel("render font", () -> {
-				font.draw(matrixStack, message, (float) (window.getWidth() / 2f / scale), (float) (window.getHeight() / 2f / scale), DyeColor.BLACK.getTextColor());
-			});
-
-
-			RenderUtils.warpGLDebugLabel("draw_color_block",()->{
-
-				Matrix4f pose = matrixStack.last().pose();
-
-				float x = 50f;
-				float y = 20f;
-				float width = 50f;
-				float height = 50f;
-				float z = 0.01f;
-				int color = FastColor.ARGB32.color(255, (int) (colors[0] * 255), (int) (colors[1] * 255), (int) (colors[2] * 255));
-
-				RenderSystem.enableDepthTest();
-				RenderSystem.disableTexture();
-				RenderSystem.enableBlend();
-				RenderSystem.defaultBlendFunc();
-				RenderSystem.setShader(GameRenderer::getPositionColorShader);
-
-				Tesselator tessellator = Tesselator.getInstance();
-				BufferBuilder buffer = tessellator.getBuilder();
-				buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-				buffer.vertex(pose, x + width,    y, z).color(color).endVertex();
-				buffer.vertex(pose,  x,    y, z).color(color).endVertex();
-				buffer.vertex(pose,  x, y+height, z).color(color).endVertex();
-				buffer.vertex(pose, x + width, y + height, z).color(color).endVertex();
-				tessellator.end();
-
-				RenderSystem.disableBlend();
-				RenderSystem.enableTexture();
-			});
 		}
 	}
 
-	public static void renderIndicator() {
-		if (dataAvailable) {
+	private static String formatRGB(float[] color) {
+		var r = (int) (color[0] * 255);
+		var g = (int) (color[1] * 255);
+		var b = (int) (color[2] * 255);
+		var str = new StringBuilder();
+		str.append("r:").append(r);
+		do {
+			str.append(' ');
+		} while (str.length() != 6);
+		str.append("g:").append(g);
+		do {
+			str.append(' ');
+		} while (str.length() != 12);
+		str.append("b:").append(b);
+		do {
+			str.append(' ');
+		} while (str.length() != 18);
+		return str.toString();
+	}
 
+	private void renderIndicator(PoseStack poseStack) {
+
+		var window = Minecraft.getInstance().getWindow();
+		var scale = window.getGuiScale();
+
+		var centerX = (int) (window.getWidth() / 2f / scale);
+		var centerY = (int) (window.getHeight() / 2f / scale);
+
+		var backWidth = 1;
+
+		RenderUtils.warpGLDebugLabel("draw_back", () ->
+				GuiComponent.fill(poseStack, centerX + 10 - backWidth, centerY + 10 - backWidth, centerX + 30 + backWidth, centerY + 10 + 20 + backWidth, 0x7F_FF_FF_FF));
+
+		RenderUtils.warpGLDebugLabel("draw_current_color_block", () ->
+				GuiComponent.fill(poseStack, centerX + 10, centerY + 10, centerX + 30, centerY + 10 + 20, Utils.pack(currentColor)));
+
+		if (dataAvailable) {
+			RenderUtils.warpGLDebugLabel("draw_selected_color_block", () ->
+					GuiComponent.fill(poseStack, centerX + 10 + 10, centerY + 10, centerX + 30, centerY + 10 + 20, Utils.pack(eyedropperColor)));
 		}
 
 	}
@@ -231,7 +286,7 @@ public enum Eyedropper {
 
 	public abstract String modeName();
 
-	protected abstract Eyedropper init();
+	protected abstract void init();
 
 	protected abstract void destroy();
 
@@ -241,16 +296,18 @@ public enum Eyedropper {
 	public static Pair<ShaderInstance, Consumer<ShaderInstance>> registerShaders(ResourceManager resourceManager) {
 		try {
 			return Pair.of(new ShaderInstance(resourceManager, new ResourceLocation(ShimmerConstants.MOD_ID, "pick_color").toString(), DefaultVertexFormat.POSITION),
-					shaderInstance -> mode.setShader(shaderInstance));
+					Eyedropper.mode::setShader);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public static void switchState() {
+		//called from command execute, but may not on render thread
 		RenderSystem.recordRenderCall(() -> {
 			if (enable) {
 				mode.destroy();
+				dataAvailable = false;
 				enable = false;
 			} else {
 				mode.init();
@@ -263,5 +320,48 @@ public enum Eyedropper {
 		return enable;
 	}
 
+
+	public static void switchMode(Eyedropper newMode) {
+		//called from command execute, but may not on render thread
+		RenderSystem.recordRenderCall(() -> {
+			if (newMode == mode) {
+				Minecraft.getInstance().player.sendSystemMessage(Component.literal("already in " + mode.modeName()));
+				return;
+			}
+			var isEnable = enable;
+			if (isEnable) {
+				switchState();//close
+			}
+			switch (newMode) {
+				case ShaderStorageBufferObject -> DOWNLOAD.destroy();
+				case DOWNLOAD -> ShaderStorageBufferObject.destroy();
+			}
+			mode = newMode;
+			if (isEnable) {
+				switchState();//open
+			}
+			Minecraft.getInstance().player.sendSystemMessage(Component.literal("switch to " + mode.modeName()));
+		});
+	}
+
+	public static boolean isDataAvailable() {
+		return dataAvailable;
+	}
+
+	public static float[] getCurrentColor() {
+		if (enable) {
+			return Arrays.copyOf(currentColor, 3);
+		} else {
+			throw new RuntimeException("can't get current when eyedropper mode is disabled");
+		}
+	}
+
+	public static float[] getEyedropperColor() {
+		if (dataAvailable) {
+			return Arrays.copyOf(eyedropperColor, 3);
+		} else {
+			throw new RuntimeException("can't get eyedropper color while data is unavailable");
+		}
+	}
 
 }
