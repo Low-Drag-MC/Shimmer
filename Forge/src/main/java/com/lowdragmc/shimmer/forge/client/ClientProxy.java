@@ -1,24 +1,26 @@
 package com.lowdragmc.shimmer.forge.client;
 
-import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
-import com.lowdragmc.shimmer.client.auxiliaryScreen.HsbColorWidget;
-import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
-import com.lowdragmc.shimmer.forge.CommonProxy;
-import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
+import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
+import com.lowdragmc.shimmer.client.auxiliaryScreen.HsbColorWidget;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
+import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
+import com.lowdragmc.shimmer.forge.CommonProxy;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.RegisterShadersEvent;
+import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.NotNull;
@@ -56,6 +58,12 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
         e.enqueueWork(() -> {
             ((ReloadableResourceManager)Minecraft.getInstance().getResourceManager()).registerReloadListener(this);
             onResourceManagerReload(Minecraft.getInstance().getResourceManager());
+
+            ClientRegistry.registerKeyBinding(ShimmerConstants.recordScreenColor);
+            OverlayRegistry.registerOverlayBottom("screen_color_pick_overly", (forgeGui, poseStack, partialTick, screenWidth, screenHeight) -> {
+                Eyedropper.update(poseStack);
+            });
+
         });
     }
 

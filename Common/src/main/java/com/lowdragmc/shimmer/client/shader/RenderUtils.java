@@ -9,6 +9,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL43;
 
 import java.io.IOException;
@@ -69,9 +70,15 @@ public class RenderUtils {
         }
     }
 
-    public static void warpGLDebugLabel(String message,Runnable block){
-        GL43.glPushDebugGroup(GL43.GL_DEBUG_SOURCE_APPLICATION, 0,message);
-        block.run();
-        GL43.glPopDebugGroup();
+    private static final boolean DEBUG_LABEL_AVAILABLE = GL.getCapabilities().GL_KHR_debug;
+
+    public static void warpGLDebugLabel(String message, Runnable block) {
+        if (DEBUG_LABEL_AVAILABLE && ShimmerConstants.useOpenGlDebugLabel) {
+            GL43.glPushDebugGroup(GL43.GL_DEBUG_SOURCE_APPLICATION, 0, message);
+            block.run();
+            GL43.glPopDebugGroup();
+        } else {
+            block.run();
+        }
     }
 }

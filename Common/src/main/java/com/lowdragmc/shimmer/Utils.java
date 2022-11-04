@@ -2,13 +2,18 @@ package com.lowdragmc.shimmer;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateHolder;
 import net.minecraft.world.level.block.state.properties.Property;
+import org.apache.http.util.Asserts;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author KilaBash
@@ -90,14 +95,59 @@ public class Utils {
                     g = (int) (p * 255.0f + 0.5f);
                     b = (int) (brightness * 255.0f + 0.5f);
                 }
-                case 5 -> {
-                    r = (int) (brightness * 255.0f + 0.5f);
-                    g = (int) (p * 255.0f + 0.5f);
-                    b = (int) (q * 255.0f + 0.5f);
-                }
+	            case 5 -> {
+		            r = (int) (brightness * 255.0f + 0.5f);
+		            g = (int) (p * 255.0f + 0.5f);
+		            b = (int) (q * 255.0f + 0.5f);
+	            }
             }
         }
-        return 0xff000000 | (r << 16) | (g << 8) | (b);
+	    return 0xff000000 | (r << 16) | (g << 8) | (b);
     }
+
+	public static void RGBtoHSB(float[] rgb, float hsb[]) {
+		int r = (int) (rgb[0] * 255);
+		int g = (int) (rgb[1] * 255);
+		int b = (int) (rgb[2] * 255);
+		float hue, saturation, brightness;
+
+		int cmax = Math.max(r, g);
+		if (b > cmax) cmax = b;
+		int cmin = Math.min(r, g);
+		if (b < cmin) cmin = b;
+
+		brightness = ((float) cmax) / 255.0f;
+		if (cmax != 0)
+			saturation = ((float) (cmax - cmin)) / ((float) cmax);
+		else
+			saturation = 0;
+		if (saturation == 0)
+			hue = 0;
+		else {
+			float redc = ((float) (cmax - r)) / ((float) (cmax - cmin));
+			float greenc = ((float) (cmax - g)) / ((float) (cmax - cmin));
+			float bluec = ((float) (cmax - b)) / ((float) (cmax - cmin));
+			if (r == cmax)
+				hue = bluec - greenc;
+			else if (g == cmax)
+				hue = 2.0f + redc - bluec;
+			else
+				hue = 4.0f + greenc - redc;
+			hue = hue / 6.0f;
+			if (hue < 0)
+				hue = hue + 1.0f;
+		}
+		hsb[0] = hue;
+		hsb[1] = saturation;
+		hsb[2] = brightness;
+	}
+
+	/**
+	 * @param color r|g|b
+	 */
+	public static int pack(float[] color) {
+		Asserts.check(color.length == 3, "raw color array's length must be 3");
+		return FastColor.ARGB32.color(255, (int) (color[0] * 255), (int) (color[1] * 255), (int) (color[2] * 255));
+	}
 
 }

@@ -9,12 +9,14 @@ import com.lowdragmc.shimmer.config.Bloom;
 import com.lowdragmc.shimmer.config.ItemLight;
 import com.lowdragmc.shimmer.config.ShimmerConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
+import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
@@ -52,7 +54,7 @@ public class AuxiliaryScreen extends Screen {
 
 		radiusSlide = new RadiusSlider(20, 110, 150, 20, new TextComponent("Radius"), 10);
 
-		mode = cycleButtonBuilder.create(20, 130, 150, 20, new TextComponent("select mode:"),
+		mode = cycleButtonBuilder.create(20, 130, 150, 20, new TextComponent("select mode"),
 				(button, value) -> {
 					inputText.onModeChange(value);
 					previewWidget.onModeChange(value);
@@ -150,9 +152,19 @@ public class AuxiliaryScreen extends Screen {
 		addRenderableWidget(exportButton);
 		addRenderableWidget(clearButton);
 
-//		importColorButton = new Button(, , );
+		importColorButton = new Button(220, 80, 95, 20, new TextComponent("import color"), button -> {
+			if (Eyedropper.isDataAvailable()) {
+				colorPicker.setRGB(Eyedropper.getEyedropperColor());
+				minecraft.player.sendMessage(new TextComponent("set record color"), Util.NIL_UUID);
+			} else if (Eyedropper.getState()) {
+				colorPicker.setRGB(Eyedropper.getCurrentColor());
+				minecraft.player.sendMessage(new TextComponent("no record, use current"), Util.NIL_UUID);
+			} else {
+				minecraft.player.sendMessage(new TextComponent("not under eyedropper mode, can't import color"), Util.NIL_UUID);
+			}
+		});
 
-//		addRenderableWidget(importColorButton);
+		addRenderableWidget(importColorButton);
 	}
 
 	@Override
@@ -193,9 +205,11 @@ public class AuxiliaryScreen extends Screen {
 	@Override
 	public void tick() {
 		inputText.tick();
-		addButton.visible = inputText.isComplete;
-		exportButton.visible = inputText.isComplete;
-		clearButton.visible = inputText.isComplete;
-		applyButton.visible = inputText.isComplete;
+		var buttonVisible = (inputText.isComplete || StringUtils.isBlank(inputText.getValue())) && !inputText.isFocused();
+		addButton.visible = buttonVisible;
+		exportButton.visible = buttonVisible;
+		clearButton.visible = buttonVisible;
+		applyButton.visible = buttonVisible;
+		importColorButton.visible = buttonVisible;
 	}
 }
