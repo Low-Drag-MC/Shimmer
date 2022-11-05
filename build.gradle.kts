@@ -40,6 +40,14 @@ subprojects {
                 includeGroup("maven.modrinth")
             }
         }
+        maven {
+            name = "IzzelAliz Maven"
+            url = uri("https://maven.izzel.io/releases/")
+        }
+        maven {
+            name = "tterrag maven"
+            url = uri("https://maven.tterrag.com/")
+        }
         maven("https://maven.blamejared.com")
     }
 

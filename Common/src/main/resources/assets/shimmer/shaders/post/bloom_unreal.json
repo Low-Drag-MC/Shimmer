@@ -1,6 +1,14 @@
 {
   "targets": [
     {
+      "name": "shimmer:filter_temp",
+      "blit": true,
+      "scaleSize": {
+        "width": 1,
+        "height": 1
+      }
+    },
+    {
       "name": "swap2a",
       "bilinear": true,
       "scaleSize": {
@@ -67,8 +75,16 @@
   ],
   "passes": [
     {
-      "name": "shimmer:seperable_blur",
+      "name": "shimmer:filter_bloom_color",
       "intarget": "shimmer:input",
+      "outtarget": "shimmer:filter_temp",
+      "auxtargets": [
+        {"id": "minecraft:main", "name": "MainSampler"}
+      ]
+    },
+    {
+      "name": "shimmer:seperable_blur",
+      "intarget": "shimmer:filter_temp",
       "outtarget": "swap2a",
       "uniforms": [
         {
@@ -191,7 +207,7 @@
       "intarget": "minecraft:main",
       "outtarget": "shimmer:output",
       "auxtargets": [
-        {"id":"shimmer:input", "name":"HighLight"},
+        {"id":"shimmer:filter_temp", "name":"HighLight"},
         {"id":"swap2b", "name":"BlurTexture1"},
         {"id":"swap4b", "name":"BlurTexture2"},
         {"id":"swap8b", "name":"BlurTexture3"},

@@ -44,8 +44,13 @@ dependencies {
     include(mixinExtras)
     forgeRuntimeLibrary(mixinExtras)
 
-    modImplementation("curse.maven:rubidium-574856:4024781")
-    modCompileOnly("curse.maven:flywheel-486392:3934664")
+    modCompileOnly("curse.maven:rubidium-574856:3973894")
+
+    modImplementation("com.jozufozu.flywheel:flywheel-forge-$minecraft_version:$flywheel_version")
+
+//    forgeRuntimeLibrary("icyllis.modernui:ModernUI-Core:$modernui_version")
+//    modImplementation("icyllis.modernui:ModernUI-Forge:${minecraft_version}-${modernui_version}")
+
 }
 
 tasks.processResources {

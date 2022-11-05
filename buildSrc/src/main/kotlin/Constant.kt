@@ -16,10 +16,12 @@ val architectury_version = "4.8.79"
 
 //Fabric
 val fabric_loader_version = "0.14.9"
-val fabric_api_version = "0.58.0+1.18.2"
+val fabric_api_version = "0.58.0+$minecraft_version"
+val cloth_config_version = "6.4.90"
 
 //Forge
-val forge_version = "1.18.2-40.1.69"
+val forge_version = "$minecraft_version-40.1.69"
+val modernui_version = "3.6.1.115"
 
 //Project
 val version_major = 0.1
@@ -29,5 +31,7 @@ val maven_path = "snapshots"
 val maven_group = "com.lowdragmc.shimmer"
 
 val mixinExtras = "com.github.LlamaLad7:MixinExtras:0.1.0"
+
+val flywheel_version = "0.6.6-94"
 
 val Project.archiveBaseName get() = "$mod_name-${project.name.toLowerCase(Locale.getDefault())}"
