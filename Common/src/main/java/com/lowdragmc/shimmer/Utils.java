@@ -59,6 +59,9 @@ public class Utils {
 		return false;
 	}
 
+	/**
+	 * all components should in [0-1]
+	 */
     public static int HSBtoRGB(float hue, float saturation, float brightness) {
         int r = 0, g = 0, b = 0;
         if (saturation == 0) {
@@ -105,6 +108,9 @@ public class Utils {
 	    return 0xff000000 | (r << 16) | (g << 8) | (b);
     }
 
+	/**
+	 * all components should in [0-1]
+	 */
 	public static void RGBtoHSB(float[] rgb, float hsb[]) {
 		int r = (int) (rgb[0] * 255);
 		int g = (int) (rgb[1] * 255);
