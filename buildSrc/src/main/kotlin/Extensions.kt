@@ -16,3 +16,4 @@ fun DependencyHandlerScope.mappings(dependency : Dependency){
     FabricConstantConfiguration.MAPPINGS(dependency)
 }
 
+fun cusrseMaven(modName:String,projectID : Long, fileId : Long) = "curse.maven:$modName-$projectID:$fileId"

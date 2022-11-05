@@ -33,11 +33,15 @@ dependencies {
     include("me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version")
 
     // Sodium
-     modImplementation("curse.maven:sodium-394468:3957319") {
+    modImplementation("curse.maven:sodium-394468:3957319") {
         exclude(group = "net.fabricmc.fabric-api")
     }
     // This is a dependency of Sodium....
-    implementation("org.joml:joml:1.10.4")
+    modCompileOnly("org.joml:joml:1.10.4")
+
+
+    modImplementation(cusrseMaven("modMenu", projectID = 308702, fileId =  4066826))
+
 }
 
 tasks.processResources {

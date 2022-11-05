@@ -31,4 +31,6 @@ val maven_group = "com.lowdragmc.shimmer"
 
 val mixinExtras = "com.github.LlamaLad7:MixinExtras:0.1.0"
 
+val flywheel_version = "0.6.7-8"
+
 val Project.archiveBaseName get() = "$mod_name-${project.name.toLowerCase()}"
