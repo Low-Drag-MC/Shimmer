@@ -27,13 +27,38 @@ public class AuxiliaryScreen extends Screen {
 	private HsbColorWidget colorPicker;
 	private SuggestionEditBoxWidget inputText;
 	private CycleButton<KeyType> mode;
-	private RadiusSlider radiusSlide;
+	private SliderWidget radiusSlide;
 	private PreviewWidget previewWidget;
 	private Button applyButton;
 	private Button exportButton;
 	private Button addButton;
 	private Button clearButton;
 	private Button importColorButton;
+
+	/**
+	 * [0-360]
+	 */
+	private SliderWidget colorHue;
+	/**
+	 * [0-100]
+	 */
+	private SliderWidget colorSaturation;
+	/**
+	 * [0-100]
+	 */
+	private SliderWidget colorBrightness;
+	/**
+	 * [0-255]
+	 */
+	private SliderWidget colorR;
+	/**
+	 * [0-255]
+	 */
+	private SliderWidget colorG;
+	/**
+	 * [0-255]
+	 */
+	private SliderWidget colorB;
 
 	private static final CycleButton.Builder<KeyType> cycleButtonBuilder =
 			CycleButton.<KeyType>builder(key -> new TextComponent(key.toString().toLowerCase()))
@@ -52,7 +77,7 @@ public class AuxiliaryScreen extends Screen {
 		colorPicker = new HsbColorWidget(20, 20, 100, 80, 20, 10, new TextComponent("1"));
 		inputText = new SuggestionEditBoxWidget(this.minecraft.font, 220, 20, 200, 20, new TextComponent("s"));
 
-		radiusSlide = new RadiusSlider(20, 110, 150, 20, new TextComponent("Radius"), 10);
+		radiusSlide = new SliderWidget(20, 110, 150, 20, 1, 15, 0.2, new TextComponent("Radius"), "%.2f", 10);
 
 		mode = cycleButtonBuilder.create(20, 130, 150, 20, new TextComponent("select mode"),
 				(button, value) -> {
@@ -165,6 +190,68 @@ public class AuxiliaryScreen extends Screen {
 		});
 
 		addRenderableWidget(importColorButton);
+
+		colorHue = new SliderWidget(220, 110, 200, 20, 0, 360, 1,
+				new TextComponent("Hue"), "%d", 204);
+		colorSaturation = new SliderWidget(220, 130, 200, 20, 0, 100, 1,
+				new TextComponent("Saturation"), "%d%%", 72);
+		colorBrightness = new SliderWidget(220, 150, 200, 20, 0, 100, 1,
+				new TextComponent("Brightness"), "%d%%", 94);
+		colorR = new SliderWidget(220, 170, 200, 20, 0, 255, 1,
+				new TextComponent("R"), "%d", 67);
+		colorG = new SliderWidget(220, 190, 200, 20, 0, 255, 1,
+				new TextComponent("G"), "%d", 170);
+		colorB = new SliderWidget(220, 210, 200, 20, 0, 255, 1,
+				new TextComponent("B"), "%d", 239);
+
+		addRenderableWidget(colorHue);
+		addRenderableWidget(colorSaturation);
+		addRenderableWidget(colorBrightness);
+		addRenderableWidget(colorR);
+		addRenderableWidget(colorG);
+		addRenderableWidget(colorB);
+
+		colorHue.addListener(((oldValue, newValue) -> {
+			var color = colorPicker.getHSB();
+			color[0] = (float) newValue;
+			colorPicker.setHSB(color);
+		}));
+		colorSaturation.addListener(((oldValue, newValue) -> {
+			var color = colorPicker.getHSB();
+			color[1] = (float) (newValue / 100f);
+			colorPicker.setHSB(color);
+		}));
+		colorBrightness.addListener(((oldValue, newValue) -> {
+			var color = colorPicker.getHSB();
+			color[2] = (float) (newValue / 100f);
+			colorPicker.setHSB(color);
+		}));
+		colorR.addListener(((oldValue, newValue) -> {
+			var color = colorPicker.getRGB();
+			color[0] = (float) (newValue / 255f);
+			colorPicker.setRGB(color);
+		}));
+		colorG.addListener(((oldValue, newValue) -> {
+			var color = colorPicker.getRGB();
+			color[1] = (float) (newValue / 255f);
+			colorPicker.setRGB(color);
+		}));
+		colorB.addListener(((oldValue, newValue) -> {
+			var color = colorPicker.getRGB();
+			color[2] = (float) (newValue / 255f);
+			colorPicker.setRGB(color);
+		}));
+
+		colorPicker.registerListener(() -> {
+			float[] hsb = colorPicker.getHSB();
+			colorHue.trySetValue(hsb[0], false);
+			colorSaturation.trySetValue(hsb[1] * 100f, false);
+			colorBrightness.trySetValue(hsb[2] * 100f, false);
+			float[] rgb = colorPicker.getRGB();
+			colorR.trySetValue(rgb[0] * 255f, false);
+			colorG.trySetValue(rgb[1] * 255f, false);
+			colorB.trySetValue(rgb[2] * 255f,false);
+		});
 	}
 
 	@Override
@@ -198,6 +285,21 @@ public class AuxiliaryScreen extends Screen {
 		} else if (this.getFocused() != null && this.getFocused().keyPressed(keyCode, scanCode, modifiers)) {
 			return true;
 		} else {
+			if (this.getFocused() == null) {
+				if (colorHue.isHoveredOrFocused()) {
+					return colorHue.keyPressed(keyCode, scanCode, modifiers);
+				} else if (colorSaturation.isHoveredOrFocused()) {
+					return colorSaturation.keyPressed(keyCode, scanCode, modifiers);
+				} else if (colorBrightness.isHoveredOrFocused()) {
+					return colorBrightness.keyPressed(keyCode, scanCode, modifiers);
+				} else if (colorR.isHoveredOrFocused()) {
+					return colorR.keyPressed(keyCode, scanCode, modifiers);
+				} else if (colorG.isHoveredOrFocused()) {
+					return colorG.keyPressed(keyCode, scanCode, modifiers);
+				} else if (radiusSlide.isHoveredOrFocused()) {
+					return radiusSlide.keyPressed(keyCode, scanCode, modifiers);
+				}
+			}
 			return super.keyPressed(keyCode, scanCode, modifiers);
 		}
 	}
@@ -211,5 +313,12 @@ public class AuxiliaryScreen extends Screen {
 		clearButton.visible = buttonVisible;
 		applyButton.visible = buttonVisible;
 		importColorButton.visible = buttonVisible;
+
+		colorHue.visible = buttonVisible;
+		colorSaturation.visible = buttonVisible;
+		colorBrightness.visible = buttonVisible;
+		colorR.visible = buttonVisible;
+		colorG.visible = buttonVisible;
+		colorB.visible = buttonVisible;
 	}
 }

@@ -15,9 +15,12 @@ import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.FastColor;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static com.mojang.blaze3d.vertex.DefaultVertexFormat.ELEMENT_POSITION;
@@ -72,15 +75,15 @@ public class HsbColorWidget extends AbstractWidget {
 	/**
 	 * hue component, must range from 0f to 360f
 	 */
-	private float h = 280;
+	private float h = 204;
 	/**
 	 * saturation component, must range from 0f to 1f
 	 */
-	private float s = 1;
+	private float s = 0.72f;
 	/**
 	 * the brightness component, must range from 0f to 1f
 	 */
-	private float b = 1;
+	private float b = 0.94f;
 	/**
 	 * thr alpha used for draw main and slide
 	 */
@@ -93,11 +96,14 @@ public class HsbColorWidget extends AbstractWidget {
 
 	private HSB_MODE mode = HSB_MODE.H;
 
+	private List<Runnable> listeners = new ArrayList<>();
+
 	public HsbColorWidget(int x, int y, int width, int height, int gap, int barWidth, Component arg) {
 		super(x, y, width, height, arg);
 		this.gap = gap;
 		this.barWidth = barWidth;
 
+		refreshRGB(true);
 	}
 
 	@Override
@@ -379,8 +385,11 @@ public class HsbColorWidget extends AbstractWidget {
 	/**
 	 * calculate rgb color when hsb changed
 	 */
-	private void refreshRGB() {
+	private void refreshRGB(boolean trigListener) {
 		rgb = Utils.HSBtoRGB(h / 360f, s, b);
+		if (trigListener){
+			listeners.forEach(Runnable::run);
+		}
 	}
 
 	/**
@@ -440,7 +449,7 @@ public class HsbColorWidget extends AbstractWidget {
 				}
 			}
 		}
-		refreshRGB();
+		refreshRGB(true);
 	}
 
 
@@ -453,23 +462,32 @@ public class HsbColorWidget extends AbstractWidget {
 		return new float[]{h, s, b};
 	}
 
+	public float[] getRGB() {
+		return new float[]{FastColor.ARGB32.red(rgb) / 255f, FastColor.ARGB32.green(rgb) / 255f, FastColor.ARGB32.blue(rgb) / 255f};
+	}
+
 	public void setHSB(float[] hsb) {
-		this.h = hsb[0];
-		this.s = hsb[1];
-		this.b = hsb[2];
+		if (hsb[0] != this.h || hsb[1] != this.s || hsb[2] != this.b){
+			this.h = hsb[0];
+			this.s = hsb[1];
+			this.b = hsb[2];
+			refreshRGB(true);
+		}
 	}
 
 	public void setRGB(float[] rgb) {
 		var hsb = new float[3];
 		Utils.RGBtoHSB(rgb, hsb);
-		this.h = hsb[0] * 360;
-		this.s = hsb[1];
-		this.b = hsb[2];
-		refreshRGB();
+		hsb[0] *= 360f;
+		setHSB(hsb);
 	}
 
 	public int rgb() {
 		return rgb;
+	}
+
+	public void registerListener(Runnable listener){
+		listeners.add(listener);
 	}
 
 	/**
