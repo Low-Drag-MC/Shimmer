@@ -28,6 +28,7 @@ public abstract class PostPassMixin {
                     target = "Lnet/minecraft/client/renderer/EffectInstance;safeGetUniform(Ljava/lang/String;)Lcom/mojang/blaze3d/shaders/AbstractUniform;", ordinal = 1))
     private void injectParseTargetNode(float pPartialTicks, CallbackInfo ci) {
         this.effect.safeGetUniform("iTime").set(PostProcessing.getITime(pPartialTicks));
+        this.effect.safeGetUniform("EnableFilter").set(PostProcessing.enableBloomFilter.get() ? 1 : 0);
     }
 
 }
