@@ -42,6 +42,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -61,6 +62,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
     public static final PostProcessing HALFTONE = new PostProcessing("halftone", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/halftone.json"));
     public static final PostProcessing DOT_SCREEN = new PostProcessing("dot_screen", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/dot_screen.json"));
 
+    public static AtomicBoolean enableBloomFilter = new AtomicBoolean(false);
     private static final Minecraft mc = Minecraft.getInstance();
     public final String name;
     private CopyDepthTarget postTarget;
@@ -190,10 +192,12 @@ public class PostProcessing implements ResourceManagerReloadListener {
     public void renderBlockPost() {
         PostChain postChain = getPostChain();
         if (postChain != null && Services.PLATFORM.useBlockBloom() && allowPost()) {
+            enableBloomFilter.set(true);
             RenderTarget mainTarget = mc.getMainRenderTarget();
             renderPost(postChain, new MRTTarget((IMainTarget) mainTarget), mainTarget);
             ((IMainTarget) mainTarget).clearBloomTexture(Minecraft.ON_OSX);
             mainTarget.bindWrite(false);
+            enableBloomFilter.set(false);
         }
     }
 
