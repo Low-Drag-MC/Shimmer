@@ -2,6 +2,7 @@ package com.lowdragmc.shimmer.fabric.client;
 
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.client.light.LightManager;
@@ -18,6 +19,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
+import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -117,6 +119,15 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                                         return 1;
                                     }
                             ))))
+                    .then(Commands.literal("dumpLightBlockStates")
+                            .executes(context -> {
+                                if (Utils.dumpAllLightingBlocks()){
+                                    context.getSource().sendSuccess(Component.literal("dump successfully to cfg/shimmer/LightBlocks.txt"),false);
+                                }else {
+                                    context.getSource().sendFailure(Component.literal("dump failed, see log for detailed information"));
+                                }
+                                return 1;
+                            }))
             ));
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);

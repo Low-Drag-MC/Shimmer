@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
  * @date 2022/05/31
  * @implNote ModelBlockRendererMixin, reglowstone.pngcode uv2 for bloom info
  */
-@Mixin(value = BlockRenderer.class, remap = false)
+@Mixin(value = BlockRenderer.class)
 public abstract class BlockRendererMixin {
 
     @ModifyReceiver(method = "renderQuadList" ,
