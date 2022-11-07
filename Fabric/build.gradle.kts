@@ -37,7 +37,7 @@ dependencies {
         exclude(group = "net.fabricmc.fabric-api")
     }
     // This is a dependency of Sodium....
-    modCompileOnly("org.joml:joml:1.10.4")
+    modImplementation("org.joml:joml:1.10.4")
 
 
     modImplementation(cusrseMaven("modMenu", projectID = 308702, fileId =  4066826))

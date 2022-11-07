@@ -2,6 +2,7 @@ package com.lowdragmc.shimmer.fabric.client;
 
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.client.light.LightManager;
@@ -19,6 +20,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -90,34 +92,43 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                                     return 1;
                                 }
                         )))
-                .then(literal("auxiliary_screen")
+		        .then(literal("auxiliary_screen")
+				        .executes(context -> {
+					        Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
+					        return 1;
+				        }))
+                    .then(literal("eyedropper")
+                            .executes(context -> {
+                                if (!Eyedropper.getState()) {
+                                    context.getSource().sendFeedback(new TextComponent("enter eyedropper mode, backend: " + Eyedropper.mode.modeName()));
+                                } else {
+                                    context.getSource().sendFeedback(new TextComponent("exit eyedropper mode"));
+                                }
+                                Eyedropper.switchState();
+                                return 1;
+                            }))
+                    .then(literal("eyedropper").then(literal("backend")
+                            .then(literal("ShaderStorageBufferObject").executes(
+                                    context -> {
+                                        Eyedropper.switchMode(Eyedropper.ShaderStorageBufferObject);
+                                        return 1;
+                                    }
+                            )).then(literal("glGetTexImage").executes(
+                                    context -> {
+                                        Eyedropper.switchMode(Eyedropper.DOWNLOAD);
+                                        return 1;
+                                    }
+                            ))))
+                .then(literal("dumpLightBlockStates")
                         .executes(context -> {
-                            Minecraft.getInstance().tell(() -> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
-                            return 1;
-                        }))
-                .then(literal("eyedropper")
-                        .executes(context -> {
-                            if (!Eyedropper.getState()) {
-                                context.getSource().sendFeedback(new TextComponent("enter eyedropper mode, backend: " + Eyedropper.mode.modeName()));
-                            } else {
-                                context.getSource().sendFeedback(new TextComponent("exit eyedropper mode"));
+                            if (Utils.dumpAllLightingBlocks()){
+                                context.getSource().sendFeedback(new TextComponent("dump successfully to cfg/shimmer/LightBlocks.txt"));
+                            }else {
+                                context.getSource().sendError(new TextComponent("dump failed, see log for detailed information"));
                             }
-                            Eyedropper.switchState();
                             return 1;
                         }))
-                .then(literal("eyedropper").then(literal("backend")
-                        .then(literal("ShaderStorageBufferObject").executes(
-                                context -> {
-                                    Eyedropper.switchMode(Eyedropper.ShaderStorageBufferObject);
-                                    return 1;
-                                }
-                        )).then(literal("glGetTexImage").executes(
-                                context -> {
-                                    Eyedropper.switchMode(Eyedropper.DOWNLOAD);
-                                    return 1;
-                                }
-                        ))))
-        );
+            );
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
 

@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer;
 
+import com.lowdragmc.shimmer.platform.Services;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
@@ -10,6 +11,9 @@ import net.minecraft.world.level.block.state.properties.Property;
 import org.apache.http.util.Asserts;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -154,6 +158,40 @@ public class Utils {
 	public static int pack(float[] color) {
 		Asserts.check(color.length == 3, "raw color array's length must be 3");
 		return FastColor.ARGB32.color(255, (int) (color[0] * 255), (int) (color[1] * 255), (int) (color[2] * 255));
+	}
+
+	public static boolean dumpAllLightingBlocks() {
+		var states = Registry.BLOCK.stream().flatMap(b -> b.getStateDefinition().getPossibleStates().stream()).filter(s -> s.getLightEmission() > 0);
+
+		File configDir = Services.PLATFORM.getConfigDir().resolve(ShimmerConstants.MOD_ID).toFile();
+		if (!configDir.exists()) {
+			if (!configDir.mkdir()) {
+				ShimmerConstants.LOGGER.error("can't create config folder");
+				return false;
+			}
+		}
+		var targetFile = new File(configDir, "LightBlocks.txt");
+		try (var writer = new FileWriter(targetFile, false)) {
+			writer.write("""
+					=======================================
+					All blockStates with Light Emission > 0
+					Maybe wrong, just for reference");
+					=======================================
+					""");
+			writer.write("\n");
+			states.forEach(s -> {
+				var output = s.toString() + " -> " + s.getLightEmission() + "\n";
+				try {
+					writer.write(output);
+				} catch (IOException e) {
+					ShimmerConstants.LOGGER.error("failed to write " + output);
+				}
+			});
+		} catch (IOException e) {
+			ShimmerConstants.LOGGER.error("failed to write block with light emission file");
+			return false;
+		}
+		return true;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.lowdragmc.shimmer.forge.client;
 
 import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.client.light.LightManager;
@@ -110,6 +111,15 @@ public class ForgeEventListener {
                                     return 1;
                                 }
                         ))))
+                .then(Commands.literal("dumpLightBlockStates")
+                        .executes(context -> {
+                            if (Utils.dumpAllLightingBlocks()){
+                                context.getSource().sendSuccess(new TextComponent("dump successfully to cfg/shimmer/LightBlocks.txt"),false);
+                            }else {
+                                context.getSource().sendFailure(new TextComponent("dump failed, see log for detailed information"));
+                            }
+                            return 1;
+                        }))
         );
     }
 }

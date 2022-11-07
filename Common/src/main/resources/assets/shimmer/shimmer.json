@@ -1,11 +1,17 @@
 {
+  "ColorReference" : {
+      "yellow" : "#22ffC8FF",
+      "red" : {
+        "r": 255,
+        "g": 165,
+        "b": 13,
+        "a": 255
+      }
+  },
   "LightBlock": [
     {
       "block": "minecraft:sea_lantern",
-      "r": 34,
-      "g": 255,
-      "b": 200,
-      "a": 255,
+      "color": "#yellow",
       "radius": 7
     },
     {
@@ -13,10 +19,7 @@
       "state": {
         "lit": true
       },
-      "r": 255,
-      "g": 165,
-      "b": 13,
-      "a": 255,
+      "color": "#red",
       "radius": 10
     },
 		{

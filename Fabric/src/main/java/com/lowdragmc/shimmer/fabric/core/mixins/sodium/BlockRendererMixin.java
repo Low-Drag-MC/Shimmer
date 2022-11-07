@@ -30,7 +30,7 @@ import java.util.List;
  * @date 2022/05/31
  * @implNote ModelBlockRendererMixin, reglowstone.pngcode uv2 for bloom info
  */
-@Mixin(value = BlockRenderer.class, remap = false)
+@Mixin(value = BlockRenderer.class)
 public abstract class BlockRendererMixin {
     @ModifyReceiver(method = "renderQuadList",
             at = @At(value = "INVOKE",
