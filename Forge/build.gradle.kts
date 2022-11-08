@@ -44,7 +44,7 @@ dependencies {
     include(mixinExtras)
     forgeRuntimeLibrary(mixinExtras)
 
-    modCompileOnly("curse.maven:rubidium-574856:3973894")
+    modImplementation("curse.maven:rubidium-574856:4024781")
 
     modImplementation("com.jozufozu.flywheel:flywheel-forge-$minecraft_version:$flywheel_version")
 

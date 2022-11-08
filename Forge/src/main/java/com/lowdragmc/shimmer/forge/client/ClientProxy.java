@@ -22,6 +22,7 @@ import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.NotNull;
 

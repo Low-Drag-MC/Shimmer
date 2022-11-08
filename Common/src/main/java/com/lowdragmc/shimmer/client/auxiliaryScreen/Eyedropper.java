@@ -76,7 +76,7 @@ public enum Eyedropper {
 
 				bufferbuilder.end();
 
-				BufferUploader.end(bufferbuilder);
+				BufferUploader._endInternal(bufferbuilder);
 				colorPickShader.clear();
 
 				GlStateManager._depthMask(true);

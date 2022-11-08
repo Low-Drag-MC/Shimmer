@@ -21,7 +21,7 @@ val cloth_config_version = "6.4.90"
 
 //Forge
 val forge_version = "$minecraft_version-40.1.69"
-val modernui_version = "3.6.1.115"
+val modernui_version = "3.5.4.113"
 
 //Project
 val version_major = 0.1

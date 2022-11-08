@@ -1,10 +1,10 @@
 package com.lowdragmc.shimmer.forge.platform;
 
+import com.lowdragmc.shimmer.client.postprocessing.PostParticle;
+import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.event.ShimmerLoadConfigEvent;
 import com.lowdragmc.shimmer.event.ShimmerReloadEvent;
 import com.lowdragmc.shimmer.forge.ForgeShimmerConfig;
-import com.lowdragmc.shimmer.client.postprocessing.PostParticle;
-import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.forge.event.ForgeShimmerLoadConfigEvent;
 import com.lowdragmc.shimmer.forge.event.ForgeShimmerReloadEvent;
 import com.lowdragmc.shimmer.platform.services.IPlatformHelper;
@@ -139,7 +139,7 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
 	@Override
 	public boolean isEnableInsetShaderInfo() {
-		return ForgeShimmerConfig.getInsertShaderInfo().get() || isDevelopmentEnvironment();
+		return ModList.get() != null && (ForgeShimmerConfig.getInsertShaderInfo().get() || isDevelopmentEnvironment());
 	}
 
 	@Override
