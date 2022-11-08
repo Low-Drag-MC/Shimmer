@@ -6,6 +6,11 @@ import net.minecraft.client.KeyMapping;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * can't call {@link Services}'s method to init field here<br>
+ * {@link Services}'s constructor need this class and at that time<br>
+ * the method call {@link Services#PLATFORM} will return null and cause a {@link NullPointerException}
+ */
 public class ShimmerConstants {
 
 	public static final String MOD_ID = "shimmer";
@@ -14,6 +19,6 @@ public class ShimmerConstants {
 
 	public static final KeyMapping recordScreenColor = new KeyMapping("shimmer.key.pickColor", InputConstants.KEY_V, "key.categories.misc");
 
-	public static final boolean useOpenGlDebugLabel = Services.PLATFORM.isDevelopmentEnvironment();
+	public static final boolean useOpenGlDebugLabel = false;
 
 }

@@ -20,6 +20,9 @@ subprojects {
     }
 
     repositories {
+        flatDir {
+            dir("libs")
+        }
         maven("https://jitpack.io")
         maven {
             url = uri("https://maven.parchmentmc.org/")
