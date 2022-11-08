@@ -48,8 +48,8 @@ dependencies {
 
     modImplementation("com.jozufozu.flywheel:flywheel-forge-$minecraft_version:$flywheel_version")
 
-//    forgeRuntimeLibrary("icyllis.modernui:ModernUI-Core:$modernui_version")
-//    modImplementation("icyllis.modernui:ModernUI-Forge:${minecraft_version}-${modernui_version}")
+    forgeRuntimeLibrary("icyllis.modernui:ModernUI-Core:$modernui_version")
+    modCompileOnly("icyllis.modernui:ModernUI-Forge:${minecraft_version}-${modernui_version}")
 
 }
 
