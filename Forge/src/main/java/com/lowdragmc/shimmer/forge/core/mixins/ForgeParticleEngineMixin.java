@@ -80,7 +80,7 @@ public abstract class ForgeParticleEngineMixin implements IParticleEngine {
     private ParticleRenderType injectRenderPre(ParticleRenderType particlerendertype, BufferBuilder bufferBuilder, TextureManager textureManager) {
         if (particlerendertype instanceof IPostParticleType && this.particles.get(particlerendertype).size() > 0) {
             PostProcessing postProcessing = ((IPostParticleType) particlerendertype).getPost();
-            postProcessing.getPostTarget().bindWrite(false);
+            postProcessing.getPostTarget(false).bindWrite(false);
             postProcessing.hasParticle();
         }
         return particlerendertype;
