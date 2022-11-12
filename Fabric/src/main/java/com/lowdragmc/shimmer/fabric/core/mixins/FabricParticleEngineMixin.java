@@ -52,7 +52,7 @@ public abstract class FabricParticleEngineMixin {
 			particleRenderType.begin(bufferBuilder, this.textureManager);
 
 			PostProcessing postProcessing = particleRenderType.getPost();
-			postProcessing.getPostTarget().bindWrite(false);
+			postProcessing.getPostTarget(false).bindWrite(false);
 			postProcessing.hasParticle();
 
 			for (Particle particle : iterable) {

@@ -1,14 +1,16 @@
 package com.lowdragmc.shimmer.client.postprocessing;
 
-import com.google.common.collect.*;
-import com.lowdragmc.shimmer.client.rendertarget.CopyDepthTarget;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.lowdragmc.shimmer.Configuration;
+import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.Utils;
+import com.lowdragmc.shimmer.client.rendertarget.CopyDepthColorTarget;
 import com.lowdragmc.shimmer.client.rendertarget.MRTTarget;
 import com.lowdragmc.shimmer.client.rendertarget.ProxyTarget;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
-import com.lowdragmc.shimmer.Configuration;
-import com.lowdragmc.shimmer.ShimmerConstants;
-import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.core.IMainTarget;
 import com.lowdragmc.shimmer.core.IParticleEngine;
 import com.lowdragmc.shimmer.core.mixins.BlendModeMixin;
@@ -65,11 +67,13 @@ public class PostProcessing implements ResourceManagerReloadListener {
     public static AtomicBoolean enableBloomFilter = new AtomicBoolean(false);
     private static final Minecraft mc = Minecraft.getInstance();
     public final String name;
-    private CopyDepthTarget postTarget;
+    private CopyDepthColorTarget postTargetWithoutColor;
+    private CopyDepthColorTarget postTargetWithColor;
     private PostChain postChain = null;
     private boolean loadFailed = false;
     private final ResourceLocation shader;
-    private final List<Consumer<MultiBufferSource>> postEntityDraw = Lists.newArrayList();
+    private final List<Consumer<MultiBufferSource>> postEntityDrawFilter = Lists.newArrayList();
+    private final List<Consumer<MultiBufferSource>> postEntityDrawForce = Lists.newArrayList();
     private final Map<ParticleRenderType, IPostParticleType> particleTypeMap = Maps.newHashMap();
     private boolean hasParticle;
 
@@ -166,13 +170,22 @@ public class PostProcessing implements ResourceManagerReloadListener {
         return s;
     }
 
-    public CopyDepthTarget getPostTarget() {
-        if (postTarget == null) {
-            postTarget = new CopyDepthTarget(mc.getMainRenderTarget(), Minecraft.ON_OSX);
-            postTarget.setClearColor(0,0,0,0);
-            postTarget.clear(Minecraft.ON_OSX);
+    public CopyDepthColorTarget getPostTarget(boolean hookColorAttachment) {
+        if (hookColorAttachment) {
+            if (postTargetWithColor == null) {
+                postTargetWithColor = new CopyDepthColorTarget(mc.getMainRenderTarget(), hookColorAttachment);
+                postTargetWithColor.setClearColor(0, 0, 0, 0);
+                postTargetWithColor.clear(Minecraft.ON_OSX);
+            }
+            return postTargetWithColor;
+        }else {
+            if (postTargetWithoutColor == null) {
+                postTargetWithoutColor = new CopyDepthColorTarget(mc.getMainRenderTarget(), hookColorAttachment);
+                postTargetWithoutColor.setClearColor(0, 0, 0, 0);
+                postTargetWithoutColor.clear(Minecraft.ON_OSX);
+            }
+            return postTargetWithoutColor;
         }
-        return postTarget;
     }
 
     private PostChain getPostChain() {
@@ -206,44 +219,94 @@ public class PostProcessing implements ResourceManagerReloadListener {
         if (target instanceof ProxyTarget) {
             ((ProxyTarget) target).setParent(post);
         }
+        BlendMode lastBlendMode = BlendModeMixin.getLastApplied();
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
         postChain.process(mc.getFrameTime());
         RenderUtils.fastBlit(postChain.getTempTarget("shimmer:output"), output);
+        BlendModeMixin.setLastApplied(lastBlendMode);
     }
 
     public void renderEntityPost(ProfilerFiller profilerFiller) {
-        if (!postEntityDraw.isEmpty()) {
-            BlendMode lastBlendMode = BlendModeMixin.getLastApplied();
-            profilerFiller.popPush("ENTITY_" + name.toUpperCase());
+        if (!postEntityDrawFilter.isEmpty()) {
+            RenderUtils.warpGLDebugLabel("post_filtered_" + this.name, () -> {
+                BlendMode lastBlendMode = BlendModeMixin.getLastApplied();
+                profilerFiller.popPush("ENTITY_" + name.toUpperCase());
 
-            RenderTarget mainTarget = mc.getMainRenderTarget();
-            CopyDepthTarget postTarget = getPostTarget();
-            postTarget.bindWrite(false);
+                RenderTarget mainTarget = mc.getMainRenderTarget();
+                CopyDepthColorTarget postTarget = getPostTarget(true);
+                postTarget.bindWrite(false);
 
-            MultiBufferSource.BufferSource bufferSource = PostMultiBufferSource.BUFFER_SOURCE;
-            for (Consumer<MultiBufferSource> sourceConsumer : postEntityDraw) {
-                sourceConsumer.accept(bufferSource);
-            }
+                MultiBufferSource.BufferSource bufferSource = PostMultiBufferSource.BUFFER_SOURCE;
+                RenderUtils.warpGLDebugLabel("draw_post_entities", () -> {
+                    postTarget.enabledAttachment();
+                    for (Consumer<MultiBufferSource> sourceConsumer : postEntityDrawFilter) {
+                        sourceConsumer.accept(bufferSource);
+                    }
+                    bufferSource.endBatch();
+                    postTarget.disableAttachment();
+                });
 
-            bufferSource.endBatch();
+                postEntityDrawFilter.clear();
 
-            postEntityDraw.clear();
+                PostChain postChain = getPostChain();
+                if (postChain == null) return;
 
-            PostChain postChain = getPostChain();
-            if (postChain == null) return;
+                if (allowPost()) {
+                    RenderUtils.warpGLDebugLabel("actual_post_process", () -> {
+                        renderPost(postChain, postTarget, mainTarget);
+                    });
+                } else {
+                    RenderUtils.warpGLDebugLabel("reject_post", () -> {
+                        RenderUtils.fastBlit(postTarget, mainTarget);
+                    });
+                }
 
-            if (allowPost()) {
-                renderPost(postChain, postTarget, mainTarget);
-            } else {
-                RenderUtils.fastBlit(postTarget, mainTarget);
-            }
+                postTarget.clear(Minecraft.ON_OSX);
+                mainTarget.bindWrite(false);
 
-            postTarget.clear(Minecraft.ON_OSX);
-            mainTarget.bindWrite(false);
+                BlendModeMixin.setLastApplied(lastBlendMode);
+                GlStateManager._disableBlend();
+            });
+        }
+        if (!postEntityDrawForce.isEmpty()) {
+            RenderUtils.warpGLDebugLabel("post_force_" + this.name, () -> {
+                BlendMode lastBlendMode = BlendModeMixin.getLastApplied();
+                profilerFiller.popPush("ENTITY_" + name.toUpperCase());
 
-            BlendModeMixin.setLastApplied(lastBlendMode);
-            GlStateManager._disableBlend();
+                RenderTarget mainTarget = mc.getMainRenderTarget();
+                CopyDepthColorTarget postTarget = getPostTarget(false);
+                postTarget.bindWrite(false);
+
+                MultiBufferSource.BufferSource bufferSource = PostMultiBufferSource.BUFFER_SOURCE;
+                RenderUtils.warpGLDebugLabel("draw_post_entities", () -> {
+                    for (Consumer<MultiBufferSource> sourceConsumer : postEntityDrawForce) {
+                        sourceConsumer.accept(bufferSource);
+                    }
+                    bufferSource.endBatch();
+                });
+
+                postEntityDrawForce.clear();
+
+                PostChain postChain = getPostChain();
+                if (postChain == null) return;
+
+                if (allowPost()) {
+                    RenderUtils.warpGLDebugLabel("actual_post_process", () -> {
+                        renderPost(postChain, postTarget, mainTarget);
+                    });
+                } else {
+                    RenderUtils.warpGLDebugLabel("reject_post", () -> {
+                        RenderUtils.fastBlit(postTarget, mainTarget);
+                    });
+                }
+
+                postTarget.clear(Minecraft.ON_OSX);
+                mainTarget.bindWrite(false);
+
+                BlendModeMixin.setLastApplied(lastBlendMode);
+                GlStateManager._disableBlend();
+            });
         }
     }
 
@@ -255,7 +318,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
         if (hasParticle) {
             hasParticle = false;
             RenderTarget mainTarget = mc.getMainRenderTarget();
-            CopyDepthTarget postTarget = getPostTarget();
+            CopyDepthColorTarget postTarget = getPostTarget(false);
             postTarget.bindWrite(false);
 
             PostChain postChain = getPostChain();
@@ -283,7 +346,16 @@ public class PostProcessing implements ResourceManagerReloadListener {
             PostMultiBufferSource.BUFFER_SOURCE.endBatch();
             return;
         }
-        postEntityDraw.add(sourceConsumer);
+        postEntityDrawFilter.add(sourceConsumer);
+    }
+
+    public void postEntityForce(Consumer<MultiBufferSource> sourceConsumer) {
+        if (ShimmerMixinPlugin.IS_OPT_LOAD) {
+            sourceConsumer.accept(PostMultiBufferSource.BUFFER_SOURCE);
+            PostMultiBufferSource.BUFFER_SOURCE.endBatch();
+            return;
+        }
+        postEntityDrawForce.add(sourceConsumer);
     }
 
     public void postParticle(ParticleOptions particleOptions, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
@@ -347,10 +419,14 @@ public class PostProcessing implements ResourceManagerReloadListener {
         if (postChain != null) {
             postChain.close();
         }
-        if (postTarget != null) {
-            postTarget.destroyBuffers();
+        if (postTargetWithoutColor != null) {
+            postTargetWithoutColor.destroyBuffers();
         }
-        postTarget = null;
+        if (postTargetWithColor != null) {
+            postTargetWithColor.destroyBuffers();
+        }
+        postTargetWithoutColor = null;
+        postTargetWithColor = null;
         postChain = null;
         loadFailed = false;
     }
@@ -363,8 +439,11 @@ public class PostProcessing implements ResourceManagerReloadListener {
         }
 
         for (PostProcessing postProcessing : PostProcessing.values()) {
-            if (postProcessing.postTarget != null) {
-                postProcessing.postTarget.resize(mc.getMainRenderTarget(), Minecraft.ON_OSX);
+            if (postProcessing.postTargetWithColor != null) {
+                postProcessing.postTargetWithColor.resize(mc.getMainRenderTarget(), Minecraft.ON_OSX);
+            }
+            if (postProcessing.postTargetWithoutColor != null) {
+                postProcessing.postTargetWithoutColor.resize(mc.getMainRenderTarget(), Minecraft.ON_OSX);
             }
         }
     }
@@ -441,6 +520,18 @@ public class PostProcessing implements ResourceManagerReloadListener {
         } else {
             FLUID_BLOOM.set(false);
         }
+    }
+
+    public static void forceBloomBlock(Runnable runnable) {
+        BLOCK_BLOOM.set(true);
+        runnable.run();
+        BLOCK_BLOOM.set(false);
+    }
+
+    public static void forceBloomFluid(Runnable runnable) {
+        FLUID_BLOOM.set(true);
+        runnable.run();
+        FLUID_BLOOM.set(false);
     }
 
     public static void cleanBloom() {
