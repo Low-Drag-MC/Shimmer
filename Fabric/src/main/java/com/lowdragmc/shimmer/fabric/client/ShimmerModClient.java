@@ -13,9 +13,9 @@ import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
 import com.lowdragmc.shimmer.fabric.FabricShimmerConfig;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
@@ -27,8 +27,9 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 import javax.annotation.Nullable;
 
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+
 
 /**
  * @author HypherionSA
@@ -39,96 +40,96 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
     @Override
     public void onInitializeClient() {
         LightManager.injectShaders();
-	    PostProcessing.injectShaders();
+        PostProcessing.injectShaders();
 
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-            dispatcher.register(literal("shimmer")
-                .then(literal("reload_postprocessing")
-                    .executes(context -> {
-                        for (PostProcessing post : PostProcessing.values()) {
-                            post.onResourceManagerReload(null);
-                        }
-                        return 1;
-                    }))
-                .then(literal("clear_lights")
-                    .executes(context -> {
-                        LightManager.clear();
-                        return 1;
-                    }))
-                .then(literal("reload_shader")
-                    .executes(context -> {
-                        if (MixinPluginShared.IS_DASH_LOADER){
-                            context.getSource().sendFailure(Component.literal("disabled when dash loader is installed"));
-                            return 0;
-                        }else {
-                            ReloadShaderManager.reloadShader();
-                            return 1;
-                        }
-                    }))
-                .then(literal("confirm_clear_resource")
-                    .executes(context -> {
-                        ReloadShaderManager.cleanResource();
-                        return 1;
-                    }))
-                .then(literal("colored_light")
-                    .then(argument("switch_state", BoolArgumentType.bool()).executes(
-                        context -> {
-                            FabricShimmerConfig.CONFIG.BLOCK_BLOOM.set(context.getArgument("switch_state", Boolean.class));
-                            return 1;
-                        }
-                    )))
-                .then(literal("bloom")
-                    .then(argument("switch_state", BoolArgumentType.bool()).executes(
-                        context -> {
-                            FabricShimmerConfig.CONFIG.ENABLE_BLOOM_EFFECT.set(context.getArgument("switch_state", Boolean.class));
-                            return 1;
-                        }
-                    )))
-                .then(literal("additive_blend")
-                        .then(argument("switch_state", BoolArgumentType.bool()).executes(
-                                context -> {
-                                    FabricShimmerConfig.CONFIG.ADDITIVE_EFFECT.set(context.getArgument("switch_state", Boolean.class));
-                                    ReloadShaderManager.reloadShader();
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+                dispatcher.register(literal("shimmer")
+                        .then(literal("reload_postprocessing")
+                                .executes(context -> {
+                                    for (PostProcessing post : PostProcessing.values()) {
+                                        post.onResourceManagerReload(null);
+                                    }
                                     return 1;
-                                }
-                        )))
-		        .then(literal("auxiliary_screen")
-				        .executes(context -> {
-					        Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
-					        return 1;
-				        }))
-                    .then(literal("eyedropper")
-                            .executes(context -> {
-                                if (!Eyedropper.getState()) {
-                                    context.getSource().sendSystemMessage(Component.literal("enter eyedropper mode, backend: " + Eyedropper.mode.modeName()));
-                                } else {
-                                    context.getSource().sendSystemMessage(Component.literal("exit eyedropper mode"));
-                                }
-                                Eyedropper.switchState();
-                                return 1;
-                            }))
-                    .then(literal("eyedropper").then(literal("backend")
-                            .then(literal("ShaderStorageBufferObject").executes(
-                                    context -> {
-                                        Eyedropper.switchMode(Eyedropper.ShaderStorageBufferObject);
+                                }))
+                        .then(literal("clear_lights")
+                                .executes(context -> {
+                                    LightManager.clear();
+                                    return 1;
+                                }))
+                        .then(literal("reload_shader")
+                                .executes(context -> {
+                                    if (MixinPluginShared.IS_DASH_LOADER){
+                                        context.getSource().sendFeedback(Component.literal("disabled when dash loader is installed"));
+                                        return 0;
+                                    }else {
+                                        ReloadShaderManager.reloadShader();
                                         return 1;
                                     }
-                            )).then(literal("glGetTexImage").executes(
-                                    context -> {
-                                        Eyedropper.switchMode(Eyedropper.DOWNLOAD);
-                                        return 1;
+                                }))
+                        .then(literal("confirm_clear_resource")
+                                .executes(context -> {
+                                    ReloadShaderManager.cleanResource();
+                                    return 1;
+                                }))
+                        .then(literal("colored_light")
+                                .then(argument("switch_state", BoolArgumentType.bool()).executes(
+                                        context -> {
+                                            FabricShimmerConfig.CONFIG.BLOCK_BLOOM.set(context.getArgument("switch_state", Boolean.class));
+                                            return 1;
+                                        }
+                                )))
+                        .then(literal("bloom")
+                                .then(argument("switch_state", BoolArgumentType.bool()).executes(
+                                        context -> {
+                                            FabricShimmerConfig.CONFIG.ENABLE_BLOOM_EFFECT.set(context.getArgument("switch_state", Boolean.class));
+                                            return 1;
+                                        }
+                                )))
+                        .then(literal("additive_blend")
+                                .then(argument("switch_state", BoolArgumentType.bool()).executes(
+                                        context -> {
+                                            FabricShimmerConfig.CONFIG.ADDITIVE_EFFECT.set(context.getArgument("switch_state", Boolean.class));
+                                            ReloadShaderManager.reloadShader();
+                                            return 1;
+                                        }
+                                )))
+                        .then(literal("auxiliary_screen")
+                                .executes(context -> {
+                                    Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
+                                    return 1;
+                                }))
+                        .then(literal("eyedropper")
+                                .executes(context -> {
+                                    if (!Eyedropper.getState()) {
+                                        context.getSource().sendFeedback(Component.literal("enter eyedropper mode, backend: " + Eyedropper.mode.modeName()));
+                                    } else {
+                                        context.getSource().sendFeedback(Component.literal("exit eyedropper mode"));
                                     }
-                            ))))
-                    .then(Commands.literal("dumpLightBlockStates")
-                            .executes(context -> {
-                                if (Utils.dumpAllLightingBlocks()){
-                                    context.getSource().sendSuccess(Component.literal("dump successfully to cfg/shimmer/LightBlocks.txt"),false);
-                                }else {
-                                    context.getSource().sendFailure(Component.literal("dump failed, see log for detailed information"));
-                                }
-                                return 1;
-                            }))
-            ));
+                                    Eyedropper.switchState();
+                                    return 1;
+                                }))
+                        .then(literal("eyedropper").then(literal("backend")
+                                .then(literal("ShaderStorageBufferObject").executes(
+                                        context -> {
+                                            Eyedropper.switchMode(Eyedropper.ShaderStorageBufferObject);
+                                            return 1;
+                                        }
+                                )).then(literal("glGetTexImage").executes(
+                                        context -> {
+                                            Eyedropper.switchMode(Eyedropper.DOWNLOAD);
+                                            return 1;
+                                        }
+                                ))))
+                        .then(literal("dumpLightBlockStates")
+                                .executes(context -> {
+                                    if (Utils.dumpAllLightingBlocks()){
+                                        context.getSource().sendFeedback(Component.literal("dump successfully to cfg/shimmer/LightBlocks.txt"));
+                                    }else {
+                                        context.getSource().sendError(Component.literal("dump failed, see log for detailed information"));
+                                    }
+                                    return 1;
+                                }))
+                ));
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
 
