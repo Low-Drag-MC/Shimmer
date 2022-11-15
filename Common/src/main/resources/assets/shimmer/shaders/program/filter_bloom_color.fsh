@@ -3,6 +3,7 @@
 uniform sampler2D DiffuseSampler;
 uniform sampler2D MainSampler;
 uniform bool EnableFilter;
+uniform vec4 BloomColor;
 
 in vec2 texCoord;
 
@@ -14,6 +15,8 @@ void main(){
         vec4 mainColor = texture(MainSampler, texCoord);
         if (distance((mainColor.rgb * fragColor.a), fragColor.rgb) > 0.01){
             fragColor = vec4(0.0);
+        }else{
+            fragColor *= BloomColor;
         }
     }
 }

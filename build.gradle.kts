@@ -17,6 +17,13 @@ subprojects {
     val loom = extensions.getByType<LoomGradleExtensionAPI>()
     loom.run {
         silentMojangMappingsLicense()
+
+        runConfigs.forEach {
+            it.vmArg("-Dmixin.debug.export=true")
+            it.vmArg("-Dmixin.dumpTargetOnFailure=true")
+            it.vmArg("-Dmixin.checks.interfaces=true")
+            it.vmArg("-Dmixin.hotSwap=true")
+        }
     }
 
     repositories {

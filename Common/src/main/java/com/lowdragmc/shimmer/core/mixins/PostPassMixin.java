@@ -29,6 +29,8 @@ public abstract class PostPassMixin {
     private void injectParseTargetNode(float pPartialTicks, CallbackInfo ci) {
         this.effect.safeGetUniform("iTime").set(PostProcessing.getITime(pPartialTicks));
         this.effect.safeGetUniform("EnableFilter").set(PostProcessing.enableBloomFilter.get() ? 1 : 0);
+        var c = PostProcessing.bloomColor;
+        this.effect.safeGetUniform("BloomColor").set(c[0],c[1],c[2],c[3]);
     }
 
 }

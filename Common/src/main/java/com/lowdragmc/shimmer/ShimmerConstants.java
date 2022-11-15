@@ -19,6 +19,6 @@ public class ShimmerConstants {
 
 	public static final KeyMapping recordScreenColor = new KeyMapping("shimmer.key.pickColor", InputConstants.KEY_V, "key.categories.misc");
 
-	public static final boolean useOpenGlDebugLabel = false;
+	public static final boolean useOpenGlDebugLabel = true;
 
 }

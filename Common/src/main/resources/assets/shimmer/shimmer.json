@@ -43,6 +43,9 @@
   ],
   "Bloom": [
     {
+      "block": "minecraft:light_blue_stained_glass"
+    },
+    {
       "particle": "minecraft:flame"
     },
     {

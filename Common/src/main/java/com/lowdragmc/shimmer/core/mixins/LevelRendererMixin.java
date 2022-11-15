@@ -18,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.phys.Vec3;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL30;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,18 +40,32 @@ import java.nio.FloatBuffer;
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin {
 
-    @Shadow @Nullable private ClientLevel level;
+    @Shadow
+    @Nullable
+    private ClientLevel level;
 
-    @Shadow @Final private ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum;
+    @Shadow
+    @Final
+    private ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum;
 
     @Inject(method = "renderLevel",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/DimensionSpecialEffects;constantAmbientLight()Z"))
     private void injectRenderLevel(PoseStack poseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera camera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
-        this.level.getProfiler().popPush("block_bloom");
-        PostProcessing.getBlockBloom().renderBlockPost();
+        this.level.getProfiler().popPush("block_bloom_no_translucent");
+        PostProcessing.getBlockBloom().renderBlockPost(true);
     }
+
+//    @Inject(method = "renderLevel",
+//            at = @At(value = "INVOKE", shift = At.Shift.BY, by = 3,
+//                    target = "Lnet/minecraft/client/renderer/RenderType;translucent()Lnet/minecraft/client/renderer/RenderType;"))
+    @Inject(method = "renderLevel",at = @At(value = "CONSTANT", args = "stringValue=string"))
+    private void injectRenderLevelTranslucentNoFancy(PoseStack poseStack, float partialTick, long finishNanoTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
+        this.level.getProfiler().popPush("block_bloom_translucent");
+        PostProcessing.getBlockBloom().renderBlockPost(false);
+    }
+
 
     @Inject(method = "renderChunkLayer",
             at = @At(value = "HEAD"))

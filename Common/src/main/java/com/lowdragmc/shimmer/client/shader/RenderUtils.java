@@ -24,32 +24,34 @@ public class RenderUtils {
     public static ShaderInstance blitShader;
 
     public static void fastBlit(RenderTarget from, RenderTarget to) {
-        RenderSystem.assertOnRenderThread();
-        GlStateManager._colorMask(true, true, true, true);
-        GlStateManager._disableDepthTest();
-        GlStateManager._depthMask(false);
+        RenderUtils.warpGLDebugLabel("fast_blit",()->{
+            RenderSystem.assertOnRenderThread();
+            GlStateManager._colorMask(true, true, true, true);
+            GlStateManager._disableDepthTest();
+            GlStateManager._depthMask(false);
 
-        to.bindWrite(true);
+            to.bindWrite(true);
 
-        blitShader.setSampler("DiffuseSampler", from.getColorTextureId());
+            blitShader.setSampler("DiffuseSampler", from.getColorTextureId());
 
-        blitShader.apply();
-        GlStateManager._enableBlend();
-        RenderSystem.defaultBlendFunc();
+            blitShader.apply();
+            GlStateManager._enableBlend();
+            RenderSystem.defaultBlendFunc();
 
-        Tesselator tesselator = RenderSystem.renderThreadTesselator();
-        BufferBuilder bufferbuilder = tesselator.getBuilder();
-        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-        bufferbuilder.vertex(-1, 1, 0).endVertex();
-        bufferbuilder.vertex(-1, -1, 0).endVertex();
-        bufferbuilder.vertex(1, -1, 0).endVertex();
-        bufferbuilder.vertex(1, 1, 0).endVertex();
-        BufferUploader.draw(bufferbuilder.end());
-        blitShader.clear();
+            Tesselator tesselator = RenderSystem.renderThreadTesselator();
+            BufferBuilder bufferbuilder = tesselator.getBuilder();
+            bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+            bufferbuilder.vertex(-1, 1, 0).endVertex();
+            bufferbuilder.vertex(-1, -1, 0).endVertex();
+            bufferbuilder.vertex(1, -1, 0).endVertex();
+            bufferbuilder.vertex(1, 1, 0).endVertex();
+            BufferUploader.draw(bufferbuilder.end());
+            blitShader.clear();
 
-        GlStateManager._depthMask(true);
-        GlStateManager._colorMask(true, true, true, true);
-        GlStateManager._enableDepthTest();
+            GlStateManager._depthMask(true);
+            GlStateManager._colorMask(true, true, true, true);
+            GlStateManager._enableDepthTest();
+        });
     }
 
     public static PoseStack copyPoseStack(PoseStack poseStack) {

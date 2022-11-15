@@ -1,5 +1,6 @@
 package com.lowdragmc.shimmer.client.shader;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.lwjgl.opengl.GL43;

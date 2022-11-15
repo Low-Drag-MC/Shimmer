@@ -54,7 +54,7 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings("unused")
 public class PostProcessing implements ResourceManagerReloadListener {
-    public static final Set<RenderType> CHUNK_TYPES = Sets.newHashSet(RenderType.solid(), RenderType.cutoutMipped(), RenderType.cutout());
+    public static final Set<RenderType> CHUNK_TYPES = Sets.newHashSet(RenderType.solid(), RenderType.cutoutMipped(), RenderType.cutout(), RenderType.translucent());
 
     private static final Map<String, PostProcessing> POST_PROCESSING_MAP = new HashMap<>();
     public static final PostProcessing BLOOM_UNREAL = new PostProcessing("bloom_unreal", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/bloom_unreal.json"));
@@ -66,6 +66,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
     public static final PostProcessing DOT_SCREEN = new PostProcessing("dot_screen", new ResourceLocation(ShimmerConstants.MOD_ID, "shaders/post/dot_screen.json"));
 
     public static AtomicBoolean enableBloomFilter = new AtomicBoolean(false);
+    public static float[] bloomColor = {1f, 1f, 1f, 1f};
     private static final Minecraft mc = Minecraft.getInstance();
     public final String name;
     private CopyDepthColorTarget postTargetWithoutColor;
@@ -206,15 +207,18 @@ public class PostProcessing implements ResourceManagerReloadListener {
         return postChain;
     }
 
-    public void renderBlockPost() {
+    public void renderBlockPost(boolean enableFilter) {
         PostChain postChain = getPostChain();
         if (postChain != null && Services.PLATFORM.useBlockBloom() && allowPost()) {
-            enableBloomFilter.set(true);
-            RenderTarget mainTarget = mc.getMainRenderTarget();
-            renderPost(postChain, new MRTTarget((IMainTarget) mainTarget), mainTarget);
-            ((IMainTarget) mainTarget).clearBloomTexture(Minecraft.ON_OSX);
-            mainTarget.bindWrite(false);
-            enableBloomFilter.set(false);
+            RenderUtils.warpGLDebugLabel("render_block_post", () -> {
+                enableBloomFilter.set(enableFilter);
+
+                RenderTarget mainTarget = mc.getMainRenderTarget();
+                renderPost(postChain, new MRTTarget((IMainTarget) mainTarget), mainTarget);
+                ((IMainTarget) mainTarget).clearBloomTexture(Minecraft.ON_OSX);
+                mainTarget.bindWrite(false);
+                enableBloomFilter.set(false);
+            });
         }
     }
 
@@ -226,7 +230,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
         BlendMode lastBlendMode = BlendModeMixin.getLastApplied();
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
-        postChain.process(mc.getFrameTime());
+        RenderUtils.warpGLDebugLabel("process_post_" + name,()-> postChain.process(mc.getFrameTime()));
         RenderUtils.fastBlit(postChain.getTempTarget("shimmer:output"), output);
         BlendModeMixin.setLastApplied(lastBlendMode);
     }

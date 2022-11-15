@@ -9,6 +9,7 @@ import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import com.lowdragmc.shimmer.forge.ForgeShimmerConfig;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -120,6 +121,23 @@ public class ForgeEventListener {
                             }
                             return 1;
                         }))
+                .then(Commands.literal("bloomColor")
+                        .then(Commands.argument("r", FloatArgumentType.floatArg(0,10))
+                                .then(Commands.argument("g", FloatArgumentType.floatArg(0,10))
+                                        .then(Commands.argument("b", FloatArgumentType.floatArg(0,10))
+                                                .then(Commands.argument("a",FloatArgumentType.floatArg(0,10))
+                                                        .executes(context -> {
+                                                            var r = context.getArgument("r", Float.class);
+                                                            var g = context.getArgument("g", Float.class);
+                                                            var b = context.getArgument("b", Float.class);
+                                                            var a = context.getArgument("a", Float.class);
+                                                            float[] color = PostProcessing.bloomColor;
+                                                            color[0] = r;
+                                                            color[1] = g;
+                                                            color[2] = b;
+                                                            color[3] = a;
+                                                            return 1;
+                                                        }))))))
         );
     }
 }
