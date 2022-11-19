@@ -13,7 +13,23 @@ import java.io.IOException;
 public class ColorReferencesTypeAdapter extends TypeAdapter<ColorReferences> {
 	@Override
 	public void write(JsonWriter out, ColorReferences colorReferences) throws IOException {
-
+		out.beginObject();
+		colorReferences.namedIntColorMap.object2IntEntrySet().forEach(entry -> {
+			var colorName = entry.getKey();
+			var color = entry.getIntValue();
+			var r = Integer.toHexString(FastColor.ARGB32.red(color));
+			var g = Integer.toHexString(FastColor.ARGB32.green(color));
+			var b = Integer.toHexString(FastColor.ARGB32.blue(color));
+			var a = Integer.toHexString(FastColor.ARGB32.alpha(color));
+			var colorString = "#" + r + g + b + a;
+			try {
+				out.name(colorName);
+				out.value(colorString);
+			} catch (IOException e) {
+				throw new RuntimeException("color name:" + colorName + "," + "color value:" + colorString, e);
+			}
+		});
+		out.endObject();
 	}
 
 	@Override
