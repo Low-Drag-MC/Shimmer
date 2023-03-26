@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * @author HypherionSA
@@ -31,6 +32,13 @@ public interface IPlatformHelper {
      * @return True if the mod is loaded, false otherwise.
      */
     boolean isModLoaded(String modId);
+
+    /**
+     * Gets all loaded mods
+     *
+     * @return a list of loaded mods
+     */
+    List<String> getLoadedMods();
 
     /**
      * Check if the game is currently in a development environment.

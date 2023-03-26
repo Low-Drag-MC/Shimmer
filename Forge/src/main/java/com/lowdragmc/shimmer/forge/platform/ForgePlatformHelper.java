@@ -22,11 +22,13 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.forgespi.language.IModInfo;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * @author HypherionSA
@@ -42,6 +44,11 @@ public class ForgePlatformHelper implements IPlatformHelper {
 	@Override
 	public boolean isModLoaded(String modId) {
 		return ModList.get().isLoaded(modId);
+	}
+
+	@Override
+	public List<String> getLoadedMods() {
+		return ModList.get().getMods().stream().map(IModInfo::getModId).toList();
 	}
 
 	@Override
@@ -122,13 +129,13 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
 	@Override
 	public ShimmerLoadConfigEvent postLoadConfigurationEvent(ShimmerLoadConfigEvent event) {
-		MinecraftForge.EVENT_BUS.post(new ForgeShimmerLoadConfigEvent(event));
+		ModLoader.get().postEvent(new ForgeShimmerLoadConfigEvent(event));
 		return event;
 	}
 
 	@Override
 	public ShimmerReloadEvent postReloadEvent(ShimmerReloadEvent event){
-		MinecraftForge.EVENT_BUS.post(new ForgeShimmerReloadEvent(event));
+		ModLoader.get().postEvent(new ForgeShimmerReloadEvent(event));
 		return event;
 	}
 

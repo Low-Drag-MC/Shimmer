@@ -16,6 +16,7 @@ import net.minecraft.world.level.material.Fluid;
 import org.lwjgl.opengl.GL30;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * @author HypherionSA
@@ -31,6 +32,11 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public boolean isModLoaded(String modId) {
         return FabricLoader.getInstance().isModLoaded(modId);
+    }
+
+    @Override
+    public List<String> getLoadedMods() {
+        return FabricLoader.getInstance().getAllMods().stream().map(modContainer -> modContainer.getMetadata().getId()).toList();
     }
 
     @Override

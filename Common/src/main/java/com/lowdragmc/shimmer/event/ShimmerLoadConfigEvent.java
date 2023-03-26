@@ -1,5 +1,8 @@
 package com.lowdragmc.shimmer.event;
 
+import com.lowdragmc.shimmer.Configuration;
+import net.minecraft.resources.ResourceLocation;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +20,9 @@ public class ShimmerLoadConfigEvent implements ShimmerEvent{
 
     public void addConfiguration(String modId,String configuration){
         additionConfigurations.put(modId,configuration);
+    }
+    public void addConfiguration(ResourceLocation rl) {
+		Configuration.configurationOfRl(rl).ifPresent(configString -> additionConfigurations.put(rl.getNamespace(), configString));
     }
 
 	/**
