@@ -33,7 +33,7 @@ dependencies {
     include("me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version")
 
     // Sodium
-    modImplementation("curse.maven:sodium-394468:3957319") {
+    modImplementation("maven.modrinth:sodium:mc1.18.2-0.4.1") {
         exclude(group = "net.fabricmc.fabric-api")
     }
     // This is a dependency of Sodium....
