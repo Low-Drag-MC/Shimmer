@@ -67,7 +67,6 @@ public class ReloadShaderManager {
         try {
             Asserts.notNull(shaderReloader,"shader reloader hasn't be set up");
             shaderReloader.reload(null,resourceManager,null,null,null,null);
-            //FIXME
             minecraft.levelRenderer.onResourceManagerReload(resourceManager);
             message(Component.literal("reload success"));
             message(Component.literal(MessageFormat.format("cache resource:{0}", reloadResources.size())));
