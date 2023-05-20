@@ -455,12 +455,6 @@ public class HsbColorWidget extends AbstractWidget {
 		refreshRGB(true);
 	}
 
-
-	@Override
-	public void updateNarration(NarrationElementOutput narrationElementOutput) {
-
-	}
-
 	public float[] getHSB() {
 		return new float[]{h, s, b};
 	}

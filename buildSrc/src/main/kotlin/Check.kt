@@ -13,7 +13,7 @@ fun check(file: File) {
     if (classReader.interfaces?.contains("org/spongepowered/asm/mixin/extensibility/IMixinConfigPlugin") ?: false) {
         val classNode = ClassNode(Opcodes.ASM9)
         classReader.accept(classNode, 0)
-        val strings = (constantUtf8.get(classReader) as Array<String>).filterNotNull()
+        @Suppress("UNCHECKED_CAST") val strings = (constantUtf8.get(classReader) as Array<String>).filterNotNull()
         val res = strings.filter { it.contains(Regex("""net[\.\/]minecraft""")) }
         if (res.isNotEmpty()) {
             val name = classReader.className

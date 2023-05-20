@@ -84,7 +84,7 @@ public class AuxiliaryScreen extends Screen {
 		previewWidget = new PreviewWidget(20, 160, 90, 90, Component.literal("preview"));
 
 		inputText.addCompleteListener(previewWidget::onContentNeedChange);
-		inputText.addCandidateListener(previewWidget::onCandicateChange);
+		inputText.addCandidateListener(previewWidget::onCandidateChange);
 
 		addRenderableWidget(colorPicker);
 		addRenderableWidget(inputText);
@@ -163,27 +163,29 @@ public class AuxiliaryScreen extends Screen {
 					} else {
 						TextFieldHelper.setClipboardContents(minecraft, " ");
 					}
-				});
-		clearButton = new Button(370, 50, 45, 20, Component.literal("clear"),
+
+				}).pos(320, 50).size(45, 20).build();
+		clearButton = Button.builder( Component.literal("clear"),
 				button -> Configuration.auxiliaryConfig = null
-		);
+		).pos(370, 50).size( 45, 20).build();
 
 		addRenderableWidget(applyButton);
 		addRenderableWidget(addButton);
 		addRenderableWidget(exportButton);
 		addRenderableWidget(clearButton);
 
-		importColorButton = new Button(220, 80, 95, 20, Component.literal("import color"), button -> {
+		importColorButton = Button.builder( Component.literal("import color"), button -> {
+			var player = Objects.requireNonNull(minecraft.player);
 			if (Eyedropper.isDataAvailable()) {
 				colorPicker.setRGB(Eyedropper.getEyedropperColor());
-				minecraft.player.sendSystemMessage(Component.literal("set record color"));
+				player.sendSystemMessage(Component.literal("set record color"));
 			} else if (Eyedropper.getState()) {
 				colorPicker.setRGB(Eyedropper.getCurrentColor());
-				minecraft.player.sendSystemMessage(Component.literal("no record, use current"));
+				player.sendSystemMessage(Component.literal("no record, use current"));
 			} else {
-				minecraft.player.sendSystemMessage(Component.literal("not under eyedropper mode, can't import color"));
+				player.sendSystemMessage(Component.literal("not under eyedropper mode, can't import color"));
 			}
-		});
+		}).pos(220, 80).size( 95, 20).build();
 
 		addRenderableWidget(importColorButton);
 

@@ -21,7 +21,9 @@
 		"RebuildTaskMixin",
 		"RenderChunkMixin",
 		"RenderTargetMixin",
-		"ShaderInstanceGlslProcessorMixin"
+		"ShaderInstanceGlslProcessorMixin",
+		"reloadShader.GameRendererMixin",
+		"reloadShader.PostPassMixin"
 	],
 	"mixins": [
 

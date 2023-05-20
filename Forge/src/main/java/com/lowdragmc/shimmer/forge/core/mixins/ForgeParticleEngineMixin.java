@@ -28,6 +28,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -111,7 +112,7 @@ public abstract class ForgeParticleEngineMixin implements IParticleEngine {
 
     @ModifyExpressionValue(method = "loadParticleDescription",
         at= @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleDescription;fromJson(Lcom/google/gson/JsonObject;)Lnet/minecraft/client/particle/ParticleDescription;"))
-    private ParticleDescription injectLoad(ParticleDescription particleDescription,ResourceManager manager, ResourceLocation registryName){
+    private ParticleDescription injectLoad(ParticleDescription particleDescription,ResourceLocation registryName, Resource resource){
         if (particleDescription instanceof IParticleDescription description && description.getEffect() != null) {
             PARTICLE_EFFECT.put(registryName, description.getEffect());
         }

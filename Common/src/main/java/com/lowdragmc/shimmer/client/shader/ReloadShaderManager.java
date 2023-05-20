@@ -80,7 +80,7 @@ public class ReloadShaderManager {
             message(Component.literal("exception occur will reloading , trying to backup").withStyle(ChatFormatting.RED));
             message(Component.literal(MessageFormat.format("error:{0}", tryException.getMessage())).withStyle(ChatFormatting.RED));
             try {
-                minecraft.gameRenderer.onResourceManagerReload(resourceManager);
+                shaderReloader.reload(null,resourceManager,null,null,null,null);
                 minecraft.levelRenderer.onResourceManagerReload(resourceManager);
                 message(Component.literal("load backup resource successful"));
             } catch (Exception backupException) {

@@ -22,8 +22,11 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.Nullable;
@@ -81,7 +84,7 @@ public abstract class ParticleEngineMixin implements IParticleEngine {
 
     @ModifyExpressionValue(method = "loadParticleDescription",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleDescription;fromJson(Lcom/google/gson/JsonObject;)Lnet/minecraft/client/particle/ParticleDescription;"))
-    private ParticleDescription injectLoad(ParticleDescription particleDescription,ResourceManager manager, ResourceLocation registryName){
+    private ParticleDescription injectLoad(ParticleDescription particleDescription,ResourceLocation registryName, Resource resource){
         if(particleDescription instanceof IParticleDescription description && description.getEffect() != null){
             PARTICLE_EFFECT.put(registryName,description.getEffect());
         }

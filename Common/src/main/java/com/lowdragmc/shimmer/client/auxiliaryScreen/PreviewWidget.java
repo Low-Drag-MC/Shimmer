@@ -25,7 +25,6 @@ import java.util.Objects;
 /**
  * the preview widget for block/fluid/particle
  */
-@ParametersAreNonnullByDefault
 public class PreviewWidget extends AbstractWidget {
 
 	private KeyType type;
@@ -117,6 +116,11 @@ public class PreviewWidget extends AbstractWidget {
 		}
 	}
 
+	@Override
+	protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+
+	}
+
 	public void onModeChange(KeyType type) {
 		this.type = type;
 		this.resourceLocation = null;
@@ -127,9 +131,9 @@ public class PreviewWidget extends AbstractWidget {
 		this.resourceLocation = content;
 	}
 
-	public void onCandicateChange(KeyType type,ResourceLocation candicate) {
+	public void onCandidateChange(KeyType type, ResourceLocation candidate) {
 		this.type = type;
-		this.resourceLocation = candicate;
+		this.resourceLocation = candidate;
 	}
 
 }
