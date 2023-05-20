@@ -1,9 +1,9 @@
 package com.lowdragmc.shimmer.client.light;
 
-import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 import java.nio.FloatBuffer;
 

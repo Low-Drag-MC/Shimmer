@@ -18,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.server.packs.resources.ResourceProvider;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterShadersEvent;
@@ -39,14 +40,14 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
 
     @SubscribeEvent
     public void shaderRegistry(RegisterShadersEvent event) {
-        ResourceManager resourceManager = event.getResourceManager();
+        ResourceProvider resourceProvider = event.getResourceProvider();
         try {
-            event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceManager, new ResourceLocation(ShimmerConstants.MOD_ID, "fast_blit"), DefaultVertexFormat.POSITION), shaderInstance -> RenderUtils.blitShader = shaderInstance);
-            event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceManager, new ResourceLocation(ShimmerConstants.MOD_ID, "rendertype_armor_cutout_no_cull"), DefaultVertexFormat.NEW_ENTITY),
+            event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceProvider, new ResourceLocation(ShimmerConstants.MOD_ID, "fast_blit"), DefaultVertexFormat.POSITION), shaderInstance -> RenderUtils.blitShader = shaderInstance);
+            event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceProvider, new ResourceLocation(ShimmerConstants.MOD_ID, "rendertype_armor_cutout_no_cull"), DefaultVertexFormat.NEW_ENTITY),
                     shaderInstance -> ShimmerRenderTypes.EmissiveArmorRenderType.emissiveArmorGlintShader = shaderInstance);
-            event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceManager,new ResourceLocation(ShimmerConstants.MOD_ID,"hsb_block"), HsbColorWidget.HSB_VERTEX_FORMAT), shaderInstance -> HsbColorWidget.hsbShader = shaderInstance);
+            event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceProvider,new ResourceLocation(ShimmerConstants.MOD_ID,"hsb_block"), HsbColorWidget.HSB_VERTEX_FORMAT), shaderInstance -> HsbColorWidget.hsbShader = shaderInstance);
             if (ShaderSSBO.support()){
-                event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceManager, new ResourceLocation(ShimmerConstants.MOD_ID, "pick_color"), DefaultVertexFormat.POSITION), Eyedropper.ShaderStorageBufferObject::setShader);
+                event.registerShader(ReloadShaderManager.backupNewShaderInstance(resourceProvider, new ResourceLocation(ShimmerConstants.MOD_ID, "pick_color"), DefaultVertexFormat.POSITION), Eyedropper.ShaderStorageBufferObject::setShader);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

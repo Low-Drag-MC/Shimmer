@@ -4,8 +4,7 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.texture.TextureManager;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author KilaBash
@@ -18,14 +17,12 @@ public interface IPostParticleType extends ParticleRenderType {
     PostProcessing getPost();
 
     @Override
-    @ParametersAreNonnullByDefault
-    default void begin(BufferBuilder pBuilder, TextureManager pTextureManager) {
+    default void begin(@NotNull BufferBuilder pBuilder, @NotNull TextureManager pTextureManager) {
         getParent().begin(pBuilder, pTextureManager);
     }
 
     @Override
-    @ParametersAreNonnullByDefault
-    default void end(Tesselator pTesselator) {
+    default void end(@NotNull Tesselator pTesselator) {
         getParent().end(pTesselator);
     }
 }

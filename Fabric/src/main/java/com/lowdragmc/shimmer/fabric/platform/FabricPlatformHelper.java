@@ -106,7 +106,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
 	public ResourceLocation getFluidTextureLocation(Fluid fluid, boolean isStill) {
 		FluidRenderHandler handler = FluidRenderHandlerRegistry.INSTANCE.get(fluid);
 		TextureAtlasSprite[] sprites = handler.getFluidSprites(null, null, fluid.defaultFluidState());
-		return (isStill ? sprites[0] : sprites[1]).getName();
+		return (isStill ? sprites[0] : sprites[1]).atlasLocation();
 	}
 
 	@Override

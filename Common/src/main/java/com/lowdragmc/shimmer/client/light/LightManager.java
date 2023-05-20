@@ -1,18 +1,14 @@
 package com.lowdragmc.shimmer.client.light;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.FileUtility;
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.client.shader.ShaderUBO;
-import com.lowdragmc.shimmer.config.ShimmerConfig;
 import com.lowdragmc.shimmer.event.ShimmerReloadEvent;
 import com.lowdragmc.shimmer.platform.Services;
-import com.mojang.math.Vector3f;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -21,7 +17,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -33,11 +29,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL30;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.*;
@@ -444,11 +441,11 @@ public enum LightManager {
 						continue;
 					}
 					var itemLocation = new ResourceLocation(itemLight.itemName);
-					if (!Registry.ITEM.containsKey(itemLocation)){
+					if (!BuiltInRegistries.ITEM.containsKey(itemLocation)){
 						ShimmerConstants.LOGGER.error("can't find item " + itemLocation + " from" + config.configSource);
 						continue;
 					}
-					var item = Registry.ITEM.get(itemLocation);
+					var item = BuiltInRegistries.ITEM.get(itemLocation);
 					registerItemLight(item, itemStack -> template);
 				}else {
 					if (!ResourceLocation.isValidResourceLocation(itemLight.itemTag)){
@@ -492,7 +489,7 @@ public enum LightManager {
     private final Map<ResourceLocation,Function<ItemStack,ColorPointLight.Template>> TAG_MAP = new HashMap<>();
 
     @Nullable
-    public ColorPointLight getItemLight(@Nonnull ItemStack itemStack, Vec3 pos){
+    public ColorPointLight getItemLight(@NotNull ItemStack itemStack, Vec3 pos){
         Function<ItemStack,ColorPointLight.Template> function = ITEM_MAP.get(itemStack.getItem());
         if (function == null) {
             var optional= itemStack.getTags().filter(tag -> TAG_MAP.containsKey(tag.location())).findAny();

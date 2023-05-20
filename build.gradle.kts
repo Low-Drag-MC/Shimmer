@@ -61,6 +61,7 @@ subprojects {
         })
         "implementation"(mixinExtras)
         "annotationProcessor"(mixinExtras)
+        "implementation"("org.jetbrains:annotations:24.0.1")
     }
 
     extensions.getByType<BasePluginExtension>().apply {

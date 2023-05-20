@@ -71,8 +71,6 @@ public class AuxiliaryScreen extends Screen {
 
 	@Override
 	protected void init() {
-		Objects.requireNonNull(this.minecraft).keyboardHandler.setSendRepeatsToGui(true);
-
 		colorPicker = new HsbColorWidget(20, 20, 100, 80, 20, 10, Component.literal("1"));
 		inputText = new SuggestionEditBoxWidget(this.minecraft.font, 220, 20, 200, 20, Component.literal("s"));
 
@@ -94,71 +92,70 @@ public class AuxiliaryScreen extends Screen {
 		addRenderableWidget(previewWidget);
 		addRenderableWidget(radiusSlide);
 
-		applyButton = new Button(220, 50, 45, 20, Component.literal("apply"),
-				button -> {
-					Configuration.load();
-					LightManager.INSTANCE.loadConfig();
-					PostProcessing.loadConfig();
-					ShimmerMetadataSection.onResourceManagerReload();
-					LightManager.onResourceManagerReload();
-					for (PostProcessing postProcessing : PostProcessing.values()) {
-						postProcessing.onResourceManagerReload(minecraft.getResourceManager());
-					}
-					minecraft.tell(minecraft.levelRenderer::allChanged);
-				});
-		addButton = new Button(270, 50, 45, 20, Component.literal("add"),
-				button -> {
+		applyButton = Button.builder(Component.literal("apply"), button -> {
+			Configuration.load();
+			LightManager.INSTANCE.loadConfig();
+			PostProcessing.loadConfig();
+			ShimmerMetadataSection.onResourceManagerReload();
+			LightManager.onResourceManagerReload();
+			for (PostProcessing postProcessing : PostProcessing.values()) {
+				postProcessing.onResourceManagerReload(minecraft.getResourceManager());
+			}
+			minecraft.tell(minecraft.levelRenderer::allChanged);})
+		.pos(220,50).size(45,20).build();
 
-					if (!inputText.isComplete) return;
+		addButton = Button.builder(Component.literal("add"),button -> {
+			if (!inputText.isComplete) return;
 
-					ShimmerConfig config;
-					if (Configuration.auxiliaryConfig != null) {
-						config = Configuration.auxiliaryConfig;
-					} else {
-						config = new ShimmerConfig();
-						config.configSource = "AuxiliaryScreen";
-						config.init();
-						config.enable = new AtomicBoolean(true);
-						Configuration.auxiliaryConfig = config;
-					}
+			ShimmerConfig config;
+			if (Configuration.auxiliaryConfig != null) {
+				config = Configuration.auxiliaryConfig;
+			} else {
+				config = new ShimmerConfig();
+				config.configSource = "AuxiliaryScreen";
+				config.init();
+				config.enable = new AtomicBoolean(true);
+				Configuration.auxiliaryConfig = config;
+			}
 
-					int rgb = colorPicker.rgb();
-					float radius = (float) radiusSlide.actualValue;
-					String content = inputText.getValue();
+			int rgb = colorPicker.rgb();
+			float radius = (float) radiusSlide.actualValue;
+			String content = inputText.getValue();
 
-					switch (mode.getValue()) {
-						case COLORED_BLOCK -> {
-							var light = new BlockLight();
-							light.setRGB(rgb);
-							light.radius = radius;
-							light.blockName = content;
-							config.blockLights.add(light);
-						}
-						case LIGHT_ITEM -> {
-							var light = new ItemLight();
-							light.setRGB(rgb);
-							light.radius = radius;
-							light.itemName = content;
-							config.itemLights.add(light);
-						}
-						case BLOOM_PARTICLE -> {
-							var bloom = new Bloom();
-							bloom.particleName = content;
-							config.blooms.add(bloom);
-						}
-						case BLOOM_FLUID -> {
-							var bloom = new Bloom();
-							bloom.fluidName = content;
-							config.blooms.add(bloom);
-						}
-						case BLOOM_BLOCK -> {
-							var bloom = new Bloom();
-							bloom.blockName = content;
-							config.blooms.add(bloom);
-						}
-					}
-				});
-		exportButton = new Button(320, 50, 45, 20, Component.literal("export"),
+			switch (mode.getValue()) {
+				case COLORED_BLOCK -> {
+					var light = new BlockLight();
+					light.setRGB(rgb);
+					light.radius = radius;
+					light.blockName = content;
+					config.blockLights.add(light);
+				}
+				case LIGHT_ITEM -> {
+					var light = new ItemLight();
+					light.setRGB(rgb);
+					light.radius = radius;
+					light.itemName = content;
+					config.itemLights.add(light);
+				}
+				case BLOOM_PARTICLE -> {
+					var bloom = new Bloom();
+					bloom.particleName = content;
+					config.blooms.add(bloom);
+				}
+				case BLOOM_FLUID -> {
+					var bloom = new Bloom();
+					bloom.fluidName = content;
+					config.blooms.add(bloom);
+				}
+				case BLOOM_BLOCK -> {
+					var bloom = new Bloom();
+					bloom.blockName = content;
+					config.blooms.add(bloom);
+				}
+			}
+		}).pos(270,50).size(45,20).build();
+
+		exportButton = Button.builder(Component.literal("export"),
 				button -> {
 					if (Configuration.auxiliaryConfig != null) {
 						var json = Configuration.gson.toJson(Configuration.auxiliaryConfig);
@@ -264,7 +261,6 @@ public class AuxiliaryScreen extends Screen {
 
 	@Override
 	public void removed() {
-		Objects.requireNonNull(this.minecraft).keyboardHandler.setSendRepeatsToGui(false);
 	}
 
 	@Override

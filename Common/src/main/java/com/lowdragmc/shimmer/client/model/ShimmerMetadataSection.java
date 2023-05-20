@@ -7,9 +7,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,7 @@ public record ShimmerMetadataSection(boolean bloom) {
     }
 
     public static boolean isBloom(TextureAtlasSprite sprite) {
-        ShimmerMetadataSection ret = getMetadata(spriteToAbsolute(sprite.getName()));
+        ShimmerMetadataSection ret = getMetadata(spriteToAbsolute(sprite.atlasLocation()));
         return ret != null && ret.bloom;
     }
 
@@ -60,14 +60,14 @@ public record ShimmerMetadataSection(boolean bloom) {
         static Serializer INSTANCE = new Serializer();
 
         @Override
-        @Nonnull
+        @NotNull
         public String getMetadataSectionName() {
             return SECTION_NAME;
         }
 
         @Override
-        @Nonnull
-        public ShimmerMetadataSection fromJson(@Nonnull JsonObject json) {
+        @NotNull
+        public ShimmerMetadataSection fromJson(@NotNull JsonObject json) {
             boolean bloom = false;
             if (json.isJsonObject()) {
                 JsonObject obj = json.getAsJsonObject();

@@ -6,9 +6,8 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.core.particles.ParticleGroup;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
 /**
@@ -28,7 +27,7 @@ public class PostParticle extends Particle {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public Particle setPower(float pMultiplier) {
         return parent.setPower(pMultiplier);
     }
@@ -39,7 +38,7 @@ public class PostParticle extends Particle {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public Particle scale(float pScale) {
         return parent.scale(pScale);
     }
@@ -65,7 +64,7 @@ public class PostParticle extends Particle {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public String toString() {
         return "post" + "_" + postProcessing.name + "_" + parent.toString();
     }
@@ -93,33 +92,32 @@ public class PostParticle extends Particle {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public AABB getBoundingBox() {
         return parent == null ? super.getBoundingBox() : parent.getBoundingBox();
     }
 
     @Override
-    public void setBoundingBox(@Nonnull AABB pBb) {
+    public void setBoundingBox(@NotNull AABB pBb) {
         if (parent != null) {
             parent.setBoundingBox(pBb);
         }
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public Optional<ParticleGroup> getParticleGroup() {
         return parent.getParticleGroup();
     }
 
 
     @Override
-    @ParametersAreNonnullByDefault
-    public void render(VertexConsumer pBuffer, Camera pRenderInfo, float pPartialTicks) {
+    public void render(@NotNull VertexConsumer pBuffer, @NotNull Camera pRenderInfo, float pPartialTicks) {
         parent.render(pBuffer, pRenderInfo, pPartialTicks);
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public ParticleRenderType getRenderType() {
         return postProcessing.getParticleType(parent.getRenderType());
     }

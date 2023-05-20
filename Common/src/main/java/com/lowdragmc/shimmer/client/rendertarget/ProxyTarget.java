@@ -1,8 +1,7 @@
 package com.lowdragmc.shimmer.client.rendertarget;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author KilaBash
@@ -45,7 +44,7 @@ public class ProxyTarget extends RenderTarget {
     }
 
     @Override
-    public void copyDepthFrom(@Nonnull RenderTarget pOtherTarget) {
+    public void copyDepthFrom(@NotNull RenderTarget pOtherTarget) {
         parent.copyDepthFrom(pOtherTarget);
     }
 

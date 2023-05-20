@@ -7,19 +7,18 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EffectInstance;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceProvider;
+import net.minecraft.server.packs.resources.*;
 import net.minecraft.util.GsonHelper;
+import org.apache.http.util.Asserts;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
@@ -28,13 +27,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-@ParametersAreNonnullByDefault
 public class ReloadShaderManager {
 
     private static Map<ResourceLocation, Resource> reloadResources = new HashMap<>();
     public static boolean isReloading = false;
     private static boolean foreReloadAll = false;
     private static final ResourceProvider reloadShaderResource = (res) -> Optional.of(reloadResources.get(res));
+    public static PreparableReloadListener shaderReloader;
 
     private static void recordResource(ResourceLocation resourceLocation, Resource resource) {
         reloadResources.put(resourceLocation, resource);
@@ -48,8 +47,8 @@ public class ReloadShaderManager {
     private static void recordCopyResource(ResourceLocation resourceLocation, Resource resource) {
         try(var res = resource.open()) {
             final byte[] data = res.readAllBytes();
-            final Resource.IoSupplier<InputStream> ioSupplier = () -> new ByteArrayInputStream(data);
-            Resource copyResource = new Resource(resource.sourcePackId(), ioSupplier);
+            final IoSupplier<InputStream> ioSupplier = () -> new ByteArrayInputStream(data);
+            Resource copyResource = new Resource(resource.source(), ioSupplier);
             recordResource(resourceLocation, copyResource);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -66,7 +65,9 @@ public class ReloadShaderManager {
         isReloading = true;
         foreReloadAll = false;
         try {
-            minecraft.gameRenderer.onResourceManagerReload(resourceManager);
+            Asserts.notNull(shaderReloader,"shader reloader hasn't be set up");
+            shaderReloader.reload(null,resourceManager,null,null,null,null);
+            //FIXME
             minecraft.levelRenderer.onResourceManagerReload(resourceManager);
             message(Component.literal("reload success"));
             message(Component.literal(MessageFormat.format("cache resource:{0}", reloadResources.size())));
@@ -98,7 +99,7 @@ public class ReloadShaderManager {
         Minecraft.getInstance().player.sendSystemMessage(component);
     }
 
-    @Nonnull
+    @NotNull
     public static ShaderInstance backupNewShaderInstance(ResourceProvider resourceProvider, String shaderName, VertexFormat vertexFormat) throws IOException {
         if (foreReloadAll) {
             return new ShaderInstance(reloadShaderResource, shaderName, vertexFormat);
@@ -113,7 +114,6 @@ public class ReloadShaderManager {
         return backupNewShaderInstance(resourceProvider, shaderLocation.toString(), vertexFormat);
     }
 
-    @Nonnull
     private static void recordProgramResource(ResourceProvider resourceProvider, String nameSpace, String shaderName) throws IOException {
         ResourceLocation programResourceLocation = new ResourceLocation(nameSpace, "shaders/core/" + shaderName + ".json");
         Resource programResource = resourceProvider.getResource(programResourceLocation).orElseThrow();

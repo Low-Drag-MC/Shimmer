@@ -24,10 +24,13 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -122,7 +125,7 @@ public abstract class ForgeParticleEngineMixin implements IParticleEngine {
 
     @Inject(method = "createParticle", at = @At(value = "HEAD"), cancellable = true)
     private void injectCreateParticle(ParticleOptions particleOptions, double x, double y, double z, double sx, double sy, double sz, CallbackInfoReturnable<Particle> cir) {
-        ResourceLocation name = Registry.PARTICLE_TYPE.getKey(particleOptions.getType());
+        ResourceLocation name = ForgeRegistries.PARTICLE_TYPES.getKey(particleOptions.getType());
         if (!ShimmerMixinPlugin.IS_OPT_LOAD) {
             if (PARTICLE_EFFECT.containsKey(name)) {
                 PostProcessing postProcessing = PostProcessing.getPost(PARTICLE_EFFECT.get(name));

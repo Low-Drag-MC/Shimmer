@@ -39,9 +39,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -218,7 +218,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
         }
     }
 
-    public void renderPost(@Nonnull PostChain postChain, RenderTarget post, RenderTarget output) {
+    public void renderPost(@NotNull PostChain postChain, RenderTarget post, RenderTarget output) {
         RenderTarget target = postChain.getTempTarget("shimmer:input");
         if (target instanceof ProxyTarget) {
             ((ProxyTarget) target).setParent(post);
