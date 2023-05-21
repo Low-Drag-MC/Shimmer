@@ -3,6 +3,7 @@ package com.lowdragmc.shimmer.config;
 import com.lowdragmc.shimmer.ShimmerConstants;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 
@@ -20,11 +21,11 @@ interface FluidChecker extends Check {
 			return null;
 		}
 		var fluidLocation = new ResourceLocation(fluidName);
-		if (!Registry.FLUID.containsKey(fluidLocation)) {
+		if (!BuiltInRegistries.FLUID.containsKey(fluidLocation)) {
 			ShimmerConstants.LOGGER.error("can't find fluid " + fluidLocation + " from" + getConfigSource());
 			return Pair.of(fluidLocation, null);
 		}
-		Fluid fluid = Registry.FLUID.get(fluidLocation);
+		Fluid fluid = BuiltInRegistries.FLUID.get(fluidLocation);
 		return Pair.of(fluidLocation, fluid);
 	}
 }

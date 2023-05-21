@@ -6,6 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
@@ -138,7 +139,7 @@ public class SuggestionEditBoxWidget extends EditBox {
 				String str = suggestions.get(i);
 				//candidate color differ
 				int color = Objects.equals(str, candidate) ? 0xffcecf67 : 0xffffffff;
-				drawString(poseStack, font, font.plainSubstrByWidth(str,200), x + 5 , y + height + currentHeight, color);
+				drawString(poseStack, font, font.plainSubstrByWidth(str,200), getX() + 5 , getY() + height + currentHeight, color);
 				currentHeight += gap;
 			}
 
@@ -167,7 +168,7 @@ public class SuggestionEditBoxWidget extends EditBox {
 	 * helper method for drawing suggestion background
 	 */
 	private void fill(PoseStack poseStack, int minY, int height, int color) {
-		GuiComponent.fill(poseStack, x, minY, x + width, minY + height, color);
+		GuiComponent.fill(poseStack, getX(), minY, getX() + width, minY + height, color);
 	}
 
 	/**
@@ -181,8 +182,8 @@ public class SuggestionEditBoxWidget extends EditBox {
 
 	private void tryInitCache() {
 		if (cache == null) {
-			var blocks = Registry.BLOCK.keySet();
-			cache = Map.of(KeyType.LIGHT_ITEM, Set.copyOf(Registry.ITEM.keySet()), KeyType.BLOOM_PARTICLE, Set.copyOf(Registry.PARTICLE_TYPE.keySet()), KeyType.BLOOM_FLUID, Set.copyOf(Registry.FLUID.keySet()), KeyType.COLORED_BLOCK, Set.copyOf(blocks), KeyType.BLOOM_BLOCK, Set.copyOf(blocks));
+			var blocks = BuiltInRegistries.BLOCK.keySet();
+			cache = Map.of(KeyType.LIGHT_ITEM, Set.copyOf(BuiltInRegistries.ITEM.keySet()), KeyType.BLOOM_PARTICLE, Set.copyOf(BuiltInRegistries.PARTICLE_TYPE.keySet()), KeyType.BLOOM_FLUID, Set.copyOf(BuiltInRegistries.FLUID.keySet()), KeyType.COLORED_BLOCK, Set.copyOf(blocks), KeyType.BLOOM_BLOCK, Set.copyOf(blocks));
 		}
 	}
 

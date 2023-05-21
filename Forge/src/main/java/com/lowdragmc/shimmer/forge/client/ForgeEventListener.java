@@ -8,6 +8,9 @@ import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import com.lowdragmc.shimmer.forge.ForgeShimmerConfig;
+import com.lowdragmc.shimmer.platform.Services;
+import com.lowdragmc.shimmer.renderdoc.RenderDoc;
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
@@ -44,36 +47,36 @@ public class ForgeEventListener {
                             for (PostProcessing post : PostProcessing.values()) {
                                 post.onResourceManagerReload(null);
                             }
-                            return 1;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("clear_lights")
                         .executes(context -> {
                             LightManager.clear();
-                            return 1;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("reload_shader")
                         .executes(context -> {
                             ReloadShaderManager.reloadShader();
-                            return 1;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("confirm_clear_resource")
                         .executes(context -> {
                             ReloadShaderManager.cleanResource();
-                            return 1;
+                            return Command.SINGLE_SUCCESS;
                         })
                 )
                 .then(Commands.literal("colored_light")
                         .then(Commands.argument("switch_state", BoolArgumentType.bool()).executes(
                                 context -> {
                                     ForgeShimmerConfig.getColoredLightEnable().set(context.getArgument("switch_state", Boolean.class));
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
                                 }
                         )))
                 .then(Commands.literal("bloom")
                         .then(Commands.argument("switch_state", BoolArgumentType.bool()).executes(
                                 context -> {
                                     ForgeShimmerConfig.getBloomEnable().set(context.getArgument("switch_state", Boolean.class));
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
                                 }
                         )))
                 .then(Commands.literal("additive_blend")
@@ -81,13 +84,13 @@ public class ForgeEventListener {
                                 context -> {
                                     ForgeShimmerConfig.getAdditiveBlend().set(context.getArgument("switch_state", Boolean.class));
                                     ReloadShaderManager.reloadShader();
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
                                 }
                         )))
                 .then(Commands.literal("auxiliary_screen")
                         .executes(context -> {
                             Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
-                            return 1;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("eyedropper")
                         .executes(context -> {
@@ -97,18 +100,18 @@ public class ForgeEventListener {
                                 context.getSource().sendSystemMessage(Component.literal("enter eyedropper mode, backend: " + Eyedropper.mode.modeName()));
                             }
                             Eyedropper.switchState();
-                            return 1;
+                            return Command.SINGLE_SUCCESS;
                         }))
                 .then(Commands.literal("eyedropper").then(literal("backend")
                         .then(literal("ShaderStorageBufferObject").executes(
                                 context -> {
                                     Eyedropper.switchMode(Eyedropper.ShaderStorageBufferObject);
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
                                 }
                         )).then(literal("glGetTexImage").executes(
                                 context -> {
                                     Eyedropper.switchMode(Eyedropper.DOWNLOAD);
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
                                 }
                         ))))
                 .then(Commands.literal("dumpLightBlockStates")
@@ -118,7 +121,21 @@ public class ForgeEventListener {
                             }else {
                                 context.getSource().sendFailure(Component.literal("dump failed, see log for detailed information"));
                             }
-                            return 1;
+                            return Command.SINGLE_SUCCESS;
+                        }))
+                .then(Commands.literal("renderDoc")
+                        .executes(context -> {
+                            if (Services.PLATFORM.isRenderDocEnable()) {
+                                var pid = RenderDoc.launchReplayUI(true);
+                                if (pid == 0) {
+                                    context.getSource().sendFailure(Component.literal("unable to init renderDoc"));
+                                } else {
+                                    context.getSource().sendSuccess(Component.literal("openSuccess, pid=" + pid),true);
+                                }
+                            } else {
+                                context.getSource().sendFailure(Component.literal("renderDoc not enable"));
+                            }
+                            return Command.SINGLE_SUCCESS;
                         }))
         );
     }

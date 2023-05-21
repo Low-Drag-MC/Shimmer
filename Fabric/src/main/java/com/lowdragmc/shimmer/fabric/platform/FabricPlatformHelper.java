@@ -106,7 +106,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
 	public ResourceLocation getFluidTextureLocation(Fluid fluid, boolean isStill) {
 		FluidRenderHandler handler = FluidRenderHandlerRegistry.INSTANCE.get(fluid);
 		TextureAtlasSprite[] sprites = handler.getFluidSprites(null, null, fluid.defaultFluidState());
-		return (isStill ? sprites[0] : sprites[1]).getName();
+		return (isStill ? sprites[0] : sprites[1]).atlasLocation();
 	}
 
 	@Override
@@ -118,6 +118,11 @@ public class FabricPlatformHelper implements IPlatformHelper {
 	@Override
 	public Path getConfigDir(){
 		return FabricLoader.getInstance().getConfigDir();
+	}
+
+	@Override
+	public boolean isRenderDocEnable() {
+		return FabricShimmerConfig.CONFIG.ENABLE_RENDER_DOC.get() || isDevelopmentEnvironment();
 	}
 
 }

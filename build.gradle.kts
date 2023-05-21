@@ -17,8 +17,14 @@ subprojects {
     val loom = extensions.getByType<LoomGradleExtensionAPI>()
     loom.run {
         silentMojangMappingsLicense()
+        this.runConfigs.forEach { setting ->
+            setting.property("mixin.debug=true")
+            setting.property("mixin.debug.export=true")
+            setting.property("mixin.dumpTargetOnFailure=true")
+            setting.property("mixin.checks.interfaces=true")
+            setting.property("mixin.hotSwap=true")
+        }
     }
-
     repositories {
         flatDir {
             dir("libs")
@@ -61,6 +67,7 @@ subprojects {
         })
         "implementation"(mixinExtras)
         "annotationProcessor"(mixinExtras)
+        "implementation"("org.jetbrains:annotations:24.0.1")
     }
 
     extensions.getByType<BasePluginExtension>().apply {

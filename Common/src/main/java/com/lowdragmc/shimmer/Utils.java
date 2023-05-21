@@ -1,7 +1,7 @@
 package com.lowdragmc.shimmer;
 
 import com.lowdragmc.shimmer.platform.Services;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.level.block.Block;
@@ -51,7 +51,7 @@ public class Utils {
 	}
 
 	public static boolean checkBlockProperties(String configSource, Map<String,String> state, ResourceLocation blockLocation) {
-		var block = Registry.BLOCK.get(blockLocation);
+		var block = BuiltInRegistries.BLOCK.get(blockLocation);
 		List<String> properties = block.getStateDefinition().getProperties().stream().map(Property::getName).toList();
 		var lack = state.keySet().stream().filter(key->!properties.contains(key)).toList();
 		if (!lack.isEmpty()){
@@ -161,7 +161,7 @@ public class Utils {
 	}
 
 	public static boolean dumpAllLightingBlocks() {
-		var states = Registry.BLOCK.stream().flatMap(b -> b.getStateDefinition().getPossibleStates().stream()).filter(s -> s.getLightEmission() > 0);
+		var states = BuiltInRegistries.BLOCK.stream().flatMap(b -> b.getStateDefinition().getPossibleStates().stream()).filter(s -> s.getLightEmission() > 0);
 
 		File configDir = Services.PLATFORM.getConfigDir().resolve(ShimmerConstants.MOD_ID).toFile();
 		if (!configDir.exists()) {

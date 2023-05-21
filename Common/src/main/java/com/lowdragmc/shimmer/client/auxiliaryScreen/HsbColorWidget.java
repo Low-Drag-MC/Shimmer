@@ -6,7 +6,7 @@ import com.lowdragmc.shimmer.Utils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Matrix4f;
+import org.joml.Matrix4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -107,7 +107,12 @@ public class HsbColorWidget extends AbstractWidget {
 	}
 
 	@Override
-	public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+	protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+
+	}
+
+	@Override
+	public void renderWidget(PoseStack poseStack, int i, int j, float f) {
 		Matrix4f pose = poseStack.last().pose();
 
 		BufferBuilder builder = Tesselator.getInstance().getBuilder();
@@ -155,7 +160,7 @@ public class HsbColorWidget extends AbstractWidget {
 					_b = b;
 				}
 			}
-			builder.vertex(pose, x, y, 0.0f);
+			builder.vertex(pose, getX(), getY(), 0.0f);
 			putColor(builder, _h, _s, _b, alpha).nextElement();
 			builder.endVertex();
 		}
@@ -179,7 +184,7 @@ public class HsbColorWidget extends AbstractWidget {
 					_b = b;
 				}
 			}
-			builder.vertex(pose, x, y + height, 0.0f);
+			builder.vertex(pose, getX(), getY() + height, 0.0f);
 			putColor(builder, _h, _s, _b, alpha).nextElement();
 			builder.endVertex();
 		}
@@ -203,7 +208,7 @@ public class HsbColorWidget extends AbstractWidget {
 					_b = b;
 				}
 			}
-			builder.vertex(pose, x + width, y + height, 0.0f);
+			builder.vertex(pose, getX() + width, getY() + height, 0.0f);
 			putColor(builder, _h, _s, _b, alpha).nextElement();
 			builder.endVertex();
 		}
@@ -228,7 +233,7 @@ public class HsbColorWidget extends AbstractWidget {
 				}
 			}
 
-			builder.vertex(pose, x + width, y, 0.0f);
+			builder.vertex(pose, getX() + width, getY(), 0.0f);
 			putColor(builder, _h, _s, _b, alpha).nextElement();
 			builder.endVertex();
 		}
@@ -239,7 +244,7 @@ public class HsbColorWidget extends AbstractWidget {
 	 */
 	private void renderSlide(Matrix4f pose, BufferBuilder builder) {
 		float _h = 0f, _s = 0f, _b = 0f;
-		var barX = x + width + gap;
+		var barX = getX() + width + gap;
 
 		{
 			//down two corners
@@ -260,11 +265,11 @@ public class HsbColorWidget extends AbstractWidget {
 					_b = 0f;
 				}
 			}
-			builder.vertex(pose, barX, y + height, 0.0f);
+			builder.vertex(pose, barX, getY() + height, 0.0f);
 			putColor(builder, _h, _s, _b, alpha).nextElement();
 			builder.endVertex();
 
-			builder.vertex(pose, barX + barWidth, y + height, 0.0f);
+			builder.vertex(pose, barX + barWidth, getY() + height, 0.0f);
 			putColor(builder, _h, _s, _b, alpha).nextElement();
 			builder.endVertex();
 		}
@@ -288,11 +293,11 @@ public class HsbColorWidget extends AbstractWidget {
 					_b = 1f;
 				}
 			}
-			builder.vertex(pose, barX + barWidth, y, 0.0f);
+			builder.vertex(pose, barX + barWidth, getY(), 0.0f);
 			putColor(builder, _h, _s, _b, alpha).nextElement();
 			builder.endVertex();
 
-			builder.vertex(pose, barX, y, 0.0f);
+			builder.vertex(pose, barX, getY(), 0.0f);
 			putColor(builder, _h, _s, _b, alpha).nextElement();
 			builder.endVertex();
 		}
@@ -305,36 +310,36 @@ public class HsbColorWidget extends AbstractWidget {
 	 */
 	private void renderInfo(PoseStack poseStack, BufferBuilder builder) {
 		Font font = Minecraft.getInstance().font;
-		var strX = x + width + gap + barWidth + 10;
+		var strX = getX() + width + gap + barWidth + 10;
 		var strGapY = (int) Math.max(0, (height - 6f * font.lineHeight) / 5f) + font.lineHeight;
-		drawString(poseStack, font, "h:" + (int) h + "°", strX, y, 0xffffffff);
-		drawString(poseStack, font, "s:" + (int) (s * 100) + "%", strX, y + strGapY, 0xffffffff);
-		drawString(poseStack, font, "b:" + (int) (b * 100) + "%", strX, y + strGapY * 2, 0xffffffff);
-		drawString(poseStack, font, "r:" + ((rgb >> 16) & 0xff), strX, y + strGapY * 3, 0xffffffff);
-		drawString(poseStack, font, "g:" + ((rgb >> 8) & 0xff), strX, y + strGapY * 4, 0xffffffff);
-		drawString(poseStack, font, "b:" + (rgb & 0xff), strX, y + strGapY * 5, 0xffffffff);
-		drawString(poseStack, font, "mode:" + mode, strX, y + strGapY * 6, 0xffffffff);
+		drawString(poseStack, font, "h:" + (int) h + "°", strX, getY(), 0xffffffff);
+		drawString(poseStack, font, "s:" + (int) (s * 100) + "%", strX, getY() + strGapY, 0xffffffff);
+		drawString(poseStack, font, "b:" + (int) (b * 100) + "%", strX, getY() + strGapY * 2, 0xffffffff);
+		drawString(poseStack, font, "r:" + ((rgb >> 16) & 0xff), strX, getY() + strGapY * 3, 0xffffffff);
+		drawString(poseStack, font, "g:" + ((rgb >> 8) & 0xff), strX, getY() + strGapY * 4, 0xffffffff);
+		drawString(poseStack, font, "b:" + (rgb & 0xff), strX, getY() + strGapY * 5, 0xffffffff);
+		drawString(poseStack, font, "mode:" + mode, strX, getY() + strGapY * 6, 0xffffffff);
 	}
 
 	/**
 	 * render the indicator color, must be called in {@link #drawHsbContext(Matrix4f, BufferBuilder)}
 	 */
 	private void renderColor(Matrix4f pose, BufferBuilder builder) {
-		var colorX = x + width + gap + barWidth + 10 + 30;
+		var colorX = getX() + width + gap + barWidth + 10 + 30;
 		var colorSideLength = 20;
-		builder.vertex(pose, colorX, y, 0.0f);
+		builder.vertex(pose, colorX, getY(), 0.0f);
 		putColor(builder, h, s, b, alpha).nextElement();
 		builder.endVertex();
 
-		builder.vertex(pose, colorX, y + colorSideLength, 0.0f);
+		builder.vertex(pose, colorX, getY() + colorSideLength, 0.0f);
 		putColor(builder, h, s, b, alpha).nextElement();
 		builder.endVertex();
 
-		builder.vertex(pose, colorX + colorSideLength, y + colorSideLength, 0.0f);
+		builder.vertex(pose, colorX + colorSideLength, getY() + colorSideLength, 0.0f);
 		putColor(builder, h, s, b, alpha).nextElement();
 		builder.endVertex();
 
-		builder.vertex(pose, colorX + colorSideLength, y, 0.0f);
+		builder.vertex(pose, colorX + colorSideLength, getY(), 0.0f);
 		putColor(builder, h, s, b, alpha).nextElement();
 		builder.endVertex();
 
@@ -357,11 +362,11 @@ public class HsbColorWidget extends AbstractWidget {
 	@Override
 	protected boolean clicked(double mouseX, double mouseY) {
 		return this.active && this.visible &&
-				mouseY >= (double) this.y &&
-				mouseY < (double) (this.y + this.height) && (
-				(mouseX >= (double) this.x && mouseX < (double) (this.x + this.width)) ||
-						((mouseX >= (double) this.x + this.width + this.gap) &&
-								mouseX <= (double) (this.x + this.width + this.gap + this.barWidth))
+				mouseY >= (double) this.getY() &&
+				mouseY < (double) (this.getY() + this.height) && (
+				(mouseX >= (double) this.getX() && mouseX < (double) (this.getX() + this.width)) ||
+						((mouseX >= (double) this.getX() + this.width + this.gap) &&
+								mouseX <= (double) (this.getX() + this.width + this.gap + this.barWidth))
 		);
 	}
 
@@ -418,9 +423,9 @@ public class HsbColorWidget extends AbstractWidget {
 	 */
 	@Override
 	public void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-		float normalizedX = normalizeMouse(mouseX, x, width);
-		var isBar = mouseX - x > width;
-		float normalizedY = normalizeMouse(mouseY, y, height);
+		float normalizedX = normalizeMouse(mouseX, getX(), width);
+		var isBar = mouseX - getX() > width;
+		float normalizedY = normalizeMouse(mouseY, getY(), height);
 		switch (mode) {
 			case H -> {
 				if (isBar) {
@@ -448,12 +453,6 @@ public class HsbColorWidget extends AbstractWidget {
 			}
 		}
 		refreshRGB(true);
-	}
-
-
-	@Override
-	public void updateNarration(NarrationElementOutput narrationElementOutput) {
-
 	}
 
 	public float[] getHSB() {

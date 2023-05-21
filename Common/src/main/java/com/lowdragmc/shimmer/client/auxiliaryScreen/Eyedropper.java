@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.FastColor;
 import org.lwjgl.opengl.GL15;
 
 import java.io.IOException;
@@ -158,9 +159,10 @@ public enum Eyedropper {
 			Window window = Minecraft.getInstance().getWindow();
 
 			int rgba = nativeImage.getPixelRGBA(window.getWidth() / 2, window.getHeight() / 2);
-			currentColor[0] = NativeImage.getR(rgba) / 255f;
-			currentColor[1] = NativeImage.getG(rgba) / 255f;
-			currentColor[2] = NativeImage.getB(rgba) / 255f;
+			//fill [red green blue]
+			currentColor[0] = FastColor.ABGR32.red(rgba);
+			currentColor[1] = FastColor.ABGR32.green(rgba);
+			currentColor[2] = FastColor.ABGR32.blue(rgba);
 
 			if (Math.abs(closeCount - openCount) >= 5) {
 				throw new RuntimeException();

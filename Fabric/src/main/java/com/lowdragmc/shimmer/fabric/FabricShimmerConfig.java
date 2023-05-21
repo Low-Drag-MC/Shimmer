@@ -19,6 +19,7 @@ public class FabricShimmerConfig implements ConfigData {
     public final AtomicBoolean ENABLE_BLOOM_EFFECT = new AtomicBoolean(true);
     public final AtomicBoolean ADDITIVE_EFFECT = new AtomicBoolean(false);
     public final AtomicBoolean INSERT_SHADER_INFO = new AtomicBoolean(false);
+    public final AtomicBoolean ENABLE_RENDER_DOC = new AtomicBoolean(false);
 
     static {
         AutoConfig.register(FabricShimmerConfig.class, GsonConfigSerializer::new);

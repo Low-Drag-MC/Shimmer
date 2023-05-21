@@ -1,36 +1,33 @@
 import org.gradle.api.Project
 
 //Mod options
-val mod_name = "Shimmer"
-val mod_author = "KilaBash"
-val mod_id = "shimmer"
+const val mod_name = "Shimmer"
+const val mod_author = "KilaBash"
+const val mod_id = "shimmer"
 
 //Common
-val minecraft_version = "1.19.2"
-val parchment_version = "1.19.2:2022.10.09"
-val enabled_platforms = "fabric,forge"
-
-//Archiitectury
-val architectury_version = "4.8.79"
+const val minecraft_version = "1.19.4"
+const val parchment_version = "1.19.3:2023.03.12"
+const val enabled_platforms = "fabric,forge"
 
 //Fabric
-val fabric_loader_version = "0.14.9"
-val fabric_api_version = "0.62.0+$minecraft_version"
-val cloth_config_version = "8.2.88"
+const val fabric_loader_version = "0.14.19"
+const val fabric_api_version = "0.81.1+$minecraft_version"
+const val cloth_config_version = "10.0.96"
 
 //Forge
-val forge_version = "$minecraft_version-43.1.34"
-val modernui_version = "3.6.1.115"
+const val forge_version = "$minecraft_version-45.0.64"
+const val modernui_version = "3.6.1.117"// FIXME
 
 //Project
-val version_major = 0.1
-val version_patch = 15
-val semantics_version = "$minecraft_version-$version_major.$version_patch"
-val maven_path = "snapshots"
-val maven_group = "com.lowdragmc.shimmer"
+const val version_major = 0.1
+const val version_patch = 15
+const val semantics_version = "$minecraft_version-$version_major.$version_patch"
+const val maven_path = "snapshots"
+const val maven_group = "com.lowdragmc.shimmer"
 
-val mixinExtras = "com.github.LlamaLad7:MixinExtras:0.1.0"
+const val mixinExtras = "com.github.LlamaLad7:MixinExtras:0.1.1"
 
-val flywheel_version = "0.6.7-8"
+const val flywheel_version = "0.6.7-8"// FIXME
 
-val Project.archiveBaseName get() = "$mod_name-${project.name.toLowerCase()}"
+val Project.archiveBaseName get() = "$mod_name-${project.name.lowercase()}"

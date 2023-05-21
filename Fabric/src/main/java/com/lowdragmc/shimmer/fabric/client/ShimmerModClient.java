@@ -11,6 +11,9 @@ import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
 import com.lowdragmc.shimmer.fabric.FabricShimmerConfig;
+import com.lowdragmc.shimmer.platform.Services;
+import com.lowdragmc.shimmer.renderdoc.RenderDoc;
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -19,13 +22,11 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -49,12 +50,12 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                                     for (PostProcessing post : PostProcessing.values()) {
                                         post.onResourceManagerReload(null);
                                     }
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
                                 }))
                         .then(literal("clear_lights")
                                 .executes(context -> {
                                     LightManager.clear();
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
                                 }))
                         .then(literal("reload_shader")
                                 .executes(context -> {
@@ -63,26 +64,26 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                                         return 0;
                                     }else {
                                         ReloadShaderManager.reloadShader();
-                                        return 1;
+                                        return Command.SINGLE_SUCCESS;
                                     }
                                 }))
                         .then(literal("confirm_clear_resource")
                                 .executes(context -> {
                                     ReloadShaderManager.cleanResource();
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
                                 }))
                         .then(literal("colored_light")
                                 .then(argument("switch_state", BoolArgumentType.bool()).executes(
                                         context -> {
                                             FabricShimmerConfig.CONFIG.BLOCK_BLOOM.set(context.getArgument("switch_state", Boolean.class));
-                                            return 1;
+                                            return Command.SINGLE_SUCCESS;
                                         }
                                 )))
                         .then(literal("bloom")
                                 .then(argument("switch_state", BoolArgumentType.bool()).executes(
                                         context -> {
                                             FabricShimmerConfig.CONFIG.ENABLE_BLOOM_EFFECT.set(context.getArgument("switch_state", Boolean.class));
-                                            return 1;
+                                            return Command.SINGLE_SUCCESS;
                                         }
                                 )))
                         .then(literal("additive_blend")
@@ -90,13 +91,13 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                                         context -> {
                                             FabricShimmerConfig.CONFIG.ADDITIVE_EFFECT.set(context.getArgument("switch_state", Boolean.class));
                                             ReloadShaderManager.reloadShader();
-                                            return 1;
+                                            return Command.SINGLE_SUCCESS;
                                         }
                                 )))
                         .then(literal("auxiliary_screen")
                                 .executes(context -> {
                                     Minecraft.getInstance().tell(()-> Minecraft.getInstance().setScreen(new AuxiliaryScreen()));
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
                                 }))
                         .then(literal("eyedropper")
                                 .executes(context -> {
@@ -106,18 +107,18 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                                         context.getSource().sendFeedback(Component.literal("exit eyedropper mode"));
                                     }
                                     Eyedropper.switchState();
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
                                 }))
                         .then(literal("eyedropper").then(literal("backend")
                                 .then(literal("ShaderStorageBufferObject").executes(
                                         context -> {
                                             Eyedropper.switchMode(Eyedropper.ShaderStorageBufferObject);
-                                            return 1;
+                                            return Command.SINGLE_SUCCESS;
                                         }
                                 )).then(literal("glGetTexImage").executes(
                                         context -> {
                                             Eyedropper.switchMode(Eyedropper.DOWNLOAD);
-                                            return 1;
+                                            return Command.SINGLE_SUCCESS;
                                         }
                                 ))))
                         .then(literal("dumpLightBlockStates")
@@ -127,7 +128,21 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                                     }else {
                                         context.getSource().sendError(Component.literal("dump failed, see log for detailed information"));
                                     }
-                                    return 1;
+                                    return Command.SINGLE_SUCCESS;
+                                }))
+                        .then(literal("renderDoc")
+                                .executes(context -> {
+                                    if (Services.PLATFORM.isRenderDocEnable()) {
+                                        var pid = RenderDoc.launchReplayUI(true);
+                                        if (pid == 0) {
+                                            context.getSource().sendError(Component.literal("unable to init renderDoc"));
+                                        } else {
+                                            context.getSource().sendFeedback(Component.literal("openSuccess, pid=" + pid));
+                                        }
+                                    } else {
+                                        context.getSource().sendFeedback(Component.literal("renderDoc not enable"));
+                                    }
+                                    return Command.SINGLE_SUCCESS;
                                 }))
                 ));
 
