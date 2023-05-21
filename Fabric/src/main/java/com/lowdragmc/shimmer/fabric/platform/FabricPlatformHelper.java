@@ -120,4 +120,9 @@ public class FabricPlatformHelper implements IPlatformHelper {
 		return FabricLoader.getInstance().getConfigDir();
 	}
 
+	@Override
+	public boolean isRenderDocEnable() {
+		return FabricShimmerConfig.CONFIG.ENABLE_RENDER_DOC.get() || isDevelopmentEnvironment();
+	}
+
 }

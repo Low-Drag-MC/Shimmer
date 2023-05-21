@@ -28,10 +28,10 @@ import java.util.Arrays;
 public abstract class FluidRendererMixin {
     @Shadow(remap = false) @Final private QuadLightData quadLightData;
 
-    @Inject(method = "calculateQuadColors", at = @At(value = "RETURN"), remap = false)
+    @Inject(method = "updateQuad", at = @At(value = "RETURN"), remap = false)
     private void injectRender(ModelQuadView quad, BlockAndTintGetter world, BlockPos pos, LightPipeline lighter, Direction dir, float brightness, ColorSampler<FluidState> colorSampler, FluidState fluidState, CallbackInfo ci) {
         if (PostProcessing.isFluidBloom()) {
-            // 0xf000f0 -> 0x1f001f0
+//             0xf000f0 -> 0x1f001f0
             Arrays.fill(this.quadLightData.lm, 0x1000100);
         }
     }

@@ -89,4 +89,6 @@ public interface IPlatformHelper {
 	int getFluidColor(Fluid fluid);
 
 	Path getConfigDir();
+
+    boolean isRenderDocEnable();
 }

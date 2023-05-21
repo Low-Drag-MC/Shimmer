@@ -20,13 +20,13 @@
 		"ProgramMixin",
 		"RebuildTaskMixin",
 		"RenderChunkMixin",
+		"RenderSystemMixin",
 		"RenderTargetMixin",
 		"ShaderInstanceGlslProcessorMixin",
 		"reloadShader.GameRendererMixin",
 		"reloadShader.PostPassMixin"
 	],
 	"mixins": [
-
 	],
 	"injectors": {
 		"defaultRequire": 1

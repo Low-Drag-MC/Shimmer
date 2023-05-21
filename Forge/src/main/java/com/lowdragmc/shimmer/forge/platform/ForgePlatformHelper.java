@@ -160,4 +160,10 @@ public class ForgePlatformHelper implements IPlatformHelper {
 		return FMLPaths.CONFIGDIR.get();
 	}
 
+	@Override
+	public boolean isRenderDocEnable() {
+		//TODO config hasn't load when we need it, need change
+		return isDevelopmentEnvironment();
+	}
+
 }

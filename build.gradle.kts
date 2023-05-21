@@ -18,10 +18,11 @@ subprojects {
     loom.run {
         silentMojangMappingsLicense()
         this.runConfigs.forEach { setting ->
-            setting.vmArg("-Dmixin.debug.export=true")
-            setting.vmArg("-Dmixin.dumpTargetOnFailure=true")
-            setting.vmArg("-Dmixin.checks.interfaces=true")
-            setting.vmArg("-Dmixin.hotSwap=true")
+            setting.property("mixin.debug=true")
+            setting.property("mixin.debug.export=true")
+            setting.property("mixin.dumpTargetOnFailure=true")
+            setting.property("mixin.checks.interfaces=true")
+            setting.property("mixin.hotSwap=true")
         }
     }
     repositories {
