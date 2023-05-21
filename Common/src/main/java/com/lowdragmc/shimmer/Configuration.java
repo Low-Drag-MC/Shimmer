@@ -7,7 +7,6 @@ import com.lowdragmc.shimmer.config.ShimmerConfig;
 import com.lowdragmc.shimmer.event.ShimmerLoadConfigEvent;
 import com.lowdragmc.shimmer.platform.Services;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ItemOverride;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 
@@ -25,10 +24,11 @@ import java.util.stream.Collectors;
  */
 public class Configuration {
 
+	private static final String configurationFileName = "shimmer.json";
 	/**
 	 * config location from mod jar and resource packs
 	 */
-	private static final ResourceLocation configLocation = new ResourceLocation(ShimmerConstants.MOD_ID, "shimmer.json");
+	private static final ResourceLocation configLocation = new ResourceLocation(ShimmerConstants.MOD_ID, configurationFileName);
 
 	/**
 	 * the Gson object, with pretty print
@@ -63,12 +63,16 @@ public class Configuration {
 				}
 			}
 			//automatic mod compat discovery
-			for (var modid: Services.PLATFORM.getLoadedMods()) {
-				causedSource = " automatic configuration added by mod " + modid;
-				Optional<String> configOpt = configurationOfRl(new ResourceLocation(modid, "sh#"));
-				if (configOpt.isPresent()) {
-					ShimmerConfig config = gson.fromJson(configOpt.get(), ShimmerConfig.class);
-					if (config.check(causedSource)) configs.add(config);
+			for (var modId : Services.PLATFORM.getLoadedMods()) {
+				causedSource = " automatic configuration added by mod " + modId;
+				ResourceLocation candidateConfigurationPath = new ResourceLocation(modId, configurationFileName);
+				Optional<String> optionalConfiguration = readConfiguration(candidateConfigurationPath);
+				if (optionalConfiguration.isPresent()) {
+					ShimmerConfig config = gson.fromJson(optionalConfiguration.get(), ShimmerConfig.class);
+					if (config.check(causedSource)) {
+						configs.add(config);
+						ShimmerConstants.LOGGER.info("automatic configuration added by mod:" + modId + " path:" + candidateConfigurationPath);
+					}
 				}
 			}
 			//added by mods through event
@@ -120,12 +124,15 @@ public class Configuration {
 		}
 	}
 
-	public static Optional<String> configurationOfRl(ResourceLocation rl) {
-		return Minecraft.getInstance().getResourceManager().getResource(rl).flatMap(resource -> {
+	/**
+	 * read shimmer configuration from path
+	 */
+	public static Optional<String> readConfiguration(ResourceLocation configurationPath) {
+		return Minecraft.getInstance().getResourceManager().getResource(configurationPath).flatMap(resource -> {
 			try (BufferedReader reader = resource.openAsReader()) {
 				return Optional.of(reader.lines().collect(Collectors.joining()));
 			} catch (IOException ioException) {
-				ShimmerConstants.LOGGER.error("couldn't load shimmer config file", ioException);
+				ShimmerConstants.LOGGER.error("find shimmer configuration file:" + configurationPath + " but failed to read", ioException);
 			}
 			return Optional.empty();
 		});
