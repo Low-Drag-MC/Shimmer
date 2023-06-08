@@ -15,7 +15,7 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -221,10 +221,10 @@ public enum Eyedropper {
 
 	protected abstract void updateCurrentColor();
 
-	public static void update(PoseStack matrixStack) {
+	public static void update(GuiGraphics guiGraphics) {
 		if (enable) {
 			mode.updateCurrentColor();
-			mode.renderIndicator(matrixStack);
+			mode.renderIndicator(guiGraphics);
 
 			if (ShimmerConstants.recordScreenColor.isDown() && readyForRecord) {
 				eyedropperColor[0] = currentColor[0];
@@ -261,7 +261,7 @@ public enum Eyedropper {
 		return str.toString();
 	}
 
-	private void renderIndicator(PoseStack poseStack) {
+	private void renderIndicator(GuiGraphics guiGraphics) {
 
 		var window = Minecraft.getInstance().getWindow();
 		var scale = window.getGuiScale();
@@ -272,14 +272,14 @@ public enum Eyedropper {
 		var backWidth = 1;
 
 		RenderUtils.warpGLDebugLabel("draw_back", () ->
-				GuiComponent.fill(poseStack, centerX + 10 - backWidth, centerY + 10 - backWidth, centerX + 30 + backWidth, centerY + 10 + 20 + backWidth, 0x7F_FF_FF_FF));
+				guiGraphics.fill(centerX + 10 - backWidth, centerY + 10 - backWidth, centerX + 30 + backWidth, centerY + 10 + 20 + backWidth, 0x7F_FF_FF_FF));
 
 		RenderUtils.warpGLDebugLabel("draw_current_color_block", () ->
-				GuiComponent.fill(poseStack, centerX + 10, centerY + 10, centerX + 30, centerY + 10 + 20, Utils.pack(currentColor)));
+				guiGraphics.fill(centerX + 10, centerY + 10, centerX + 30, centerY + 10 + 20, Utils.pack(currentColor)));
 
 		if (dataAvailable) {
 			RenderUtils.warpGLDebugLabel("draw_selected_color_block", () ->
-					GuiComponent.fill(poseStack, centerX + 10 + 10, centerY + 10, centerX + 30, centerY + 10 + 20, Utils.pack(eyedropperColor)));
+					guiGraphics.fill(centerX + 10 + 10, centerY + 10, centerX + 30, centerY + 10 + 20, Utils.pack(eyedropperColor)));
 		}
 
 	}

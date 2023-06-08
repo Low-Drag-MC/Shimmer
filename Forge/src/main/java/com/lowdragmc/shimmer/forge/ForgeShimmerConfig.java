@@ -14,6 +14,7 @@ public class ForgeShimmerConfig {
     private static ForgeConfigSpec.BooleanValue ADDITIVE_BLEND;
     private static ForgeConfigSpec.IntValue BLOOM_COLOR_ATTACHMENT_NUMBER;
     private static ForgeConfigSpec.BooleanValue INSERT_SHADER_INFO;
+    private static ForgeConfigSpec.BooleanValue ENABLE_BUILDIN_SETTING;
 
     public static ForgeConfigSpec.IntValue getUboOffset() {
         if (UBO_OFFSET == null) {
@@ -81,6 +82,14 @@ public class ForgeShimmerConfig {
         return INSERT_SHADER_INFO;
     }
 
+    public static ForgeConfigSpec.BooleanValue getEnableBuildinSetting(){
+        if (ENABLE_BUILDIN_SETTING == null) {
+            logAccessUnInit("ENABLE_BUILDIN_SETTING");
+            registerConfig();
+        }
+        return ENABLE_BUILDIN_SETTING;
+    }
+
     private static void logAccessUnInit(String configValueName){
         ShimmerConstants.LOGGER.error("trying to access uninitialized shimmer config value:{}," +
             "see stacktrace at debug log file",configValueName);
@@ -129,6 +138,11 @@ public class ForgeShimmerConfig {
                 whether inset shader name into shader source file or not
                 """
         ).define("inset shader", false);
+        ENABLE_BUILDIN_SETTING = builder.comment(
+        """
+                whether enable buildin shimmer.json
+                """
+        ).define("enable buildin setting", true);
     }
 
 }

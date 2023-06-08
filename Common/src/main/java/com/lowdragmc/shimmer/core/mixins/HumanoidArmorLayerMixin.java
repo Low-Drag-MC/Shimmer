@@ -22,20 +22,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @date 2022/05/02
  * @implNote HumanoidArmorLayerMixin, used to inject emissive + bloom armor via custom resource pack.
  */
-@Mixin(HumanoidArmorLayer.class)
+@Mixin(HumanoidArmorLayer.class)//FIXME
 public abstract class HumanoidArmorLayerMixin {
 
     @Shadow protected abstract ResourceLocation getArmorLocation(ArmorItem armorItem, boolean bl, String string);
 
-    @Inject(method = "renderModel",
-            at = @At(value = "RETURN"))
-    private void injectRenderModel(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, ArmorItem armorItem, boolean hasFoil, HumanoidModel model, boolean $$6, float r, float g, float b, String resourceLocation, CallbackInfo ci) {
-        ResourceLocation armorResource = this.getArmorLocation(armorItem, hasFoil, resourceLocation);
-        ResourceLocation bloomResource = new ResourceLocation(armorResource.getNamespace(), armorResource.getPath().replace(".png", "_bloom.png"));
-        if (ResourceUtils.isResourceExist(bloomResource)) {
-            PoseStack finalStack = RenderUtils.copyPoseStack(poseStack);
-            PostProcessing.BLOOM_UNITY.postEntity(sourceConsumer -> model.renderToBuffer(finalStack, sourceConsumer.getBuffer(ShimmerRenderTypes.emissiveArmor(bloomResource)), 0xF000F0, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F));
-        }
-    }
+//    @Inject(method = "renderModel",
+//            at = @At(value = "RETURN"))
+//    private void injectRenderModel(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, ArmorItem armorItem, boolean hasFoil, HumanoidModel model, boolean $$6, float r, float g, float b, String resourceLocation, CallbackInfo ci) {
+//        ResourceLocation armorResource = this.getArmorLocation(armorItem, hasFoil, resourceLocation);
+//        ResourceLocation bloomResource = new ResourceLocation(armorResource.getNamespace(), armorResource.getPath().replace(".png", "_bloom.png"));
+//        if (ResourceUtils.isResourceExist(bloomResource)) {
+//            PoseStack finalStack = RenderUtils.copyPoseStack(poseStack);
+//            PostProcessing.BLOOM_UNITY.postEntity(sourceConsumer -> model.renderToBuffer(finalStack, sourceConsumer.getBuffer(ShimmerRenderTypes.emissiveArmor(bloomResource)), 0xF000F0, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F));
+//        }
+//    }
+
+//    @Inject(method = "renderModel" , at = @At(value = "RETURN"))
+//    private <A> void injectRenderModel(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, ArmorItem armorItem, A humanoidModel, boolean bl, float f, float g, float h, @Nullable String string, CallbackInfo ci){
+//
+//    }
 
 }

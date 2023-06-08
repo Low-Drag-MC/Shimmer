@@ -9,6 +9,7 @@ import com.lowdragmc.shimmer.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class Configuration {
 	/**
 	 * the config object from auxiliary screen
 	 */
-	public static ShimmerConfig auxiliaryConfig;
+	@Nullable public static ShimmerConfig auxiliaryConfig;
 
 	/**
 	 * load all configs
@@ -64,6 +65,7 @@ public class Configuration {
 			}
 			//automatic mod compat discovery
 			for (var modId : Services.PLATFORM.getLoadedMods()) {
+				if (modId.equals(ShimmerConstants.MOD_ID) && !Services.PLATFORM.enableBuildinSetting()) continue; //special process for shimmer
 				causedSource = " automatic configuration added by mod " + modId;
 				ResourceLocation candidateConfigurationPath = new ResourceLocation(modId, configurationFileName);
 				Optional<String> optionalConfiguration = readConfiguration(candidateConfigurationPath);

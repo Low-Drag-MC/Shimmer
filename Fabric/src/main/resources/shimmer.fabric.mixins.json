@@ -4,7 +4,16 @@
 	"package": "com.lowdragmc.shimmer.fabric.core.mixins",
 	"compatibilityLevel": "JAVA_17",
 	"plugin": "com.lowdragmc.shimmer.fabric.core.mixins.ShimmerFabricMixinPlugin",
-	"client": ["BakedQuadMixin", "FabricParticleEngineMixin", "MinecraftMixin", "MutableQuadViewImplMixin", "ParticleEngineMixin", "QuadViewImplMixin", "ResourceLocationMixin", "ShaderInstanceMixin"],
+	"client": ["BakedQuadMixin",
+		"FabricParticleEngineMixin",
+		"MinecraftMixin",
+		"MutableQuadViewImplMixin",
+		"ParticleEngineMixin",
+		"QuadViewImplMixin",
+		"ResourceLocationMixin",
+		"ShaderInstanceMixin",
+		"GuiMixin"
+	],
 	"server": [
 	],
 	"injectors": {

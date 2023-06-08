@@ -131,4 +131,9 @@ public class FabricPlatformHelper implements IPlatformHelper {
 		return FabricShimmerConfig.CONFIG.ENABLE_RENDER_DOC.get() || isDevelopmentEnvironment();
 	}
 
+	@Override
+	public boolean enableBuildinSetting() {
+		return FabricShimmerConfig.CONFIG.ENABLE_BUILDIN_SETTING.get();
+	}
+
 }

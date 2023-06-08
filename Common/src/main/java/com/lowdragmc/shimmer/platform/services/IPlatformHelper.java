@@ -99,4 +99,6 @@ public interface IPlatformHelper {
 	Path getConfigDir();
 
     boolean isRenderDocEnable();
+
+	boolean enableBuildinSetting();
 }

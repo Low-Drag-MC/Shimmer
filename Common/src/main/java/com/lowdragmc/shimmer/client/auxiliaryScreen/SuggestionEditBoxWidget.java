@@ -1,11 +1,9 @@
 package com.lowdragmc.shimmer.client.auxiliaryScreen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -96,9 +94,9 @@ public class SuggestionEditBoxWidget extends EditBox {
 	}
 
 	@Override
-	public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 		//render current by super
-		super.render(poseStack, mouseX, mouseY, partialTick);
+		super.render(guiGraphics, mouseX, mouseY, partialTick);
 
 		//check if suggestion need render
 		if (suggestions != null && suggestions.contains(this.getValue())) return;
@@ -125,7 +123,7 @@ public class SuggestionEditBoxWidget extends EditBox {
 
 			//render suggestion background
 			int gap = Minecraft.getInstance().font.lineHeight + 8;
-			fill(poseStack, height, gap * (max - begin + 1), 0x7F000000);
+			fillSuggestionBackground(guiGraphics, height, gap * (max - begin + 1), 0x7F000000);
 
 			//select candidate
 			if (candidate == null || (!suggestions.contains(lastContent)) && !suggestions.contains(candidate))
@@ -139,7 +137,7 @@ public class SuggestionEditBoxWidget extends EditBox {
 				String str = suggestions.get(i);
 				//candidate color differ
 				int color = Objects.equals(str, candidate) ? 0xffcecf67 : 0xffffffff;
-				drawString(poseStack, font, font.plainSubstrByWidth(str,200), getX() + 5 , getY() + height + currentHeight, color);
+				guiGraphics.drawString(font, font.plainSubstrByWidth(str,200), getX() + 5 , getY() + height + currentHeight, color);
 				currentHeight += gap;
 			}
 
@@ -167,8 +165,8 @@ public class SuggestionEditBoxWidget extends EditBox {
 	/**
 	 * helper method for drawing suggestion background
 	 */
-	private void fill(PoseStack poseStack, int minY, int height, int color) {
-		GuiComponent.fill(poseStack, getX(), minY, getX() + width, minY + height, color);
+	private void fillSuggestionBackground(GuiGraphics guiGraphics, int minY, int height, int color) {
+		guiGraphics.fill(getX(), minY, getX() + width, minY + height, color);
 	}
 
 	/**

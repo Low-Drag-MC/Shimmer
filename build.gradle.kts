@@ -75,7 +75,7 @@ subprojects {
     }
 
     extensions.getByType<PublishingExtension>().apply {
-        val platformName = project.name.toLowerCase()
+        val platformName = project.name.lowercase()
         publications {
             create<MavenPublication>(name = platformName) {
                 groupId = maven_group

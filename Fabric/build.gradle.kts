@@ -15,7 +15,7 @@ val common by configurations.creating
 val shadowCommon by configurations.creating
 val developmentFabric = configurations.named("developmentFabric")
 
-configurations{
+configurations {
     compileClasspath.get().extendsFrom(common)
     runtimeClasspath.get().extendsFrom(common)
     developmentFabric.get().extendsFrom(common)
@@ -33,11 +33,19 @@ dependencies {
     include("me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version")
 
     // Sodium
-    modImplementation("maven.modrinth:sodium:mc1.19.4-0.4.10") {
+    modCompileOnly("maven.modrinth:sodium:mc1.20-0.4.10") {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
-    modImplementation("maven.modrinth:modmenu:6.2.2")
+    modCompileOnly("maven.modrinth:iris:1.6.4+1.20") {
+        exclude(group = "net.fabricmc.fabric-api")
+    }
+
+    implementation("org.anarres:jcpp:1.4.14")// for iris
+    implementation("io.github.douira:glsl-transformer:2.0.0-pre13") // for iris
+    implementation("org.antlr:antlr4-runtime:4.11.1") // for iris
+
+    modImplementation("maven.modrinth:modmenu:$mod_menu_version")
 
 }
 

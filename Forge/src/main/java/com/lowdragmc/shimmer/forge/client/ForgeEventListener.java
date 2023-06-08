@@ -117,7 +117,7 @@ public class ForgeEventListener {
                 .then(Commands.literal("dumpLightBlockStates")
                         .executes(context -> {
                             if (Utils.dumpAllLightingBlocks()){
-                                context.getSource().sendSuccess(Component.literal("dump successfully to cfg/shimmer/LightBlocks.txt"),false);
+                                context.getSource().sendSuccess(() -> Component.literal("dump successfully to cfg/shimmer/LightBlocks.txt"),false);
                             }else {
                                 context.getSource().sendFailure(Component.literal("dump failed, see log for detailed information"));
                             }
@@ -130,7 +130,7 @@ public class ForgeEventListener {
                                 if (pid == 0) {
                                     context.getSource().sendFailure(Component.literal("unable to init renderDoc"));
                                 } else {
-                                    context.getSource().sendSuccess(Component.literal("openSuccess, pid=" + pid),true);
+                                    context.getSource().sendSuccess(() -> Component.literal("openSuccess, pid=" + pid),true);
                                 }
                             } else {
                                 context.getSource().sendFailure(Component.literal("renderDoc not enable"));

@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GlStateManager.class)
 public abstract class GLStateManagerMixin {
-    @Inject(method = "_glBindFramebuffer", at = @At("HEAD"))
-    private static void traceBindBuffer(int target, int frameBuffer, CallbackInfo ci) {
-        TracedGLState.bindFrameBuffer = frameBuffer;
-    }
+	@Inject(method = "_glBindFramebuffer", at = @At("HEAD"), remap = false)
+	private static void traceBindBuffer(int target, int frameBuffer, CallbackInfo ci) {
+		TracedGLState.bindFrameBuffer = frameBuffer;
+	}
 }

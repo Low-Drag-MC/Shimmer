@@ -17,7 +17,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.ForgeConfig;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -171,6 +170,11 @@ public class ForgePlatformHelper implements IPlatformHelper {
 	public boolean isRenderDocEnable() {
 		//TODO config hasn't load when we need it, need change
 		return isDevelopmentEnvironment();
+	}
+
+	@Override
+	public boolean enableBuildinSetting() {
+		return ForgeShimmerConfig.getEnableBuildinSetting().get();
 	}
 
 }

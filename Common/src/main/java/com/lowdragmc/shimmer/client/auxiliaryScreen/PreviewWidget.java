@@ -4,10 +4,10 @@ import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -39,47 +39,35 @@ public class PreviewWidget extends AbstractWidget {
 	}
 
 	@Override
-	public void renderWidget(PoseStack poseStack, int i, int j, float f) {
+	public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
 		if (type != null && resourceLocation != null) {
 			switch (type) {
 				case COLORED_BLOCK, BLOOM_BLOCK -> {
-					//must call renderAndDecorateItem with x and y 0
-					//translate position ourselves and scale, or vertex position will fly
-					//same for LIGHT_ITEM
-					ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 					Block block = BuiltInRegistries.BLOCK.get(resourceLocation);
 
-					PoseStack modelViewStack = RenderSystem.getModelViewStack();
-					modelViewStack.pushPose();
-					modelViewStack.translate(getX(), getY(),0);
-					modelViewStack.scale(scale,scale,1f);
-
-					itemRenderer.renderAndDecorateItem(modelViewStack, new ItemStack(block), 0, 0);
-
-					modelViewStack.popPose();
-					RenderSystem.applyModelViewMatrix();
+					PoseStack poseStack = guiGraphics.pose();
+					poseStack.pushPose();
+					poseStack.scale(scale,scale,1f);
+					poseStack.translate(getX() / scale,getY() /scale ,0);
+					guiGraphics.renderItem(new ItemStack(block),0,0);
+					poseStack.popPose();
 				}
 				case LIGHT_ITEM -> {
-					ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 					Item item = BuiltInRegistries.ITEM.get(resourceLocation);
 
-					PoseStack modelViewStack = RenderSystem.getModelViewStack();
-
-					modelViewStack.pushPose();
-					modelViewStack.translate(getX(), getY(),0);
-					modelViewStack.scale(scale,scale,1f);
-
-					itemRenderer.renderAndDecorateItem(modelViewStack, new ItemStack(item), 0, 0);
-
-					modelViewStack.popPose();
-					RenderSystem.applyModelViewMatrix();
+					PoseStack poseStack = guiGraphics.pose();
+					poseStack.pushPose();
+					poseStack.scale(scale,scale,1f);
+					poseStack.translate(getX() / scale,getY() /scale ,0);
+					guiGraphics.renderItem(new ItemStack(item),0,0);
+					poseStack.popPose();
 				}
 				case BLOOM_PARTICLE -> {
 					TextureAtlas textureAtlas = Minecraft.getInstance().particleEngine.textureAtlas;
 					TextureAtlasSprite sprite = textureAtlas.getSprite(new ResourceLocation(resourceLocation.getNamespace(), "particle/" + resourceLocation.getPath()));
 					if (Objects.equals(sprite.atlasLocation(), MissingTextureAtlasSprite.getLocation())) return;
 
-					Matrix4f pose = poseStack.last().pose();
+					Matrix4f pose = guiGraphics.pose().last().pose();
 					RenderSystem._setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
 					RenderSystem.setShader(GameRenderer::getPositionTexShader);
 					BufferBuilder builder = Tesselator.getInstance().getBuilder();
@@ -93,7 +81,7 @@ public class PreviewWidget extends AbstractWidget {
 					BufferUploader.draw(builder.end());
 				}
 				case BLOOM_FLUID -> {
-					Matrix4f pose = poseStack.last().pose();
+					Matrix4f pose = guiGraphics.pose().last().pose();
 					RenderSystem._setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 					RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 					BufferBuilder builder = Tesselator.getInstance().getBuilder();

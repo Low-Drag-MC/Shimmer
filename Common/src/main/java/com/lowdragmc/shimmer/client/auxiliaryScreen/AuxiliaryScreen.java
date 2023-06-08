@@ -8,8 +8,8 @@ import com.lowdragmc.shimmer.config.BlockLight;
 import com.lowdragmc.shimmer.config.Bloom;
 import com.lowdragmc.shimmer.config.ItemLight;
 import com.lowdragmc.shimmer.config.ShimmerConfig;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.font.TextFieldHelper;
@@ -255,7 +255,6 @@ public class AuxiliaryScreen extends Screen {
 	@Override
 	public void resize(Minecraft minecraft, int width, int height) {
 		this.minecraft = minecraft;
-		this.itemRenderer = minecraft.getItemRenderer();
 		this.font = minecraft.font;
 		this.width = width;
 		this.height = height;
@@ -266,9 +265,9 @@ public class AuxiliaryScreen extends Screen {
 	}
 
 	@Override
-	public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-		renderBackground(poseStack);
-		super.render(poseStack, mouseX, mouseY, partialTick);
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+		renderBackground(guiGraphics);
+		super.render(guiGraphics, mouseX, mouseY, partialTick);
 	}
 
 	/**

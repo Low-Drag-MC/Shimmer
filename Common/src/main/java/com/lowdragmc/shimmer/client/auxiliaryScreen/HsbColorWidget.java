@@ -6,6 +6,7 @@ import com.lowdragmc.shimmer.Utils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.gui.GuiGraphics;
 import org.joml.Matrix4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -112,22 +113,22 @@ public class HsbColorWidget extends AbstractWidget {
 	}
 
 	@Override
-	public void renderWidget(PoseStack poseStack, int i, int j, float f) {
-		Matrix4f pose = poseStack.last().pose();
+	public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
 
 		BufferBuilder builder = Tesselator.getInstance().getBuilder();
-		drawHsbContext(pose, builder);
+		drawHsbContext(guiGraphics, builder);
 
-		renderInfo(poseStack, builder);
+		renderInfo(guiGraphics, builder);
 	}
 
 	/**
 	 * have context for render hsb content
 	 */
-	private void drawHsbContext(Matrix4f pose, BufferBuilder builder) {
+	private void drawHsbContext(GuiGraphics guiGraphics, BufferBuilder builder) {
 		RenderSystem.setShader(() -> hsbShader);
 		builder.begin(VertexFormat.Mode.QUADS, HSB_VERTEX_FORMAT);
 
+		var pose = guiGraphics.pose().last().pose();
 		renderMain(pose, builder);
 		renderSlide(pose, builder);
 		renderColor(pose, builder);
@@ -136,7 +137,7 @@ public class HsbColorWidget extends AbstractWidget {
 	}
 
 	/**
-	 * render the main color, must be called in {@link #drawHsbContext(Matrix4f, BufferBuilder)}
+	 * render the main color, must be called in {@link #drawHsbContext(GuiGraphics, BufferBuilder)}
 	 */
 	private void renderMain(Matrix4f pose, BufferBuilder builder) {
 		float _h = 0, _s = 0, _b = 0f;
@@ -240,7 +241,7 @@ public class HsbColorWidget extends AbstractWidget {
 	}
 
 	/**
-	 * render the slide, must be called in {@link #drawHsbContext(Matrix4f, BufferBuilder)}
+	 * render the slide, must be called in {@link #drawHsbContext(GuiGraphics, BufferBuilder)}
 	 */
 	private void renderSlide(Matrix4f pose, BufferBuilder builder) {
 		float _h = 0f, _s = 0f, _b = 0f;
@@ -308,21 +309,21 @@ public class HsbColorWidget extends AbstractWidget {
 	/**
 	 * render hsb/rgb/mode info
 	 */
-	private void renderInfo(PoseStack poseStack, BufferBuilder builder) {
+	private void renderInfo(GuiGraphics guiGraphics, BufferBuilder builder) {
 		Font font = Minecraft.getInstance().font;
 		var strX = getX() + width + gap + barWidth + 10;
 		var strGapY = (int) Math.max(0, (height - 6f * font.lineHeight) / 5f) + font.lineHeight;
-		drawString(poseStack, font, "h:" + (int) h + "°", strX, getY(), 0xffffffff);
-		drawString(poseStack, font, "s:" + (int) (s * 100) + "%", strX, getY() + strGapY, 0xffffffff);
-		drawString(poseStack, font, "b:" + (int) (b * 100) + "%", strX, getY() + strGapY * 2, 0xffffffff);
-		drawString(poseStack, font, "r:" + ((rgb >> 16) & 0xff), strX, getY() + strGapY * 3, 0xffffffff);
-		drawString(poseStack, font, "g:" + ((rgb >> 8) & 0xff), strX, getY() + strGapY * 4, 0xffffffff);
-		drawString(poseStack, font, "b:" + (rgb & 0xff), strX, getY() + strGapY * 5, 0xffffffff);
-		drawString(poseStack, font, "mode:" + mode, strX, getY() + strGapY * 6, 0xffffffff);
+		guiGraphics.drawString(font, "h:" + (int) h + "°", strX, getY(), 0xffffffff);
+		guiGraphics.drawString(font, "s:" + (int) (s * 100) + "%", strX, getY() + strGapY, 0xffffffff);
+		guiGraphics.drawString(font, "b:" + (int) (b * 100) + "%", strX, getY() + strGapY * 2, 0xffffffff);
+		guiGraphics.drawString(font, "r:" + ((rgb >> 16) & 0xff), strX, getY() + strGapY * 3, 0xffffffff);
+		guiGraphics.drawString(font, "g:" + ((rgb >> 8) & 0xff), strX, getY() + strGapY * 4, 0xffffffff);
+		guiGraphics.drawString(font, "b:" + (rgb & 0xff), strX, getY() + strGapY * 5, 0xffffffff);
+		guiGraphics.drawString(font, "mode:" + mode, strX, getY() + strGapY * 6, 0xffffffff);
 	}
 
 	/**
-	 * render the indicator color, must be called in {@link #drawHsbContext(Matrix4f, BufferBuilder)}
+	 * render the indicator color, must be called in {@link #drawHsbContext(GuiGraphics, BufferBuilder)}
 	 */
 	private void renderColor(Matrix4f pose, BufferBuilder builder) {
 		var colorX = getX() + width + gap + barWidth + 10 + 30;

@@ -150,7 +150,8 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
 
         KeyBindingHelper.registerKeyBinding(ShimmerConstants.recordScreenColor);
 
-        HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> Eyedropper.update(matrixStack));
+        //error inject place, need render before crosshair
+        //HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> Eyedropper.update(guiGraphics));
     }
 
     @Override
