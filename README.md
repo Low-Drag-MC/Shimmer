@@ -1,8 +1,20 @@
 # Shimmer
-A mod that integrates my passion for rendering
 
-Join our [discord](https://discord.gg/CQywkfwPrC) for communication, issue feedback  
-our [curseforge](https://www.curseforge.com/minecraft/mc-mods/shimmer)  
+![logo_full_ alpha_bg](https://github.com/Low-Drag-MC/Shimmer/assets/26162862/ecc3a347-2e41-4ba2-a426-d5b36eab503c)
+
+<blockquote style="text-align: center;">
+Shimmer is a mod concentrated on rendering effects<br>
+fantasy bloom and colored light<br>
+both configurable json and java api support<br>
+customize what you like
+</blockquote>
+
+Join our [![discord](https://shields.io/badge/Discord-Join%20Us-blue?logo=Discord&style=flat)](https://discord.gg/CQywkfwPrC) for communication, issue feedback  
+
+<h3 align="center">
+<a href="https://modrinth.com/mod/shimmer!" target="_blank">Modrinth Homepage</a> |
+<a href="https://www.curseforge.com/minecraft/mc-mods/shimmer/" target="_blank">CurseForge Homepage</a>
+</h3>
 
 ## Bloom
 ![image](https://user-images.githubusercontent.com/26162862/201468458-021dedc4-d883-44d2-961a-d2f38110fae4.png)  
