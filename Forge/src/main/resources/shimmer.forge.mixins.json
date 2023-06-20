@@ -9,9 +9,8 @@
 		"ForgeParticleEngineMixin",
 		"ForgeShaderInstanceMixin",
 		"QuadLighterMixin",
-		"flywheel.LevelRenderMixin"
-  ],
-  "mixins": [
+		"BlockLightEngineMixin",
+		"flywheel.LevelRenderMixin",
 		"rubidium.BlockRendererMixin",
 		"rubidium.ChunkRenderRebuildTaskMixin",
 		"rubidium.FluidRendererMixin",
@@ -20,6 +19,8 @@
 		"rubidium.ShaderChunkRendererMixin",
 		"rubidium.ShaderLoaderMixin",
 		"rubidium.SodiumWorldRendererMixin"
+  ],
+  "mixins": [
   ],
   "injectors": {
     "defaultRequire": 1

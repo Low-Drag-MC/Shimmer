@@ -6,20 +6,13 @@
 	"plugin": "com.lowdragmc.shimmer.fabric.core.mixins.ShimmerFabricMixinPlugin",
 	"client": ["BakedQuadMixin",
 		"FabricParticleEngineMixin",
-		"MinecraftMixin",
+		"GuiMixin", "MinecraftMixin",
 		"MutableQuadViewImplMixin",
 		"ParticleEngineMixin",
 		"QuadViewImplMixin",
 		"ResourceLocationMixin",
 		"ShaderInstanceMixin",
-		"GuiMixin"
-	],
-	"server": [
-	],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"mixins": [
+		"BlockLightEngineMixin",
 		"sodium.BlockRendererMixin",
 		"sodium.ChunkRenderRebuildTaskMixin",
 		"sodium.FluidRendererMixin",
@@ -28,5 +21,13 @@
 		"sodium.ShaderChunkRendererMixin",
 		"sodium.ShaderLoaderMixin",
 		"sodium.SodiumWorldRendererMixin"
+	],
+	"server": [
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"mixins": [
+
 	]
 }

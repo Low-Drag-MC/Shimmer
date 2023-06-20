@@ -22,6 +22,8 @@ public class ShimmerConfig {
 	public List<Bloom> blooms;
 	@SerializedName("ColorReference")
 	public ColorReferences colorReferences;
+	@SerializedName("BuildIn")
+	public AtomicBoolean buildIn;
 
 	/**
 	 * init containers if necessary

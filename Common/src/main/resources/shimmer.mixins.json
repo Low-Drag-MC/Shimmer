@@ -6,7 +6,6 @@
 	"plugin": "com.lowdragmc.shimmer.core.mixins.ShimmerMixinPlugin",
 	"client": [
 		"BlendModeMixin",
-		"BlockLightEngineMixin",
 		"GameRendererMixin",
 		"GLStateManagerMixin",
 		"HumanoidArmorLayerMixin",

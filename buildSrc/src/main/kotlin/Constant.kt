@@ -13,7 +13,7 @@ const val enabled_platforms = "fabric,forge"
 //Fabric
 const val fabric_loader_version = "0.14.21"
 const val fabric_api_version = "0.83.0+$minecraft_version"
-const val cloth_config_version = "10.0.96"
+const val cloth_config_version = "11.0.99"
 const val mod_menu_version = "7.0.0"
 
 //Forge
@@ -22,7 +22,7 @@ const val modernui_version = "3.6.1.117"// FIXME
 
 //Project
 const val version_major = 0.1
-const val version_patch = 15
+const val version_patch = 16
 const val semantics_version = "$minecraft_version-$version_major.$version_patch"
 const val maven_path = "snapshots"
 const val maven_group = "com.lowdragmc.shimmer"

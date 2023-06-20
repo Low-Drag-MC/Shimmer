@@ -60,5 +60,7 @@
         "lit": true
       }
     }
-  ]
+  ],
+  "BuildIn" : true,
+  "ConfigSource" : "buildIn settings by shimmer, can be disable by config file"
 }
