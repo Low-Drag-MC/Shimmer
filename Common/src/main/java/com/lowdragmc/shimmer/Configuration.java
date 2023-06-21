@@ -63,8 +63,7 @@ public class Configuration {
 				causedSource = " file managed my minecraft located in" + " [sourceName:" + resource.sourcePackId() + "," + "location:" + resource.sourcePackId() + "]";
 				try (InputStreamReader reader = new InputStreamReader(resource.open())) {
 					ShimmerConfig config = gson.fromJson(reader, ShimmerConfig.class);
-					if (config.buildIn.get()) continue;
-					if (config.check(causedSource)) configs.add(config);
+					if (config.check(causedSource) && !config.buildIn.get()) configs.add(config);
 				}
 			}
 			//automatic mod compat discovery
