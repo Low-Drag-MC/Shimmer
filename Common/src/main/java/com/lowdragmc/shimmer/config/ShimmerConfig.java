@@ -33,6 +33,7 @@ public class ShimmerConfig {
 		if (itemLights == null) itemLights = new ArrayList<>();
 		if (blooms == null) blooms = new ArrayList<>();
 		if (colorReferences == null) colorReferences = new ColorReferences();
+		if (buildIn == null) buildIn = new AtomicBoolean(false);
 
 		colorReferences.init();
 

@@ -25,12 +25,13 @@ public abstract class BlockLightEngineMixin extends LightEngine {
 		throw new RuntimeException("mixin class's constructor will ne be invoked");
 	}
 
-	@ModifyVariable(method = "getEmission"
-		, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/level/block/state/BlockState;getLightEmission(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)I"))
-	private int injectColoredLightSource(int light,long pos, BlockState blockState){
-		if (Minecraft.getInstance().level == null) return light;
-		var shimmerLight = LightManager.INSTANCE.getLight(this.chunkSource.getLevel(), BlockPos.of(pos));
-		return Math.max(light,shimmerLight);
-	}
+//	@ModifyVariable(method = "getEmission"
+//		, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/level/block/state/BlockState;getLightEmission(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)I"))
+//	private int injectColoredLightSource(int light,long pos, BlockState blockState){
+//		if (Minecraft.getInstance().level == null) return light;
+//		var shimmerLight = LightManager.INSTANCE.getLight(this.chunkSource.getLevel(), BlockPos.of(pos));
+//		return Math.max(light,shimmerLight);
+//		return light;
+//	}
 
 }

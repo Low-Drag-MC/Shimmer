@@ -22,7 +22,7 @@ const val modernui_version = "3.6.1.117"// FIXME
 
 //Project
 const val version_major = 0.1
-const val version_patch = 16
+const val version_patch = 17
 const val semantics_version = "$minecraft_version-$version_major.$version_patch"
 const val maven_path = "snapshots"
 const val maven_group = "com.lowdragmc.shimmer"

@@ -12,7 +12,6 @@
 		"QuadViewImplMixin",
 		"ResourceLocationMixin",
 		"ShaderInstanceMixin",
-		"BlockLightEngineMixin",
 		"sodium.BlockRendererMixin",
 		"sodium.ChunkRenderRebuildTaskMixin",
 		"sodium.FluidRendererMixin",

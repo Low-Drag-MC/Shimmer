@@ -18,6 +18,7 @@
 		"PostPassMixin",
 		"ProgramMixin",
 		"RebuildTaskMixin",
+		"LightEngineMixin",
 		"RenderChunkMixin",
 		"RenderSystemMixin",
 		"RenderTargetMixin",
