@@ -7,7 +7,6 @@
   "client": [
 		"BakedQuadMixin",
 		"ForgeParticleEngineMixin",
-		"ForgeShaderInstanceMixin",
 		"QuadLighterMixin",
 		"flywheel.LevelRenderMixin",
 		"rubidium.BlockRendererMixin",

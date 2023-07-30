@@ -18,7 +18,6 @@ import java.util.function.Function;
 public class ShaderInjection {
     private static final Map<String, List<Function<String, String>>> VSH_INJECTIONS = Maps.newHashMap();
     private static final Map<String, List<Function<String, String>>> FSH_INJECTIONS = Maps.newHashMap();
-    private static final Map<String, List<Function<JsonObject, JsonObject>>> CONFIG_INJECTIONS = Maps.newHashMap();
 
     public static void registerVSHInjection(String shaderName, Function<String, String> injection) {
         VSH_INJECTIONS.computeIfAbsent(shaderName, s->new ArrayList<>()).add(injection);
@@ -26,21 +25,6 @@ public class ShaderInjection {
 
     public static void registerFSHInjection(String shaderName, Function<String, String> injection) {
         FSH_INJECTIONS.computeIfAbsent(shaderName, s->new ArrayList<>()).add(injection);
-    }
-
-    public static void registerConfigInjection(String shaderName, Function<JsonObject, JsonObject> injection) {
-        CONFIG_INJECTIONS.computeIfAbsent(shaderName, s->new ArrayList<>()).add(injection);
-    }
-
-    public static boolean hasInjectConfig(String shaderName) {
-        return CONFIG_INJECTIONS.containsKey(shaderName);
-    }
-    public static JsonObject injectConfig(String shaderName, JsonObject config) {
-        ShimmerConstants.LOGGER.info("inject shader config {}.", shaderName);
-        for (Function<JsonObject, JsonObject> function : CONFIG_INJECTIONS.getOrDefault(shaderName, Collections.emptyList())) {
-            config = function.apply(config);
-        }
-        return config;
     }
 
     public static boolean hasInjectFSH(String shaderName) {

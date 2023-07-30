@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -35,9 +36,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(ChunkRenderRebuildTask.class)
 public abstract class ChunkRenderRebuildTaskMixin {
     @Shadow(remap = false) @Final private RenderSection render;
-    ImmutableList.Builder<ColorPointLight> lights;
+    @Unique
+    ImmutableList.Builder<ColorPointLight> shimmer$lights;
 
-    /* The above redirect inject causes a crash outside the dev env. This does not */
     @Inject(method = "performBuild", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/state/BlockState;isAir()Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     private void injectCompile(ChunkBuildContext buildContext, CancellationSource cancellationSource, CallbackInfoReturnable<ChunkBuildResult> cir, ChunkRenderData.Builder renderData, VisGraph occluder, ChunkRenderBounds.Builder bounds, ChunkBuildBuffers buffers, BlockRenderCache cache, WorldSlice slice, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, BlockPos.MutableBlockPos blockPos, BlockPos.MutableBlockPos modelOffset, BlockRenderContext context, int y, int z, int x, BlockState blockState) {
@@ -45,7 +46,7 @@ public abstract class ChunkRenderRebuildTaskMixin {
         if (LightManager.INSTANCE.isBlockHasLight(blockState.getBlock(), fluidstate)) {
             ColorPointLight light = LightManager.INSTANCE.getBlockStateLight(slice, new BlockPos(x, y, z), blockState, fluidstate);
             if (light != null) {
-                lights.add(light);
+                shimmer$lights.add(light);
             }
         }
         PostProcessing.setupBloom(blockState, fluidstate);
@@ -56,7 +57,7 @@ public abstract class ChunkRenderRebuildTaskMixin {
     private void injectCompilePre(ChunkBuildContext buildContext,
                                   CancellationSource cancellationSource,
                                   CallbackInfoReturnable<ChunkBuildResult> cir) {
-        lights = ImmutableList.builder();
+        shimmer$lights = ImmutableList.builder();
     }
 
     @Inject(method = "performBuild", at = @At(value = "RETURN"), remap = false)
@@ -64,7 +65,7 @@ public abstract class ChunkRenderRebuildTaskMixin {
                                    CancellationSource cancellationSource,
                                    CallbackInfoReturnable<ChunkBuildResult> cir) {
         if (this.render instanceof IRenderChunk renderChunk) {
-            renderChunk.setShimmerLights(lights.build());
+            renderChunk.setShimmerLights(shimmer$lights.build());
         }
         PostProcessing.cleanBloom();
     }

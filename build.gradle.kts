@@ -52,10 +52,16 @@ subprojects {
         maven {
             name = "IzzelAliz Maven"
             url = uri("https://maven.izzel.io/releases/")
+            content {
+                includeGroup("icyllis.modernui")
+            }
         }
         maven {
             name = "tterrag maven"
             url = uri("https://maven.tterrag.com/")
+            content {
+                includeGroup("com.jozufozu.flywheel")
+            }
         }
     }
 

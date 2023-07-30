@@ -33,11 +33,11 @@ dependencies {
     include("me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version")
 
     // Sodium
-    modCompileOnly("maven.modrinth:sodium:mc1.20-0.4.10") {
+    modImplementation("maven.modrinth:sodium:mc1.20-0.4.10") {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
-    modCompileOnly("maven.modrinth:iris:1.6.4+1.20") {
+    modImplementation("maven.modrinth:iris:1.6.4+1.20") {
         exclude(group = "net.fabricmc.fabric-api")
     }
 

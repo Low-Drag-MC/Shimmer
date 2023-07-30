@@ -1,6 +1,5 @@
 package com.lowdragmc.shimmer.forge.core.mixins.rubidium;
 
-import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.core.IBakedQuad;
 import me.jellysquid.mods.sodium.client.model.IndexBufferBuilder;

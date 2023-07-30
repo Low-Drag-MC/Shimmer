@@ -27,7 +27,6 @@ public abstract class BlockLightEngineMixin extends LightEngine {
 	}
 
 	@Inject(method = "getEmission" , at = @At("HEAD"), cancellable = true)
-	@Unique
 	private void shimmer$injectBlockLight(long pos, BlockState state, CallbackInfoReturnable<Integer> cir){
 		var blockPos = BlockPos.of(pos);
 		int light = LightManager.INSTANCE.getLight(state, blockPos);
