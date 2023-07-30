@@ -10,7 +10,6 @@ import com.lowdragmc.shimmer.event.ShimmerLoadConfigEvent;
 import com.lowdragmc.shimmer.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.resources.Resource;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,19 +62,25 @@ public class Configuration {
 				causedSource = " file managed my minecraft located in" + " [sourceName:" + resource.sourcePackId() + "," + "location:" + resource.sourcePackId() + "]";
 				try (InputStreamReader reader = new InputStreamReader(resource.open())) {
 					ShimmerConfig config = gson.fromJson(reader, ShimmerConfig.class);
-					if (config.check(causedSource) && !config.buildIn.get()) configs.add(config);
+					if (config.check(causedSource)) {
+						if (config.buildIn.get()) {
+							if (Services.PLATFORM.enableBuildinSetting()) {
+								ShimmerConstants.LOGGER.info("buildIn shimmer configuration is enabled, this can be disabled by config file");
+								causedSource = " buildIn shimmer configuration";
+							} else {
+								ShimmerConstants.LOGGER.info("buildIn shimmer configuration has been disabled by config file");
+								continue;
+							}
+						} else  {
+							ShimmerConstants.LOGGER.info("mod jar and resource pack discovery:" + causedSource);
+						}
+						configs.add(config);
+					}
 				}
 			}
 			//automatic mod compat discovery
 			for (var modId : Services.PLATFORM.getLoadedMods()) {
-				if (modId.equals(ShimmerConstants.MOD_ID)) { //special process for shimmer
-					if (Services.PLATFORM.enableBuildinSetting()) {
-						ShimmerConstants.LOGGER.info("buildIn shimmer configuration is enabled, this can be disabled by config file");
-					} else {
-						ShimmerConstants.LOGGER.info("buildIn shimmer configuration has been disabled by config file");
-						continue;
-					}
-				}
+				if (modId.equals(ShimmerConstants.MOD_ID)) continue;
 				causedSource = " automatic configuration added by mod " + modId;
 				ResourceLocation candidateConfigurationPath = new ResourceLocation(modId, configurationFileName);
 				Optional<String> optionalConfiguration = readConfiguration(candidateConfigurationPath);
@@ -116,6 +121,7 @@ public class Configuration {
 
 			//from auxiliary screen
 			if (auxiliaryConfig != null) {
+				ShimmerConstants.LOGGER.info("configurations made by auxiliary screen added");
 				configs.add(auxiliaryConfig);
 			}
 
@@ -140,7 +146,16 @@ public class Configuration {
 	 * read shimmer configuration from path
 	 */
 	public static Optional<String> readConfiguration(ResourceLocation configurationPath) {
-		return Minecraft.getInstance().getResourceManager().getResource(configurationPath).flatMap(resource -> {
+		var resources = Minecraft.getInstance().getResourceManager().getResourceStack(configurationPath);
+		if (resources.size() > 1) {
+			ShimmerConstants.LOGGER.error("find multi shimmer configuration file under " + configurationPath);
+			ShimmerConstants.LOGGER.error("will only load the first");
+			for (int i = 0; i < resources.size(); i++) {
+				var res = resources.get(i);
+				ShimmerConstants.LOGGER.error("index:{}, sourcePackName{}",i,res);
+			}
+		}
+		return resources.stream().findFirst().flatMap(resource -> {
 			try (BufferedReader reader = resource.openAsReader()) {
 				return Optional.of(reader.lines().collect(Collectors.joining()));
 			} catch (IOException ioException) {

@@ -1,18 +1,15 @@
 package com.lowdragmc.shimmer.core.mixins;
 
 import com.google.common.collect.ImmutableList;
-import com.lowdragmc.shimmer.LightQueen;
 import com.lowdragmc.shimmer.client.light.ColorPointLight;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.core.IRenderChunk;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ChunkBufferBuilderPack;
 import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,11 +40,6 @@ public abstract class RebuildTaskMixin {
             ColorPointLight light = LightManager.INSTANCE.getBlockStateLight(instance, pPos, blockstate, fluidstate);
             if (light != null) {
                 lights.add(light);
-                var longPos = BlockPos.asLong(pPos.getX(),pPos.getY(),pPos.getZ());
-                LightQueen.queue.enqueue(longPos);
-                LightQueen.queue.enqueue(LightEngine.QueueEntry.increaseLightFromEmission(
-                        (int)light.radius,true
-                ));
             }
         }
 

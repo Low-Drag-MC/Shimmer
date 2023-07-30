@@ -461,8 +461,7 @@ public enum LightManager {
 
     }
 
-	public int getLight(BlockGetter instance, BlockPos pPos) {
-        BlockState blockState = instance.getBlockState(pPos);
+	public int getLight(BlockState blockState, BlockPos pPos) {
         FluidState fluidState = blockState.getFluidState();
         int light = 0;
         if (isBlockHasLight(blockState.getBlock(), fluidState)) {

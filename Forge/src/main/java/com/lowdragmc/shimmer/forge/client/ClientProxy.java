@@ -13,12 +13,11 @@ import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
 import com.lowdragmc.shimmer.forge.CommonProxy;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.server.packs.resources.ResourceProvider;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterShadersEvent;
@@ -55,11 +54,8 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
     }
 
     @SubscribeEvent
-    public void clientSetup(FMLClientSetupEvent e) {
-        e.enqueueWork(() -> {
-            ((ReloadableResourceManager)Minecraft.getInstance().getResourceManager()).registerReloadListener(this);
-            onResourceManagerReload(Minecraft.getInstance().getResourceManager());
-        });
+    public void registerReloadableResourceManager(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(this);
     }
 
     @Override

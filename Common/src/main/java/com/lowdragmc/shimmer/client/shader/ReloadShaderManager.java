@@ -16,6 +16,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.resources.*;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.profiling.InactiveProfiler;
+import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.http.util.Asserts;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +25,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -58,6 +62,10 @@ public class ReloadShaderManager {
     public static void reloadShader() {
         Minecraft minecraft = Minecraft.getInstance();
         ResourceManager resourceManager = minecraft.getResourceManager();
+        PreparableReloadListener.PreparationBarrier barrier = CompletableFuture::completedFuture;
+        ProfilerFiller profilerFiller = InactiveProfiler.INSTANCE;
+        Executor backgroundExecutor = Util.backgroundExecutor();
+        Executor gameExecutor = Minecraft.getInstance();
         message(Component.literal("start reloading shader"));
         long time = System.currentTimeMillis();
         Map<ResourceLocation, Resource> backupResource = reloadResources;
@@ -66,7 +74,7 @@ public class ReloadShaderManager {
         foreReloadAll = false;
         try {
             Asserts.notNull(shaderReloader,"shader reloader hasn't be set up");
-            shaderReloader.reload(null,resourceManager,null,null,null,null);
+            shaderReloader.reload(barrier,resourceManager,profilerFiller,profilerFiller,backgroundExecutor,gameExecutor);
             minecraft.levelRenderer.onResourceManagerReload(resourceManager);
             message(Component.literal("reload success"));
             message(Component.literal(MessageFormat.format("cache resource:{0}", reloadResources.size())));
@@ -79,7 +87,7 @@ public class ReloadShaderManager {
             message(Component.literal("exception occur will reloading , trying to backup").withStyle(ChatFormatting.RED));
             message(Component.literal(MessageFormat.format("error:{0}", tryException.getMessage())).withStyle(ChatFormatting.RED));
             try {
-                shaderReloader.reload(null,resourceManager,null,null,null,null);
+                shaderReloader.reload(barrier,resourceManager,profilerFiller,profilerFiller,backgroundExecutor,gameExecutor);
                 minecraft.levelRenderer.onResourceManagerReload(resourceManager);
                 message(Component.literal("load backup resource successful"));
             } catch (Exception backupException) {

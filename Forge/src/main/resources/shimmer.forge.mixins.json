@@ -9,7 +9,6 @@
 		"ForgeParticleEngineMixin",
 		"ForgeShaderInstanceMixin",
 		"QuadLighterMixin",
-		"BlockLightEngineMixin",
 		"flywheel.LevelRenderMixin",
 		"rubidium.BlockRendererMixin",
 		"rubidium.ChunkRenderRebuildTaskMixin",
