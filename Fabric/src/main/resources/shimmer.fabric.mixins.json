@@ -19,7 +19,13 @@
 		"sodium.RenderSectionMixin",
 		"sodium.ShaderChunkRendererMixin",
 		"sodium.ShaderLoaderMixin",
-		"sodium.SodiumWorldRendererMixin"
+		"sodium.SodiumWorldRendererMixin",
+		"iris.NewWorldRenderingPipelineAccessor",
+		"iris.ShaderPropertiesMixin",
+		"iris.GlResourceAccessor",
+		"iris.ShaderStorageBufferHolderAccessor",
+		"iris.ShaderStorageBufferHolderMixin",
+		"iris.StandardMacrosMixin"
 	],
 	"server": [
 	],

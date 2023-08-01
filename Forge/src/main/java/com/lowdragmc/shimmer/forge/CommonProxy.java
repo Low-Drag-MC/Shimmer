@@ -2,6 +2,7 @@ package com.lowdragmc.shimmer.forge;
 
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 
 /**
  * @author KilaBash

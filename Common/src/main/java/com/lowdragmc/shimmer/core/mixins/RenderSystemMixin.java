@@ -18,7 +18,7 @@ public class RenderSystemMixin {
 	@Inject(method = "initBackendSystem", at = @At(value = "HEAD"))
 	private static void initRenderDoc(CallbackInfoReturnable<TimeSource.NanoTimeSource> cir) {
 		if (Services.PLATFORM.isRenderDocEnable()) {
-			RenderDoc.init();
+//			RenderDoc.init();
 		}
 	}
 }

@@ -117,9 +117,9 @@ public class ForgeShimmerConfig {
                         "Block bloom only, does not apply to post-processing")
                 .define("Block Bloom Effect",true);
         LIGHT_MAP = builder.comment(
-                        "using light map for more realistic lighting",
-                        "true for light map ON",
-                        "If using the light map, the light is more realistic and avoid lights through the wall. The light is smoother when closed. It is a tradeoff.")
+                        "using light analyzeShaderProperties for more realistic lighting",
+                        "true for light analyzeShaderProperties ON",
+                        "If using the light analyzeShaderProperties, the light is more realistic and avoid lights through the wall. The light is smoother when closed. It is a tradeoff.")
                 .define("Using Light Map",true);
         COLORED_LIGHT_ENABLE = builder.define("enable colored light", true);
         BLOOM_ENABLE = builder.define("enable bloom effect",true);

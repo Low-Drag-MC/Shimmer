@@ -42,7 +42,11 @@ public class ShaderSSBO {
 	}
 
 	public void bindBuffer() {
-		GL30.glBindBuffer(BUFFER_TYPE, this.id);
+		if (!inValid){
+			GL30.glBindBuffer(BUFFER_TYPE, this.id);
+		} else {
+			ShimmerConstants.LOGGER.error("try to use an already close ShaderStorageBufferObject");
+		}
 	}
 
 	public void unBindBuffer() {

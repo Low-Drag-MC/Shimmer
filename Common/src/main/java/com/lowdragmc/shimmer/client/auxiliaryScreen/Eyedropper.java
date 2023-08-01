@@ -226,7 +226,7 @@ public enum Eyedropper {
 			mode.updateCurrentColor();
 			mode.renderIndicator(guiGraphics);
 
-			if (ShimmerConstants.recordScreenColor.isDown() && readyForRecord) {
+			if (ShimmerConstants.recordScreenColor.get().get().isDown() && readyForRecord) {
 				eyedropperColor[0] = currentColor[0];
 				eyedropperColor[1] = currentColor[1];
 				eyedropperColor[2] = currentColor[2];
@@ -234,7 +234,7 @@ public enum Eyedropper {
 				readyForRecord = false;
 				Minecraft.getInstance().player.sendSystemMessage(Component.literal("set color " + formatRGB(eyedropperColor))
 						.append(makeColorPreview(eyedropperColor)));
-			} else if (!ShimmerConstants.recordScreenColor.isDown()) {
+			} else if (!ShimmerConstants.recordScreenColor.get().get().isDown()) {
 				readyForRecord = true;
 			}
 

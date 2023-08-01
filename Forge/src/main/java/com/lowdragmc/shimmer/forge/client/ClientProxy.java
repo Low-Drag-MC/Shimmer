@@ -72,7 +72,7 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
 
     @SubscribeEvent
     public void registerKeyBinding(RegisterKeyMappingsEvent event) {
-        event.register(ShimmerConstants.recordScreenColor);
+        event.register(ShimmerConstants.recordScreenColor.get().get());
     }
 
     @SubscribeEvent

@@ -5,8 +5,11 @@ import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.FileUtility;
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.Utils;
+import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderInjection;
 import com.lowdragmc.shimmer.client.shader.ShaderUBO;
+import com.lowdragmc.shimmer.comp.iris.IrisHandle;
+import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
 import com.lowdragmc.shimmer.event.ShimmerReloadEvent;
 import com.lowdragmc.shimmer.platform.Services;
 import it.unimi.dsi.fastutil.Pair;
@@ -22,7 +25,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -181,16 +183,33 @@ public enum LightManager {
     }
 
     public void renderLevelPre(int blockLightSize, float camX, float camY, float camZ) {
-        updateNoUVLight();
-        if (Services.PLATFORM.isColoredLightEnable()){
-            lightUBO.bufferSubData(getOffset(UV_LIGHT.size()), BUFFER);
+        RenderUtils.warpGLDebugLabel("renderLevelPre",()->{
+            updateNoUVLight();
+            if (Services.PLATFORM.isColoredLightEnable()){
+                lightUBO.bufferSubData(getOffset(UV_LIGHT.size()), BUFFER);
 
-            envUBO.bufferSubData(0, new int[]{UV_LIGHT.size() + blockLightSize});
-            envUBO.bufferSubData(4,new int[]{NO_UV_LIGHT_COUNT});
-            envUBO.bufferSubData(16, new float[]{camX, camY, camZ});
-        }else {
-            envUBO.bufferSubData(0,new int[4]);
-        }
+                envUBO.bufferSubData(0, new int[]{UV_LIGHT.size() + blockLightSize});
+                envUBO.bufferSubData(4,new int[]{NO_UV_LIGHT_COUNT});
+                envUBO.bufferSubData(16, new float[]{camX, camY, camZ});
+
+                if (MixinPluginShared.IS_IRIS_LOAD) {
+                    IrisHandle irisHandle = IrisHandle.INSTANCE;
+                    if(irisHandle == null || !irisHandle.underShaderPack()) return;
+                    var buffer = irisHandle.getBuffer();
+                    if (buffer == null) return;
+                    var light = buffer.getLeft();
+                    var env = buffer.getRight();
+
+                    light.bufferSubData(getOffset(UV_LIGHT.size()), BUFFER);
+
+                    env.bufferSubData(0, new int[]{UV_LIGHT.size() + blockLightSize});
+                    env.bufferSubData(4,new int[]{NO_UV_LIGHT_COUNT});
+                    env.bufferSubData(16, new float[]{camX, camY, camZ});
+                }
+            }else {
+                envUBO.bufferSubData(0,new int[4]);
+            }
+        });
     }
 
     private int NO_UV_LIGHT_COUNT = 0;

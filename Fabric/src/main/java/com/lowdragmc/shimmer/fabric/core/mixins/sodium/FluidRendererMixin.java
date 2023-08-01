@@ -32,7 +32,11 @@ public abstract class FluidRendererMixin {
     private void injectRender(ModelQuadView quad, BlockAndTintGetter world, BlockPos pos, LightPipeline lighter, Direction dir, float brightness, ColorSampler<FluidState> colorSampler, FluidState fluidState, CallbackInfo ci) {
         if (PostProcessing.isFluidBloom()) {
 //             0xf000f0 -> 0x1f001f0
-            Arrays.fill(this.quadLightData.lm, 0x1000100);
+//            Arrays.fill(this.quadLightData.lm, 0x1000100);
+            var lm = this.quadLightData.lm;
+            for (int index = 0; index < lm.length; index++) {
+                lm[index] = lm[index] | 0x10000100;
+            }
         }
     }
 }

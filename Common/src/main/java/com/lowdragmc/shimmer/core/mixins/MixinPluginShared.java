@@ -3,23 +3,24 @@ package com.lowdragmc.shimmer.core.mixins;
 import com.lowdragmc.shimmer.ShimmerConstants;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 public interface MixinPluginShared {
 
 	static boolean isClassFound(String className) {
 		try {
 			Class.forName(className, false, Thread.currentThread().getContextClassLoader());
-			ShimmerConstants.LOGGER.error("find class {}", className);
+			ShimmerConstants.LOGGER.debug("find class {}", className);
 			return true;
 		} catch (ClassNotFoundException e) {
-			ShimmerConstants.LOGGER.error("can't find class {}", className);
+			ShimmerConstants.LOGGER.debug("can't find class {}", className);
 			return false;
 		}
 	}
 
 	private static boolean checkOptifine() {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		if (classLoader.getName().equals("TRANSFORMER")) {
+		if (Objects.equals(classLoader.getName(),"TRANSFORMER")) {
 			//under forge's TransformingClassLoader
 			try {
 				//try not to load the class
@@ -40,7 +41,9 @@ public interface MixinPluginShared {
 	}
 
 	private static boolean doUnderOptifine(boolean underOptifine) {
-		ShimmerConstants.LOGGER.error("detect shimmer is running under optifine, all the functions are disabled, consider just remove shimmer");
+		if (underOptifine) {
+			ShimmerConstants.LOGGER.error("detect shimmer is running under optifine, all the functions are disabled, consider just remove shimmer");
+		}
 		return underOptifine;
 	}
 
@@ -49,5 +52,8 @@ public interface MixinPluginShared {
 
 	boolean IS_SODIUM_LOAD = isClassFound("me.jellysquid.mods.sodium.mixin.SodiumMixinPlugin");
 	boolean IS_RUBIDIUM_LOAD = IS_SODIUM_LOAD;
+
+	boolean IS_IRIS_LOAD = isClassFound("net.coderbot.iris.compat.sodium.mixin.IrisSodiumCompatMixinPlugin");
+	boolean IS_OCLUUS_LOAD = IS_IRIS_LOAD;
 
 }
