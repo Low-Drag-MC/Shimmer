@@ -1,7 +1,8 @@
 package com.lowdragmc.shimmer.fabric.client;
 
 import com.lowdragmc.shimmer.Configuration;
-import com.lowdragmc.shimmer.ShimmerConstants;
+
+import com.lowdragmc.shimmer.ShimmerFields;
 import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
@@ -18,7 +19,6 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
@@ -148,7 +148,7 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
 
-        KeyBindingHelper.registerKeyBinding(ShimmerConstants.recordScreenColor.get().get());
+        KeyBindingHelper.registerKeyBinding(ShimmerFields.recordScreenColor);
 
         //error inject place, need render before crosshair
         //HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> Eyedropper.update(guiGraphics));

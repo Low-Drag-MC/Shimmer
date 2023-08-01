@@ -20,6 +20,7 @@ public interface MixinPluginShared {
 
 	private static boolean checkOptifine() {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		//knot class loader's name is null
 		if (Objects.equals(classLoader.getName(),"TRANSFORMER")) {
 			//under forge's TransformingClassLoader
 			try {

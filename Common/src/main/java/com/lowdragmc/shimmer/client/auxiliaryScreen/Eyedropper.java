@@ -2,6 +2,7 @@ package com.lowdragmc.shimmer.client.auxiliaryScreen;
 
 
 import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.ShimmerFields;
 import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
@@ -226,7 +227,7 @@ public enum Eyedropper {
 			mode.updateCurrentColor();
 			mode.renderIndicator(guiGraphics);
 
-			if (ShimmerConstants.recordScreenColor.get().get().isDown() && readyForRecord) {
+			if (ShimmerFields.recordScreenColor.isDown() && readyForRecord) {
 				eyedropperColor[0] = currentColor[0];
 				eyedropperColor[1] = currentColor[1];
 				eyedropperColor[2] = currentColor[2];
@@ -234,7 +235,7 @@ public enum Eyedropper {
 				readyForRecord = false;
 				Minecraft.getInstance().player.sendSystemMessage(Component.literal("set color " + formatRGB(eyedropperColor))
 						.append(makeColorPreview(eyedropperColor)));
-			} else if (!ShimmerConstants.recordScreenColor.get().get().isDown()) {
+			} else if (!ShimmerFields.recordScreenColor.isDown()) {
 				readyForRecord = true;
 			}
 
