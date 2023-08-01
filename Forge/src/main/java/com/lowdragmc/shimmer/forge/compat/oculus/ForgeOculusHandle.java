@@ -1,4 +1,4 @@
-package com.lowdragmc.shimmer.fabric.compact.iris;
+package com.lowdragmc.shimmer.forge.compat.oculus;
 
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
@@ -10,12 +10,10 @@ import net.irisshaders.iris.api.v0.IrisApi;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL46;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
 
-public class FabricIrisHandle implements IrisHandle {
+public class ForgeOculusHandle implements IrisHandle {
 
-    public FabricIrisHandle() {
+    public ForgeOculusHandle() {
     }
 
     private boolean available = MixinPluginShared.IS_IRIS_LOAD;

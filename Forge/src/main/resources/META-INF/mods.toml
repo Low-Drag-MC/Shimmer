@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[43,)"
+license="MIT"
+issueTrackerURL="https://github.com/Low-Drag-MC/Shimmer/issues"
+
+[[mods]]
+modId="shimmer"
+version="${version}"
+displayName="Shimmer"
+displayURL="https://github.com/Low-Drag-MC/Shimmer"
+logoFile="logo_full.png"
+credits="hypherionsa"
+authors="KilaBash, zomb_676"
+description='''Shimemr, make rendering vivid'''
+
+[[dependencies.shimmer]]
+modId="forge"
+mandatory=true
+versionRange="[43,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.shimmer]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20,1.21)"
+ordering="NONE"
+side="BOTH"

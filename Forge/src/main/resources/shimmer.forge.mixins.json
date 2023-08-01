@@ -16,7 +16,11 @@
 		"rubidium.RenderSectionMixin",
 		"rubidium.ShaderChunkRendererMixin",
 		"rubidium.ShaderLoaderMixin",
-		"rubidium.SodiumWorldRendererMixin"
+		"rubidium.SodiumWorldRendererMixin",
+        "oculus.ShaderPropertiesMixin",
+        "oculus.HeldItemSupplierMixin",
+        "oculus.ShaderStorageBufferHolderMixin",
+        "oculus.StandardMacrosMixin"
   ],
   "mixins": [
   ],
