@@ -2,6 +2,7 @@ package com.lowdragmc.shimmer.forge.client;
 
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.ShimmmerFields;
 import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.HsbColorWidget;
@@ -22,7 +23,6 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -72,7 +72,7 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
 
     @SubscribeEvent
     public void registerKeyBinding(RegisterKeyMappingsEvent event) {
-        event.register(ShimmerConstants.recordScreenColor);
+        event.register(ShimmmerFields.recordScreenColor);
     }
 
     @SubscribeEvent

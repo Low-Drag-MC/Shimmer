@@ -3,6 +3,7 @@ package com.lowdragmc.shimmer.core.mixins;
 import com.lowdragmc.shimmer.ShimmerConstants;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 public interface MixinPluginShared {
 
@@ -19,7 +20,8 @@ public interface MixinPluginShared {
 
 	private static boolean checkOptifine() {
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		if (classLoader.getName().equals("TRANSFORMER")) {
+		//knot class loader's name is null
+		if (Objects.equals(classLoader.getName(),"TRANSFORMER")) {
 			//under forge's TransformingClassLoader
 			try {
 				//try not to load the class
