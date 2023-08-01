@@ -69,7 +69,7 @@ public abstract class ProgramMixin {
         }
 
         if (processor instanceof IGlslProcessor iGlslProcessor){
-            iGlslProcessor.clearImportedPathRecord();
+            iGlslProcessor.shimmer$clearImportedPathRecord();
         }
 
         GlStateManager.glDeleteShader(testShaderId);

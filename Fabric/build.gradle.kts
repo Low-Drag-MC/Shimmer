@@ -41,7 +41,7 @@ dependencies {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
-    implementation("org.anarres:jcpp:1.4.14")// for iris
+    implementation("org.anarres:jcpp:1.4.14") {isTransitive = false}// for iris
     implementation("io.github.douira:glsl-transformer:2.0.0-pre13") // for iris
     implementation("org.antlr:antlr4-runtime:4.11.1") // for iris
 

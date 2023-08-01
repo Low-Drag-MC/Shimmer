@@ -22,6 +22,7 @@
 		"sodium.SodiumWorldRendererMixin",
 		"iris.NewWorldRenderingPipelineAccessor",
 		"iris.ShaderPropertiesMixin",
+		"iris.HeldItemSupplierMixin",
 		"iris.GlResourceAccessor",
 		"iris.ShaderStorageBufferHolderAccessor",
 		"iris.ShaderStorageBufferHolderMixin",

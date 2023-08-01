@@ -22,6 +22,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -554,6 +555,11 @@ public enum LightManager {
         ColorPointLight light = new ColorPointLight(this,pos,color,radius,-1,false);
         NO_UV_LIGHT_PLAYER.put(playerUUID,light);
         return light;
+    }
+
+    public @Nullable ColorPointLight getPlayerHeldItemLight(Player player) {
+        if (player == null) return null;
+        return NO_UV_LIGHT_PLAYER.get(player.getUUID());
     }
 
     public boolean removePlayerLight(UUID playerUUID){

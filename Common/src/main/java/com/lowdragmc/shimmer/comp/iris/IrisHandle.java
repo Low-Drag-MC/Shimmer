@@ -32,7 +32,7 @@ public interface IrisHandle {
         if (!MixinPluginShared.IS_IRIS_LOAD) return null;
         var platformName = Services.PLATFORM.getPlatformName();
         var classLocation = switch (platformName) {
-            case "Fabric" -> "com.lowdragmc.shimmer.fabric.comp.iris.FabricIrisHandle";
+            case "Fabric" -> "com.lowdragmc.shimmer.fabric.compact.iris.FabricIrisHandle";
             case "Forge" -> "com.lowdragmc.shimmer.fabric.platform.FabricPlatformHelper";
             default -> throw new RuntimeException("unknown loader " + platformName);
         };

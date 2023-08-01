@@ -6,7 +6,9 @@ import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL43;
+import org.lwjgl.opengl.GL46;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 /**
@@ -94,6 +96,12 @@ public class ShaderSSBO {
 	}
 
 	public void bufferSubData(long offset, FloatBuffer data) {
+		bindBuffer();
+		GL30.glBufferSubData(BUFFER_TYPE, offset, data);
+		unBindBuffer();
+	}
+
+	public void bufferSubData(long offset, ByteBuffer data) {
 		bindBuffer();
 		GL30.glBufferSubData(BUFFER_TYPE, offset, data);
 		unBindBuffer();

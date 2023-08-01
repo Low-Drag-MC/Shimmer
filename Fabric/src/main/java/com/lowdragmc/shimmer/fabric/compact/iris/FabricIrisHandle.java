@@ -1,4 +1,4 @@
-package com.lowdragmc.shimmer.fabric.comp.iris;
+package com.lowdragmc.shimmer.fabric.compact.iris;
 
 import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
@@ -10,6 +10,8 @@ import net.irisshaders.iris.api.v0.IrisApi;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL46;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
 public class FabricIrisHandle implements IrisHandle {
 
@@ -24,7 +26,7 @@ public class FabricIrisHandle implements IrisHandle {
 
     @Override
     public void updateInfo(Object buffers) {
-        if (!available) return;
+        if (!available || !ShimmerConstants.IRIS_COMPACT_ENABLE) return;
         if (buffers instanceof ShaderStorageBuffer[] suffers) {
             int lightBufferIndex = -1;
             int envBufferIndex = -1;
@@ -61,10 +63,13 @@ public class FabricIrisHandle implements IrisHandle {
                 {
                     var oldBuffer = suffers[finalEnvBufferIndex];
                     envBuffer.createBufferData(oldBuffer.getSize(), GL46.GL_DYNAMIC_COPY);
+                    envBuffer.bufferSubData(0,new int[8]);
                     envBuffer.bindIndex(oldBuffer.getIndex());
                     oldBuffer.destroy();
                     suffers[finalEnvBufferIndex] = new ShaderStorageBuffer(envBuffer.id, oldBuffer.getIndex(), oldBuffer.getSize());
                 }
+                suffers[finalLightBufferIndex].bind();
+                suffers[finalEnvBufferIndex].bind();
                 ssbos = Pair.of(lightBuffer, envBuffer);
             });
         } else {
