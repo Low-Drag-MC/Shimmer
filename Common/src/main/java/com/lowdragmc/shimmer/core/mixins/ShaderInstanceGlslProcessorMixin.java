@@ -4,6 +4,7 @@ import com.lowdragmc.shimmer.core.IGlslProcessor;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Set;
 
@@ -13,7 +14,7 @@ public class ShaderInstanceGlslProcessorMixin implements IGlslProcessor {
     @Shadow
     private Set<String> importedPaths;
 
-    public void clearImportedPathRecord() {
+    public void shimmer$clearImportedPathRecord() {
         importedPaths.clear();
     }
 

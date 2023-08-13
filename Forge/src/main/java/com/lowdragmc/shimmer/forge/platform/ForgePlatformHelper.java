@@ -19,6 +19,7 @@ import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
+import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
@@ -169,6 +170,7 @@ public class ForgePlatformHelper implements IPlatformHelper {
 	@Override
 	public boolean isRenderDocEnable() {
 		//TODO config hasn't load when we need it, need change
+		if (FMLConfig.getBoolConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_CONTROL)) return false;
 		return isDevelopmentEnvironment();
 	}
 

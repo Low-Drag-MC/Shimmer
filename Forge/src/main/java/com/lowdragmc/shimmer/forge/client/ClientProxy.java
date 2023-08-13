@@ -2,7 +2,7 @@ package com.lowdragmc.shimmer.forge.client;
 
 import com.lowdragmc.shimmer.Configuration;
 import com.lowdragmc.shimmer.ShimmerConstants;
-import com.lowdragmc.shimmer.ShimmmerFields;
+import com.lowdragmc.shimmer.ShimmerFields;
 import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.HsbColorWidget;
@@ -72,7 +72,7 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
 
     @SubscribeEvent
     public void registerKeyBinding(RegisterKeyMappingsEvent event) {
-        event.register(ShimmmerFields.recordScreenColor);
+        event.register(ShimmerFields.recordScreenColor);
     }
 
     @SubscribeEvent

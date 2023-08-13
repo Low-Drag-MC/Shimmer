@@ -31,6 +31,9 @@ public class ShimmerFabricMixinPlugin implements IMixinConfigPlugin , MixinPlugi
         if (mixinClassName.contains("com.lowdragmc.shimmer.core.mixins.sodium")) {
             return IS_SODIUM_LOAD;
         }
+        if (mixinClassName.contains("com.lowdragmc.shimmer.core.mixins.iris")) {
+            return IS_IRIS_LOAD;
+        }
         return true;
     }
 

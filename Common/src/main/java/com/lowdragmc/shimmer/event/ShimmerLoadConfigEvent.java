@@ -35,7 +35,7 @@ public class ShimmerLoadConfigEvent implements ShimmerEvent{
     }
 
 	/**
-	 * @return the immutable map
+	 * @return the immutable analyzeShaderProperties
 	 */
 	public Map<String, String> getConfiguration(){
 		return Map.copyOf(additionConfigurations);

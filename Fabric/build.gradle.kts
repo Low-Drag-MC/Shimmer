@@ -33,15 +33,15 @@ dependencies {
     include("me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version")
 
     // Sodium
-    modImplementation("maven.modrinth:sodium:mc1.20-0.4.10") {
+    modImplementation("maven.modrinth:sodium:mc1.20.1-0.5.0") {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
-    modImplementation("maven.modrinth:iris:1.6.4+1.20") {
+    modImplementation("maven.modrinth:iris:1.6.5+1.20.1") {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
-    implementation("org.anarres:jcpp:1.4.14")// for iris
+    implementation("org.anarres:jcpp:1.4.14") {isTransitive = false}// for iris
     implementation("io.github.douira:glsl-transformer:2.0.0-pre13") // for iris
     implementation("org.antlr:antlr4-runtime:4.11.1") // for iris
 

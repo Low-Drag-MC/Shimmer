@@ -1,7 +1,7 @@
 package com.lowdragmc.shimmer.forge.core.mixins.rubidium;
 
-import me.jellysquid.mods.sodium.client.render.chunk.ChunkRenderList;
 import me.jellysquid.mods.sodium.client.render.chunk.RenderSectionManager;
+import me.jellysquid.mods.sodium.client.render.chunk.lists.SortedRenderLists;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -13,5 +13,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(RenderSectionManager.class)
 public interface RenderSectionManagerAccessor {
     @Accessor(remap = false)
-    ChunkRenderList getChunkRenderList();
+    SortedRenderLists getRenderLists();
 }

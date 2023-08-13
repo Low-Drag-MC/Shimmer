@@ -14,15 +14,15 @@ authors="KilaBash, zomb_676"
 description='''Shimemr, make rendering vivid'''
 
 [[dependencies.shimmer]]
-    modId="forge"
-    mandatory=true
-    versionRange="[43,)"
-    ordering="NONE"
-    side="BOTH"
+modId="forge"
+mandatory=true
+versionRange="[43,)"
+ordering="NONE"
+side="BOTH"
 
 [[dependencies.shimmer]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.20,1.21)"
-    ordering="NONE"
-    side="BOTH"
+modId="minecraft"
+mandatory=true
+versionRange="[1.20,1.21)"
+ordering="NONE"
+side="BOTH"

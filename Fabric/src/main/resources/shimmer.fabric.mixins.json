@@ -13,13 +13,17 @@
 		"ResourceLocationMixin",
 		"ShaderInstanceMixin",
 		"sodium.BlockRendererMixin",
-		"sodium.ChunkRenderRebuildTaskMixin",
+		"sodium.ChunkBuilderMeshingTaskMixin",
 		"sodium.FluidRendererMixin",
 		"sodium.RenderSectionManagerAccessor",
 		"sodium.RenderSectionMixin",
 		"sodium.ShaderChunkRendererMixin",
 		"sodium.ShaderLoaderMixin",
-		"sodium.SodiumWorldRendererMixin"
+		"sodium.SodiumWorldRendererMixin",
+		"iris.ShaderPropertiesMixin",
+		"iris.HeldItemSupplierMixin",
+		"iris.ShaderStorageBufferHolderMixin",
+		"iris.StandardMacrosMixin"
 	],
 	"server": [
 	],

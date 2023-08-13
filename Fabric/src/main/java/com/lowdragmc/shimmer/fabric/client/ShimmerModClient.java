@@ -2,7 +2,7 @@ package com.lowdragmc.shimmer.fabric.client;
 
 import com.lowdragmc.shimmer.Configuration;
 
-import com.lowdragmc.shimmer.ShimmmerFields;
+import com.lowdragmc.shimmer.ShimmerFields;
 import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
@@ -148,7 +148,7 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
 
-        KeyBindingHelper.registerKeyBinding(ShimmmerFields.recordScreenColor);
+        KeyBindingHelper.registerKeyBinding(ShimmerFields.recordScreenColor);
 
         //error inject place, need render before crosshair
         //HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> Eyedropper.update(guiGraphics));

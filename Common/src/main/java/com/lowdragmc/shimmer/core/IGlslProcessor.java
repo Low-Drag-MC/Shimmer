@@ -1,5 +1,5 @@
 package com.lowdragmc.shimmer.core;
 
 public interface IGlslProcessor {
-    void clearImportedPathRecord();
+    void shimmer$clearImportedPathRecord();
 }

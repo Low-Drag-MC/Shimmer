@@ -27,7 +27,7 @@ public class PostMultiBufferSource extends MultiBufferSource.BufferSource {
             map.put(Sheets.solidBlockSheet(), fixedBufferPack.builder(RenderType.solid()));
             map.put(Sheets.cutoutBlockSheet(), fixedBufferPack.builder(RenderType.cutout()));
             map.put(Sheets.bannerSheet(), fixedBufferPack.builder(RenderType.cutoutMipped()));
-//            map.put(ShimmerRenderTypes.bloom(), fixedBufferPack.builder(ShimmerRenderTypes.bloom()));
+//            analyzeShaderProperties.put(ShimmerRenderTypes.bloom(), fixedBufferPack.builder(ShimmerRenderTypes.bloom()));
             map.put(Sheets.translucentCullBlockSheet(), fixedBufferPack.builder(RenderType.translucent()));
             put(map, Sheets.shieldSheet());
             put(map, Sheets.bedSheet());

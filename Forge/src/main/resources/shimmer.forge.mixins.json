@@ -10,13 +10,17 @@
 		"QuadLighterMixin",
 		"flywheel.LevelRenderMixin",
 		"rubidium.BlockRendererMixin",
-		"rubidium.ChunkRenderRebuildTaskMixin",
+		"rubidium.ChunkBuilderMeshingTaskMixin",
 		"rubidium.FluidRendererMixin",
 		"rubidium.RenderSectionManagerAccessor",
 		"rubidium.RenderSectionMixin",
 		"rubidium.ShaderChunkRendererMixin",
 		"rubidium.ShaderLoaderMixin",
-		"rubidium.SodiumWorldRendererMixin"
+		"rubidium.SodiumWorldRendererMixin",
+        "oculus.ShaderPropertiesMixin",
+        "oculus.HeldItemSupplierMixin",
+        "oculus.ShaderStorageBufferHolderMixin",
+        "oculus.StandardMacrosMixin"
   ],
   "mixins": [
   ],
