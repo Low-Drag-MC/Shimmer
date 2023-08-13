@@ -22,6 +22,8 @@ public class Services {
                 ShimmerConstants.LOGGER.warn("behaviour may ne be correct");
                 yield "com.lowdragmc.shimmer.fabric.platform.FabricPlatformHelper";
             }
+            //https://github.com/sp614x/optifine/issues/1631
+            case "optifine" -> throw new RuntimeException("doesn't support under optifine, please uninstall shimmer");
             case "vanilla" -> throw new RuntimeException("run on vanilla?");
             default -> throw new RuntimeException("unknown loader " + loaderName);
         };

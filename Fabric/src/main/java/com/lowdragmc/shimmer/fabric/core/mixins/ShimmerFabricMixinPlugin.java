@@ -28,10 +28,10 @@ public class ShimmerFabricMixinPlugin implements IMixinConfigPlugin , MixinPlugi
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (IS_OPT_LOAD) return false;
-        if (mixinClassName.contains("com.lowdragmc.shimmer.core.mixins.sodium")) {
+        if (mixinClassName.contains("com.lowdragmc.shimmer.fabric.core.mixins.sodium")) {
             return IS_SODIUM_LOAD;
         }
-        if (mixinClassName.contains("com.lowdragmc.shimmer.core.mixins.iris")) {
+        if (mixinClassName.contains("com.lowdragmc.shimmer.fabric.core.mixins.iris")) {
             return IS_IRIS_LOAD;
         }
         return true;

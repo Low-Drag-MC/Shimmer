@@ -16,7 +16,7 @@ public class ForgeOculusHandle implements IrisHandle {
     public ForgeOculusHandle() {
     }
 
-    private boolean available = MixinPluginShared.IS_IRIS_LOAD;
+    private boolean available = MixinPluginShared.IS_OCULUS_LOAD;
     @Nullable
     private Pair<ShaderSSBO, ShaderSSBO> ssbos;
     private int lightIndex = -1;

@@ -19,25 +19,29 @@ public interface MixinPluginShared {
 	}
 
 	private static boolean checkOptifine() {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		//knot class loader's name is null
-		if (Objects.equals(classLoader.getName(),"TRANSFORMER")) {
-			//under forge's TransformingClassLoader
-			try {
-				//try not to load the class
-				var fmlLoaderClass = Class.forName("net.minecraftforge.fml.loading.FMLLoader");
-				var getGameLayerMethod = fmlLoaderClass.getMethod("getGameLayer");
-				var gameLayer = getGameLayerMethod.invoke(null);
-				var configurationMethod = gameLayer.getClass().getMethod("configuration");
-				//fully-qualified class name, Configuration is a common name
-				var configuration = (java.lang.module.Configuration)configurationMethod.invoke(gameLayer);
-                return configuration.toString().contains("optifine");
-			} catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-				ShimmerConstants.LOGGER.catching(e);
+		try {
+			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+			//knot class loader's name is null
+			if (Objects.equals(classLoader.getName(),"TRANSFORMER")) {
+				//under forge's TransformingClassLoader
+				try {
+					//try not to load the class
+					var fmlLoaderClass = Class.forName("net.minecraftforge.fml.loading.FMLLoader");
+					var getGameLayerMethod = fmlLoaderClass.getMethod("getGameLayer");
+					var gameLayer = getGameLayerMethod.invoke(null);
+					var configurationMethod = gameLayer.getClass().getMethod("configuration");
+					//fully-qualified class name, Configuration is a common name
+					var configuration = (java.lang.module.Configuration)configurationMethod.invoke(gameLayer);
+					return configuration.toString().contains("optifine");
+				} catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+					ShimmerConstants.LOGGER.catching(e);
+				}
+				//fall back, this will cause class loading and may prevent subsequent transforming operations
+				return isClassFound("optifine.Installer");
 			}
-			//fall back, this will cause class loading and may prevent subsequent transforming operations
-			return isClassFound("net.optifine.shaders.ShadersRender");
-        }
+		} catch (Exception e){
+			ShimmerConstants.LOGGER.catching(e);
+		}
 		return false;
 	}
 
@@ -55,6 +59,6 @@ public interface MixinPluginShared {
 	boolean IS_RUBIDIUM_LOAD = IS_SODIUM_LOAD;
 
 	boolean IS_IRIS_LOAD = isClassFound("net.coderbot.iris.compat.sodium.mixin.IrisSodiumCompatMixinPlugin");
-	boolean IS_OCLUUS_LOAD = IS_IRIS_LOAD;
+	boolean IS_OCULUS_LOAD = IS_IRIS_LOAD;
 
 }
