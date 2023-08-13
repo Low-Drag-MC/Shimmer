@@ -7,7 +7,6 @@ import com.lowdragmc.shimmer.platform.Services;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public interface IrisHandle {
@@ -33,7 +32,7 @@ public interface IrisHandle {
         var platformName = Services.PLATFORM.getPlatformName();
         var classLocation = switch (platformName) {
             case "Fabric" -> "com.lowdragmc.shimmer.fabric.compact.iris.FabricIrisHandle";
-            case "Forge" -> "com.lowdragmc.shimmer.forge.compat.iris.ForgeOculusHandle";
+            case "Forge" -> "com.lowdragmc.shimmer.forge.compat.oculus.ForgeOculusHandle";
             default -> throw new RuntimeException("unknown loader " + platformName);
         };
         IrisHandle handle = null;
@@ -46,6 +45,8 @@ public interface IrisHandle {
     });
 
     boolean underShaderPack();
+
+    boolean underShadowPass();
 
     static void analyzeShaderProperties(String shaderProperties) {
         shaderProperties.lines().forEach(str -> {

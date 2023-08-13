@@ -13,7 +13,7 @@
 		"ResourceLocationMixin",
 		"ShaderInstanceMixin",
 		"sodium.BlockRendererMixin",
-		"sodium.ChunkRenderRebuildTaskMixin",
+		"sodium.ChunkBuilderMeshingTaskMixin",
 		"sodium.FluidRendererMixin",
 		"sodium.RenderSectionManagerAccessor",
 		"sodium.RenderSectionMixin",

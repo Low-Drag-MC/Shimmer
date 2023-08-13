@@ -195,7 +195,7 @@ public enum LightManager {
 
                 if (MixinPluginShared.IS_IRIS_LOAD) {
                     IrisHandle irisHandle = IrisHandle.INSTANCE;
-                    if(irisHandle == null || !irisHandle.underShaderPack()) return;
+                    if (irisHandle == null || !irisHandle.underShaderPack() || irisHandle.underShadowPass()) return;
                     var buffer = irisHandle.getBuffer();
                     if (buffer == null) return;
                     var light = buffer.getLeft();

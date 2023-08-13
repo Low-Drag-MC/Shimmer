@@ -108,4 +108,9 @@ public class FabricIrisHandle implements IrisHandle {
     public boolean underShaderPack() {
         return IrisApi.getInstance().isShaderPackInUse();
     }
+
+    @Override
+    public boolean underShadowPass() {
+        return IrisApi.getInstance().isRenderingShadowPass();
+    }
 }
