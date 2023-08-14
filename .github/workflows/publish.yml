@@ -40,54 +40,76 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    strategy:
+      matrix:
+        loader: [ Forge, Fabric ]
+        website: [ modrinth, curseforge, github_release ]
+    name: ${{ matrix.website }} (${{ matrix.loader }})
 
     steps:
-      - name: Download a single artifact
+      - name: Download shimmer artifact
         uses: actions/download-artifact@v3
         with:
           name: Shimmer
 
+      - name: Checking and setting the environment
+        id: shimmer_env
+        run: |
+          export loader = ${{ matrix.loader }}
+          export name=$(ls ${loader}/build/libs/ | grep shadow -v | grep sources -v | awk -F.jar '{print $1}')
+          export mod_name=$(echo $name | awk -F- '{print $1}')
+          export loader_name=$(echo $name | awk -F- '{print $2}')
+          export mc_version=$(echo $name | awk -F- '{print $3}')
+          export mod_version=$(echo $name | awk -F- '{print $4}')
+          export full_version=$(echo ${mc_version}-${mod_version})
+          echo "name=$name" >> $GITHUB_OUTPUT
+          echo "mod_name=$mod_name" >> $GITHUB_OUTPUT
+          echo "loader_name=$loader_name" >> $GITHUB_OUTPUT
+          echo "mc_version=$mc_version" >> $GITHUB_OUTPUT
+          echo "mod_version=$mod_version" >> $GITHUB_OUTPUT
+          echo "full_version=$full_version" >> $GITHUB_OUTPUT
+          rm ${loader}/build/libs/*shadow.jar
+          echo "files=$(ls ${loader}/build/libs/*)" >> $GITHUB_OUTPUT
+
       - name: Publish Github Release
         uses: Kir-Antipov/mc-publish@v3.3
-        continue-on-error : true
-        if: ${{ inputs.github-release }}
+        if: ${{ matrix.website == 'github_release' && inputs.github-release }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          github-generate-changelog : true
+          files: ${{ steps.shimmer_env.outputs.files }}
+          name : ${{ steps.shimmer_env.outputs.name }}
+          version : ${{ steps.shimmer_env.outputs.full_version }}
+          version-type: ${{ inputs.release-type }}
+          changelog: ${{ inputs.changelog }}
+          java : Java 18
 
-          version-type : ${{ inputs.release-type }}
-          changelog : ${{ inputs.changelog }}
-          files: |
-            Fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
-            Forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
-          java: Java 18
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-generate-changelog: true
 
       - name: Publish Modrinth Release
         uses: Kir-Antipov/mc-publish@v3.3
-        continue-on-error : true
-        if: ${{ inputs.modrinth }}
+        if : ${{ matrix.website == 'modrinth' && inputs.modrinth }}
         with:
-          modrinth-id: rWlXIATK
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-
+          files: ${{ steps.shimmer_env.outputs.files }}
+          name: ${{ steps.shimmer_env.outputs.name }}
+          version: ${{ steps.shimmer_env.outputs.full_version }}
           version-type: ${{ inputs.release-type }}
           changelog: ${{ inputs.changelog }}
-          files: |
-            Fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
-            Forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
           java: Java 18
+
+          modrinth-id: uBKACKpl
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
       - name: Publish Curseforge Release
         uses: Kir-Antipov/mc-publish@v3.3
-        continue-on-error : true
-        if: ${{ inputs.curseforge }}
+        continue-on-error: true
+        if: ${{ matrix.website == 'curseforge' && inputs.curseforge }}
         with:
-          curseforge-id: 627824
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-
+          files: ${{ steps.shimmer_env.outputs.files }}
+          name: ${{ steps.shimmer_env.outputs.name }}
+          version: ${{ steps.shimmer_env.outputs.full_version }}
           version-type: ${{ inputs.release-type }}
           changelog: ${{ inputs.changelog }}
-          files: |
-            Fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
-            Forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
           java: Java 18
+
+          curseforge-id: 627824
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
