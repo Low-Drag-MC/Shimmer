@@ -29,18 +29,17 @@ on:
         type: boolean
         default: true
 
-permissions:
-  packages: write
-  actions: read
-  contents: read
-
 jobs:
   call-build-workflow:
+    permissions:
+      actions: read
     uses: "./.github/workflows/build.yml"
 
   publish:
     needs: call-build-workflow
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Download a single artifact
@@ -50,6 +49,7 @@ jobs:
 
       - name: Publish Github Release
         uses: Kir-Antipov/mc-publish@v3.3
+        continue-on-error : true
         if: ${{ inputs.github-release }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -64,6 +64,7 @@ jobs:
 
       - name: Publish Modrinth Release
         uses: Kir-Antipov/mc-publish@v3.3
+        continue-on-error : true
         if: ${{ inputs.modrinth }}
         with:
           modrinth-id: rWlXIATK
@@ -78,6 +79,7 @@ jobs:
 
       - name: Publish Curseforge Release
         uses: Kir-Antipov/mc-publish@v3.3
+        continue-on-error : true
         if: ${{ inputs.curseforge }}
         with:
           curseforge-id: 627824
