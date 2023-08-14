@@ -5,6 +5,7 @@ import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
 import com.lowdragmc.shimmer.comp.iris.IrisHandle;
 import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
+import com.lowdragmc.shimmer.fabric.core.mixins.iris.ShaderStorageBufferAccessor;
 import net.coderbot.iris.gl.buffer.ShaderStorageBuffer;
 import net.irisshaders.iris.api.v0.IrisApi;
 import org.apache.commons.lang3.tuple.Pair;
@@ -56,8 +57,8 @@ public class FabricIrisHandle implements IrisHandle {
                     var oldBuffer = suffers[finalLightBufferIndex];
                     lightBuffer.createBufferData(oldBuffer.getSize(), GL46.GL_DYNAMIC_COPY);
                     lightBuffer.bindIndex(oldBuffer.getIndex());
-                    oldBuffer.destroy();
-                    suffers[finalLightBufferIndex] = new ShaderStorageBuffer(lightBuffer.id, oldBuffer.getIndex(), oldBuffer.getSize());
+                    ((ShaderStorageBufferAccessor)oldBuffer).callDestroy();
+                    suffers[finalLightBufferIndex] = new ShaderStorageBuffer(lightBuffer.id, ((ShaderStorageBufferAccessor)oldBuffer).getInfo());
                 }
                 var envBuffer = new ShaderSSBO();
                 {
@@ -65,8 +66,8 @@ public class FabricIrisHandle implements IrisHandle {
                     envBuffer.createBufferData(oldBuffer.getSize(), GL46.GL_DYNAMIC_COPY);
                     envBuffer.bufferSubData(0,new int[8]);
                     envBuffer.bindIndex(oldBuffer.getIndex());
-                    oldBuffer.destroy();
-                    suffers[finalEnvBufferIndex] = new ShaderStorageBuffer(envBuffer.id, oldBuffer.getIndex(), oldBuffer.getSize());
+                    ((ShaderStorageBufferAccessor)oldBuffer).callDestroy();
+                    suffers[finalEnvBufferIndex] = new ShaderStorageBuffer(envBuffer.id, ((ShaderStorageBufferAccessor)oldBuffer).getInfo());
                 }
                 suffers[finalLightBufferIndex].bind();
                 suffers[finalEnvBufferIndex].bind();

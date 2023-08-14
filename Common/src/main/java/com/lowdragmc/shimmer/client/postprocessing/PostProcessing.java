@@ -158,7 +158,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
     }
 
     public static String RbBloomMRTFSHInjection(String s) {
-        s = new StringBuffer(s).insert(s.lastIndexOf("in vec4 v_Color;"), """
+        s = new StringBuffer(s).insert(s.lastIndexOf("in vec3 v_ColorModulator;"), """
                         in float isBloom;
                         """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), """
@@ -166,7 +166,7 @@ public class PostProcessing implements ResourceManagerReloadListener {
                         """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
                     if (isBloom > 255.) {
-                        bloomColor = fragColor * smoothstep(u_FogEnd,u_FogStart,v_FragDistance);
+                        bloomColor = out_FragColor * smoothstep(u_FogEnd,u_FogStart,v_FragDistance);
                     } else {
                         bloomColor = vec4(0.);
                     }

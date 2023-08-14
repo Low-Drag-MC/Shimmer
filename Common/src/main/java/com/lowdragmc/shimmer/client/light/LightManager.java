@@ -117,12 +117,12 @@ public enum LightManager {
                  """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), getLightShader()).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf('}'), Services.PLATFORM.useLightMap() ? """
-                    v_Color = color_light_uv(position, v_Color, _vert_tex_light_coord);
+                    v_ColorModulator = color_light_uv(position, vec4(v_ColorModulator, 1.0), ivec2(_vert_light) * 16 ).rgb;
                 """ : """
-                    v_Color = color_light(position, v_Color);
+                    v_ColorModulator = color_light(position, vec4(v_ColorModulator,1.0)  * 16).rgb;
                 """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf("}"), """
-                isBloom = float(_vert_tex_light_coord.x);
+                isBloom = ((_vert_material >> 4u) & 0x01u) > 0u ? 256.0 : 0.0;
                 """).toString();
         return s;
     }
