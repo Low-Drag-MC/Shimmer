@@ -32,7 +32,7 @@ on:
 jobs:
   call-build-workflow:
     permissions:
-      actions: read
+      contents: read
     uses: "./.github/workflows/build.yml"
 
   publish:
