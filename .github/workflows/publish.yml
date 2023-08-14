@@ -50,8 +50,8 @@ jobs:
           version-type : ${{ inputs.release-type }}
           changelog : ${{ inputs.changelog }}
           files: |
-            fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
-            forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+            Fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+            Forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
           java: Java 18
 
       - name: Publish Modrinth Release
@@ -64,8 +64,8 @@ jobs:
           version-type: ${{ inputs.release-type }}
           changelog: ${{ inputs.changelog }}
           files: |
-            fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
-            forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+            Fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+            Forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
           java: Java 18
 
       - name: Publish Curseforge Release
@@ -78,6 +78,6 @@ jobs:
           version-type: ${{ inputs.release-type }}
           changelog: ${{ inputs.changelog }}
           files: |
-            fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
-            forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+            Fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+            Forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
           java: Java 18
