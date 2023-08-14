@@ -1,0 +1,83 @@
+name: publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-type:
+        description: "release type"
+        default: release
+        required: true
+        type: choice
+        options:
+          - alpha
+          - beta
+          - release
+      changelog:
+        description: "change log"
+        required: true
+        type: string
+      github-release:
+        description: "publish github release"
+        type: boolean
+        default: true
+      modrinth:
+        description: "publish modrinth"
+        type: boolean
+        default: true
+      curseforge:
+        description: "publish curseforge"
+        type: boolean
+        default: true
+
+permissions: read-all
+
+jobs:
+  call-build-workflow:
+    uses: "./.github/workflows/build.yml"
+
+  publish:
+    needs: call-build-workflow
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Publish Github Release
+        uses: Kir-Antipov/mc-publish@v3.3
+        if: ${{ inputs.github-release }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-generate-changelog : true
+
+          version-type : ${{ inputs.release-type }}
+          changelog : ${{ inputs.changelog }}
+          files: |
+            fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+            forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+          java: Java 18
+
+      - name: Publish Modrinth Release
+        uses: Kir-Antipov/mc-publish@v3.3
+        if: ${{ inputs.modrinth }}
+        with:
+          modrinth-id: rWlXIATK
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          version-type: ${{ inputs.release-type }}
+          changelog: ${{ inputs.changelog }}
+          files: |
+            fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+            forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+          java: Java 18
+
+      - name: Publish Curseforge Release
+        uses: Kir-Antipov/mc-publish@v3.3
+        if: ${{ inputs.curseforge }}
+        with:
+          curseforge-id: 627824
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          version-type: ${{ inputs.release-type }}
+          changelog: ${{ inputs.changelog }}
+          files: |
+            fabric/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+            forge/build/libs/!(*-@(dev|sources|javadoc|dev-shadow)).jar
+          java: Java 18
