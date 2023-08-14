@@ -49,13 +49,15 @@ jobs:
     steps:
       - name: Download shimmer artifact
         uses: actions/download-artifact@v3
+        continue-on-error: true
         with:
           name: Shimmer
 
       - name: Checking and setting the environment
         id: shimmer_env
+        continue-on-error: true
         run: |
-          export loader = ${{ matrix.loader }}
+          export loader=${{ matrix.loader }}
           export name=$(ls ${loader}/build/libs/ | grep shadow -v | grep sources -v | awk -F.jar '{print $1}')
           export mod_name=$(echo $name | awk -F- '{print $1}')
           export loader_name=$(echo $name | awk -F- '{print $2}')
@@ -73,6 +75,7 @@ jobs:
 
       - name: Publish Github Release
         uses: Kir-Antipov/mc-publish@v3.3
+        continue-on-error: true
         if: ${{ matrix.website == 'github_release' && inputs.github-release }}
         with:
           files: ${{ steps.shimmer_env.outputs.files }}
@@ -87,6 +90,7 @@ jobs:
 
       - name: Publish Modrinth Release
         uses: Kir-Antipov/mc-publish@v3.3
+        continue-on-error: true
         if : ${{ matrix.website == 'modrinth' && inputs.modrinth }}
         with:
           files: ${{ steps.shimmer_env.outputs.files }}
