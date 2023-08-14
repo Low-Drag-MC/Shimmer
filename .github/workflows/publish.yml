@@ -32,6 +32,7 @@ on:
 permissions:
   packages: write
   actions: read
+  contents: read
 
 jobs:
   call-build-workflow:
