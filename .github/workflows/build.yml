@@ -33,6 +33,7 @@ jobs:
       uses: actions/upload-artifact@v3.1.2
       with:
         name: Shimmer
+        if-no-files-found: error
         path: |
           Fabric/build/libs
           Forge/build/libs

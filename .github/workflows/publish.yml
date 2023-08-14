@@ -40,6 +40,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Download a single artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: Shimmer
+
       - name: Publish Github Release
         uses: Kir-Antipov/mc-publish@v3.3
         if: ${{ inputs.github-release }}
