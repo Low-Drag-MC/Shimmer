@@ -54,7 +54,7 @@ jobs:
         loader: [ Forge, Fabric ]
         website: [ modrinth, curseforge, github_release ]
     name: ${{ matrix.website }} (${{ matrix.loader }})
-    if: ${{ (matrix.loader == 'Forge' && inputs.forge) || (matrix.loader == 'Fabric' && inputs.fabric) }}
+    if: ${{ matrix.loader == 'Forge' && inputs.forge }} || ${{ matrix.loader == 'Fabric' && inputs.fabric) }}
 
     steps:
       - name: Download shimmer artifact
