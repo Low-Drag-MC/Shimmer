@@ -71,14 +71,15 @@ jobs:
           echo "mod_version=$mod_version" >> $GITHUB_OUTPUT
           echo "full_version=$full_version" >> $GITHUB_OUTPUT
           rm ${loader}/build/libs/*shadow.jar
-          echo "files=${loader}/build/libs/*" >> $GITHUB_OUTPUT
 
       - name: Publish Github Release
         uses: Kir-Antipov/mc-publish@v3.3
         continue-on-error: true
         if: ${{ matrix.website == 'github_release' && inputs.github-release }}
         with:
-          files: ${{ steps.shimmer_env.outputs.files }}
+          files: |
+            ${{ matrix.loader }}/build/libs/!(*-@(dev|sources|javadoc)).jar
+            ${{ matrix.loader }}build/libs/*-@(dev|sources|javadocs).jar
           name : ${{ steps.shimmer_env.outputs.name }}
           version : ${{ steps.shimmer_env.outputs.full_version }}
           version-type: ${{ inputs.release-type }}
@@ -93,7 +94,9 @@ jobs:
         continue-on-error: true
         if : ${{ matrix.website == 'modrinth' && inputs.modrinth }}
         with:
-          files: ${{ steps.shimmer_env.outputs.files }}
+          files: |
+            ${{ matrix.loader }}/build/libs/!(*-@(dev|sources|javadoc)).jar
+            ${{ matrix.loader }}build/libs/*-@(dev|sources|javadocs).jar
           name: ${{ steps.shimmer_env.outputs.name }}
           version: ${{ steps.shimmer_env.outputs.full_version }}
           version-type: ${{ inputs.release-type }}
@@ -108,7 +111,9 @@ jobs:
         continue-on-error: true
         if: ${{ matrix.website == 'curseforge' && inputs.curseforge }}
         with:
-          files: ${{ steps.shimmer_env.outputs.files }}
+          files: |
+            ${{ matrix.loader }}/build/libs/!(*-@(dev|sources|javadoc)).jar
+            ${{ matrix.loader }}build/libs/*-@(dev|sources|javadocs).jar
           name: ${{ steps.shimmer_env.outputs.name }}
           version: ${{ steps.shimmer_env.outputs.full_version }}
           version-type: ${{ inputs.release-type }}
