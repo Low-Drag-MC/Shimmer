@@ -82,4 +82,7 @@ public interface IrisHandle {
         });
     }
 
+    void bindWriteMain();
+
+    int getCompositeId();
 }

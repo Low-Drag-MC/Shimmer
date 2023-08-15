@@ -142,4 +142,14 @@ public class FabricIrisHandle implements IrisHandle {
     public boolean underShadowPass() {
         return IrisApi.getInstance().isRenderingShadowPass();
     }
+
+    @Override
+    public void bindWriteMain() {
+        GBufferMainRenderTarget.autoBind();
+    }
+
+    @Override
+    public int getCompositeId() {
+        return GBufferMainRenderTarget.getID();
+    }
 }

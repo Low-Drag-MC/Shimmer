@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(ShaderStorageBuffer.class)
+@Mixin(value = ShaderStorageBuffer.class, remap = false)
 public interface ShaderStorageBufferAccessor {
     @Invoker void callDestroy();
     @Accessor ShaderStorageInfo getInfo();

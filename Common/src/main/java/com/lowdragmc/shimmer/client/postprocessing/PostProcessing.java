@@ -177,14 +177,14 @@ public class PostProcessing implements ResourceManagerReloadListener {
     public CopyDepthColorTarget getPostTarget(boolean hookColorAttachment) {
         if (hookColorAttachment) {
             if (postTargetWithColor == null) {
-                postTargetWithColor = new CopyDepthColorTarget(mc.getMainRenderTarget(), hookColorAttachment);
+                postTargetWithColor = new CopyDepthColorTarget(mc.getMainRenderTarget(), true);
                 postTargetWithColor.setClearColor(0, 0, 0, 0);
                 postTargetWithColor.clear(Minecraft.ON_OSX);
             }
             return postTargetWithColor;
         }else {
             if (postTargetWithoutColor == null) {
-                postTargetWithoutColor = new CopyDepthColorTarget(mc.getMainRenderTarget(), hookColorAttachment);
+                postTargetWithoutColor = new CopyDepthColorTarget(mc.getMainRenderTarget(), false);
                 postTargetWithoutColor.setClearColor(0, 0, 0, 0);
                 postTargetWithoutColor.clear(Minecraft.ON_OSX);
             }

@@ -7,6 +7,7 @@ import com.lowdragmc.shimmer.comp.iris.IrisHandle;
 import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
 import net.coderbot.iris.gl.buffer.ShaderStorageBuffer;
 import net.irisshaders.iris.api.v0.IrisApi;
+import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL46;
@@ -133,5 +134,16 @@ public class ForgeOculusHandle implements IrisHandle {
     @Override
     public boolean underShadowPass() {
         return IrisApi.getInstance().isRenderingShadowPass();
+    }
+
+    @Override
+    public void bindWriteMain() {
+        //TODO wait oculus update
+        Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
+    }
+
+    @Override
+    public int getCompositeId() {
+        return Minecraft.getInstance().getMainRenderTarget().getColorTextureId();
     }
 }

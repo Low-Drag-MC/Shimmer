@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lowdragmc.shimmer.client.rendertarget.ProxyTarget;
 import com.lowdragmc.shimmer.client.rendertarget.ScaleTextureTarget;
+import com.lowdragmc.shimmer.client.rendertarget.SelectRenderTarget;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.shaders.Uniform;
@@ -11,9 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.util.GsonHelper;
 import org.lwjgl.opengl.GL11;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -41,7 +40,8 @@ public abstract class PostChainMixin {
 
     @Shadow public abstract void addTempTarget(String pName, int pWidth, int pHeight);
 
-    public void addTempTarget(String pName, float sw, float sh) {
+    @Unique
+    public void shimmer$addTempTarget(String pName, float sw, float sh) {
         RenderTarget rendertarget = new ScaleTextureTarget(sw, sh, screenWidth, screenHeight, true, Minecraft.ON_OSX);
         rendertarget.setClearColor(0.0F, 0.0F, 0.0F, 0.0F);
         if (Services.PLATFORM.isStencilEnabled(screenTarget)) { Services.PLATFORM.enableStencil(rendertarget); }
@@ -62,7 +62,7 @@ public abstract class PostChainMixin {
             JsonObject scaleSize = GsonHelper.getAsJsonObject(jsonobject, "scaleSize");
             float width = GsonHelper.getAsFloat(scaleSize, "width", 1);
             float height = GsonHelper.getAsFloat(scaleSize, "height", 1);
-            addTempTarget(s, width, height);
+            shimmer$addTempTarget(s, width, height);
             if (GsonHelper.getAsBoolean(jsonobject, "bilinear", false)) {
                 customRenderTargets.get(s).setFilterMode(GL11.GL_LINEAR);
             }
@@ -92,6 +92,8 @@ public abstract class PostChainMixin {
                 if (!customRenderTargets.containsKey(pTarget)) {
                     addTempTarget(pTarget, screenWidth, screenHeight);
                 }
+            } else if (pTarget.equals("shimmer:composite_source")) {
+                cir.setReturnValue(new SelectRenderTarget());
             }
         }
     }

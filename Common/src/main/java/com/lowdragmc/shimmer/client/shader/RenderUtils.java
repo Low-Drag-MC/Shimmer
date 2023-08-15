@@ -1,16 +1,20 @@
 package com.lowdragmc.shimmer.client.shader;
 
 import com.lowdragmc.shimmer.ShimmerConstants;
+import com.lowdragmc.shimmer.comp.iris.IrisHandle;
+import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL43;
+import org.lwjgl.opengl.GL46;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -31,11 +35,16 @@ public class RenderUtils {
 
         to.bindWrite(true);
 
+        if (MixinPluginShared.IS_IRIS_LOAD && to == Minecraft.getInstance().getMainRenderTarget()) {
+            IrisHandle.INSTANCE.bindWriteMain();
+        } else {
+            Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
+        }
+
         blitShader.setSampler("DiffuseSampler", from.getColorTextureId());
 
-        blitShader.apply();
-        GlStateManager._enableBlend();
-        RenderSystem.defaultBlendFunc();
+        blitShader.apply();//iris will disable color mask here, open here
+        GL46.glColorMaski(0,true, true,true,true);
 
         Tesselator tesselator = RenderSystem.renderThreadTesselator();
         BufferBuilder bufferbuilder = tesselator.getBuilder();
