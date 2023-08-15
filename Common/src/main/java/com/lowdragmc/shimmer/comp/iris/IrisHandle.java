@@ -17,11 +17,18 @@ public interface IrisHandle {
      */
     void updateInfo(Object buffers);
 
+    /**
+     * don't destroy ssbo buffer, it will be destroyed by iris since we delegate to it
+     */
     void onSSBODestroyed();
 
     void setLightsIndex(int index);
 
+    int getLightsIndex();
+
     void setEnvIndex(int index);
+
+    int getEnvIndex();
 
     static <T> T make(Supplier<T> supplier) {
         return supplier.get();
@@ -58,10 +65,14 @@ public interface IrisHandle {
                     try {
                         final int index = Integer.parseInt(analyze[1]);
                         switch (analyze[0]) {
-                            case ShimmerConstants.SHIMMER_SHADERS_PROPERTIES_LIGHTS_IDENTIFIER ->
-                                    INSTANCE.setLightsIndex(index);
-                            case ShimmerConstants.SHIMMER_SHADERS_PROPERTIES_ENV_IDENTIFIER ->
-                                    INSTANCE.setEnvIndex(index);
+                            case ShimmerConstants.SHIMMER_SHADERS_PROPERTIES_LIGHTS_IDENTIFIER -> {
+                                ShimmerConstants.LOGGER.info("detect LIGHT BUFFER ssbo index:" + index);
+                                INSTANCE.setLightsIndex(index);
+                            }
+                            case ShimmerConstants.SHIMMER_SHADERS_PROPERTIES_ENV_IDENTIFIER -> {
+                                ShimmerConstants.LOGGER.info("detect ENV BUFFER ssbo index:" + index);
+                                INSTANCE.setEnvIndex(index);
+                            }
                         }
                     } catch (NumberFormatException ignored) {
 

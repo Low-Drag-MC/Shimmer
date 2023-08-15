@@ -11,20 +11,32 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL46;
 
+@SuppressWarnings("unused")
 public class ForgeOculusHandle implements IrisHandle {
 
+    /**
+     * must have this, this is called by reflect
+     */
     public ForgeOculusHandle() {
     }
 
     private boolean available = MixinPluginShared.IS_OCULUS_LOAD;
     @Nullable
     private Pair<ShaderSSBO, ShaderSSBO> ssbos;
+    /**
+     * global ssbo index
+     */
     private int lightIndex = -1;
     private int envIndex = -1;
 
     @Override
     public void updateInfo(Object buffers) {
         if (!available || !ShimmerConstants.IRIS_COMPACT_ENABLE) return;
+        if (lightIndex == -1 || envIndex == -1) {
+            ShimmerConstants.LOGGER.info("env buffer not set fully, light:{}, env:{}", lightIndex, envIndex);
+            ShimmerConstants.LOGGER.info("shimmer shader support for colored light with ssbo is now offline");
+            return;
+        }
         if (buffers instanceof ShaderStorageBuffer[] suffers) {
             int lightBufferIndex = -1;
             int envBufferIndex = -1;
@@ -44,11 +56,16 @@ public class ForgeOculusHandle implements IrisHandle {
                     }
                 }
             }
-            if (lightBufferIndex == -1 || envBufferIndex == -1) return;
+            if (lightBufferIndex == -1 || envBufferIndex == -1) {
+                ShimmerConstants.LOGGER.error("failed to detect ssbo created by iris");
+                return;
+            } else {
+                ShimmerConstants.LOGGER.info("detect ssbo created by iris success");
+            }
             int finalLightBufferIndex = lightBufferIndex;
             int finalEnvBufferIndex = envBufferIndex;
             RenderUtils.warpGLDebugLabel("initSSBO", () -> {
-                var lightBuffer = new ShaderSSBO();
+                var lightBuffer = new ShaderSSBO();//TODO add check after oculus follows iris
                 //no need to call glShaderStorageBlockBinding here, as we set layout in shader explicitly
                 {
                     var oldBuffer = suffers[finalLightBufferIndex];
@@ -75,15 +92,11 @@ public class ForgeOculusHandle implements IrisHandle {
         }
     }
 
+
+
     @Override
     public void onSSBODestroyed() {
-        if (ssbos != null) {
-            ssbos.getLeft().close();
-            ssbos.getRight().close();
-            ssbos = null;
-        }
-        lightIndex = -1;
-        envIndex = -1;
+        ssbos = null;
     }
 
     @Override
@@ -92,8 +105,18 @@ public class ForgeOculusHandle implements IrisHandle {
     }
 
     @Override
+    public int getLightsIndex() {
+        return lightIndex;
+    }
+
+    @Override
     public void setEnvIndex(int index) {
         this.envIndex = index;
+    }
+
+    @Override
+    public int getEnvIndex() {
+        return envIndex;
     }
 
     @Override

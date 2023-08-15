@@ -11,24 +11,35 @@ import net.irisshaders.iris.api.v0.IrisApi;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL46;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
 
+@SuppressWarnings("unused")
 public class FabricIrisHandle implements IrisHandle {
 
+    /**
+     * must have this, this is called by reflect
+     */
     public FabricIrisHandle() {
     }
 
     private boolean available = MixinPluginShared.IS_IRIS_LOAD;
     @Nullable
     private Pair<ShaderSSBO, ShaderSSBO> ssbos;
+    /**
+     * global ssbo index
+     */
     private int lightIndex = -1;
     private int envIndex = -1;
 
     @Override
     public void updateInfo(Object buffers) {
         if (!available || !ShimmerConstants.IRIS_COMPACT_ENABLE) return;
+        if (lightIndex == -1 || envIndex == -1) {
+            ShimmerConstants.LOGGER.info("env buffer not set fully, light:{}, env:{}", lightIndex, envIndex);
+            ShimmerConstants.LOGGER.info("shimmer shader support for colored light with ssbo is now offline");
+            return;
+        }
         if (buffers instanceof ShaderStorageBuffer[] suffers) {
+            //index in the ShaderStorageBuffer[]
             int lightBufferIndex = -1;
             int envBufferIndex = -1;
             for (int i = 0; i < suffers.length; i++) {
@@ -47,30 +58,18 @@ public class FabricIrisHandle implements IrisHandle {
                     }
                 }
             }
-            if (lightBufferIndex == -1 || envBufferIndex == -1) return;
+            if (lightBufferIndex == -1 || envBufferIndex == -1) {
+                ShimmerConstants.LOGGER.error("failed to detect ssbo created by iris");
+                return;
+            } else {
+                ShimmerConstants.LOGGER.info("detect ssbo created by iris success");
+            }
             int finalLightBufferIndex = lightBufferIndex;
             int finalEnvBufferIndex = envBufferIndex;
+            if (checkIsRelative(suffers[lightBufferIndex], "light") || checkIsRelative(suffers[envBufferIndex],"env")) return;
             RenderUtils.warpGLDebugLabel("initSSBO", () -> {
-                var lightBuffer = new ShaderSSBO();
-                //no need to call glShaderStorageBlockBinding here, as we set layout in shader explicitly
-                {
-                    var oldBuffer = suffers[finalLightBufferIndex];
-                    lightBuffer.createBufferData(oldBuffer.getSize(), GL46.GL_DYNAMIC_COPY);
-                    lightBuffer.bindIndex(oldBuffer.getIndex());
-                    ((ShaderStorageBufferAccessor)oldBuffer).callDestroy();
-                    suffers[finalLightBufferIndex] = new ShaderStorageBuffer(lightBuffer.id, ((ShaderStorageBufferAccessor)oldBuffer).getInfo());
-                }
-                var envBuffer = new ShaderSSBO();
-                {
-                    var oldBuffer = suffers[finalEnvBufferIndex];
-                    envBuffer.createBufferData(oldBuffer.getSize(), GL46.GL_DYNAMIC_COPY);
-                    envBuffer.bufferSubData(0,new int[8]);
-                    envBuffer.bindIndex(oldBuffer.getIndex());
-                    ((ShaderStorageBufferAccessor)oldBuffer).callDestroy();
-                    suffers[finalEnvBufferIndex] = new ShaderStorageBuffer(envBuffer.id, ((ShaderStorageBufferAccessor)oldBuffer).getInfo());
-                }
-                suffers[finalLightBufferIndex].bind();
-                suffers[finalEnvBufferIndex].bind();
+                var lightBuffer = replaceSSBO(suffers, finalLightBufferIndex);
+                var envBuffer = replaceSSBO(suffers, finalEnvBufferIndex);
                 ssbos = Pair.of(lightBuffer, envBuffer);
             });
         } else {
@@ -78,15 +77,34 @@ public class FabricIrisHandle implements IrisHandle {
         }
     }
 
+    private static boolean checkIsRelative(ShaderStorageBuffer buffer, String name) {
+        if (((ShaderStorageBufferAccessor)buffer).getInfo().relative()) {
+            ShimmerConstants.LOGGER.error("expect buffer:{} not relative", name);
+            return true;
+        } {
+            return false;
+        }
+    }
+
+    private static ShaderSSBO replaceSSBO(ShaderStorageBuffer[] suffers, int replaceIndex) {
+        var oldBuffer = suffers[replaceIndex];
+        //destroy origin
+        ((ShaderStorageBufferAccessor) oldBuffer).callDestroy();
+        //create ours
+        var buffer = new ShaderSSBO();
+        buffer.createBufferData(oldBuffer.getSize(), GL46.GL_DYNAMIC_COPY);
+        buffer.bindIndex(oldBuffer.getIndex());
+        //warp and bind
+        var irisSSBO = new ShaderStorageBuffer(buffer.id, ((ShaderStorageBufferAccessor) oldBuffer).getInfo());
+        suffers[replaceIndex] = irisSSBO;
+        irisSSBO.bind();
+
+        return buffer;
+    }
+
     @Override
     public void onSSBODestroyed() {
-        if (ssbos != null) {
-            ssbos.getLeft().close();
-            ssbos.getRight().close();
-            ssbos = null;
-        }
-        lightIndex = -1;
-        envIndex = -1;
+        ssbos = null;
     }
 
     @Override
@@ -95,8 +113,18 @@ public class FabricIrisHandle implements IrisHandle {
     }
 
     @Override
+    public int getLightsIndex() {
+        return lightIndex;
+    }
+
+    @Override
     public void setEnvIndex(int index) {
         this.envIndex = index;
+    }
+
+    @Override
+    public int getEnvIndex() {
+        return envIndex;
     }
 
     @Override

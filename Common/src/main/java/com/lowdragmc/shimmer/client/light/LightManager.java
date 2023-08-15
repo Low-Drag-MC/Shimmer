@@ -206,6 +206,9 @@ public enum LightManager {
                     env.bufferSubData(0, new int[]{UV_LIGHT.size() + blockLightSize});
                     env.bufferSubData(4,new int[]{NO_UV_LIGHT_COUNT});
                     env.bufferSubData(16, new float[]{camX, camY, camZ});
+
+                    light.bindIndex(irisHandle.getLightsIndex());
+                    env.bindIndex(irisHandle.getEnvIndex());
                 }
             }else {
                 envUBO.bufferSubData(0,new int[4]);
@@ -217,8 +220,10 @@ public enum LightManager {
 
     public void updateNoUVLight(){
         LocalPlayer localPlayer = Minecraft.getInstance().player;
+        if (localPlayer == null) return;
         NO_UV_LIGHT_COUNT = 0;
         Vec3 localPlayerPosition = localPlayer.position();
+        if (Minecraft.getInstance().level == null) return;
         List<AbstractClientPlayer> players = Minecraft.getInstance().level.players();
         float partialTicks = Minecraft.getInstance().getFrameTime();
         for (AbstractClientPlayer player : players) {
@@ -328,6 +333,7 @@ public enum LightManager {
     }
 
     @Nullable
+    @SuppressWarnings("unused")
     public ColorPointLight addLight(Vector3f pos, int color, float radius) {
         return addLight(pos, color, radius, false);
     }
@@ -424,7 +430,7 @@ public enum LightManager {
     public void loadConfig() {
 	    ITEM_MAP.clear();
 	    TAG_MAP.clear();
-	    BLOCK_MAP.clear();;
+	    BLOCK_MAP.clear();
 		FLUID_MAP.clear();
 
 		for (var config : Configuration.configs){
@@ -437,7 +443,8 @@ public enum LightManager {
 
 					if (blockLight.hasState()){
 
-						if (Utils.checkBlockProperties(config.configSource, blockLight.state, blockPair.first())) continue;
+                        assert blockLight.state != null;
+                        if (Utils.checkBlockProperties(config.configSource, blockLight.state, blockPair.first())) continue;
 
 						List<BlockState> validStates = Utils.getAvailableStates(blockLight.state, block);
 						var light = new ColorPointLight.Template(blockLight.radius,blockLight.color());
@@ -550,6 +557,7 @@ public enum LightManager {
      * @param playerUUID the specified player's UUID
      * @return instance created. null -- if no more available space. control enable/disable yourself
      */
+    @SuppressWarnings("unused")
     public ColorPointLight addPlayerItemLight(Vector3f pos, int color, float radius, UUID playerUUID) {
         if (maxFixedLight() == MAXIMUM_LIGHT_SUPPORT) return null;
         ColorPointLight light = new ColorPointLight(this,pos,color,radius,-1,false);
@@ -562,10 +570,12 @@ public enum LightManager {
         return NO_UV_LIGHT_PLAYER.get(player.getUUID());
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean removePlayerLight(UUID playerUUID){
         return NO_UV_LIGHT_PLAYER.remove(playerUUID) != null;
     }
 
+    @SuppressWarnings("unused")
     public boolean removePlayerLight(ColorPointLight removeLight){
         Set<UUID> set = NO_UV_LIGHT_PLAYER.keySet();
         for (UUID uuid : set) {
