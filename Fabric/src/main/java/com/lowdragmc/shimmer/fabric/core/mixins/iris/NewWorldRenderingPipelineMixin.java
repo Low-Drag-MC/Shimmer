@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(NewWorldRenderingPipeline.class)
+@Mixin(value = NewWorldRenderingPipeline.class, remap = false)
 public class NewWorldRenderingPipelineMixin {
     @Inject(method = "destroy",at = @At("RETURN"))
     private void injectDestroy(CallbackInfo ci){
