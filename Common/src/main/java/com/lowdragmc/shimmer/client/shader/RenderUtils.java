@@ -45,6 +45,8 @@ public class RenderUtils {
 
         blitShader.apply();//iris will disable color mask here, open here
         GL46.glColorMaski(0,true, true,true,true);
+        GlStateManager._enableBlend();
+        RenderSystem.defaultBlendFunc();
 
         Tesselator tesselator = RenderSystem.renderThreadTesselator();
         BufferBuilder bufferbuilder = tesselator.getBuilder();
