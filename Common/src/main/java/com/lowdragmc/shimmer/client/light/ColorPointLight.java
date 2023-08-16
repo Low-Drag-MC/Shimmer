@@ -34,9 +34,9 @@ public class ColorPointLight {
         g = template.g;
         b = template.b;
         radius = template.radius;
-        x = (float) (pos.x() + 0.5f);
-        y = (float) (pos.y() + 0.5f);
-        z = (float) (pos.z() + 0.5f);
+        x = (float) pos.x();
+        y = (float) pos.y();
+        z = (float) pos.z();
         this.uv = uv;
     }
 
