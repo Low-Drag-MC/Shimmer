@@ -43,7 +43,7 @@ public abstract class ChunkBuilderMeshingTaskMixin {
     @Unique
     private static final String INJECT_SIGNATURE = "execute(Lme/jellysquid/mods/sodium/client/render/chunk/compile/ChunkBuildContext;Lme/jellysquid/mods/sodium/client/util/task/CancellationToken;)Lme/jellysquid/mods/sodium/client/render/chunk/compile/ChunkBuildOutput;";
 
-    @Inject(method = INJECT_SIGNATURE, at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos$MutableBlockPos;set(III)Lnet/minecraft/core/BlockPos$MutableBlockPos;", ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
+    @Inject(method = INJECT_SIGNATURE, at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos$MutableBlockPos;set(III)Lnet/minecraft/core/BlockPos$MutableBlockPos;", ordinal = 1), locals = LocalCapture.CAPTURE_FAILHARD)
     private void injectChunkCompileAddLight(ChunkBuildContext buildContext, CancellationToken cancellationToken, CallbackInfoReturnable<ChunkBuildOutput> cir, BuiltSectionInfo.Builder renderData, VisGraph occluder, ChunkBuildBuffers buffers, BlockRenderCache cache, WorldSlice slice, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, BlockPos.MutableBlockPos blockPos, BlockPos.MutableBlockPos modelOffset, BlockRenderContext context, int y, int z, int x, BlockState blockState) {
         var fluidState = blockState.getFluidState();
         if (LightManager.INSTANCE.isBlockHasLight(blockState.getBlock(), fluidState)) {

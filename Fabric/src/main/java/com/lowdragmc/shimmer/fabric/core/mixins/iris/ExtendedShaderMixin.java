@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.Objects;
 
-@Mixin(value = ExtendedShader.class, remap = false)
+@Mixin(value = ExtendedShader.class)
 public class ExtendedShaderMixin {
 
     @SuppressWarnings("unused")
