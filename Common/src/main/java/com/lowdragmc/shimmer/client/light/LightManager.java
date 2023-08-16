@@ -193,6 +193,9 @@ public enum LightManager {
                 envUBO.bufferSubData(4,new int[]{NO_UV_LIGHT_COUNT});
                 envUBO.bufferSubData(16, new float[]{camX, camY, camZ});
 
+                LightCounter.setFreeUVLightCount(UV_LIGHT.size());
+                LightCounter.setBlockLightCount(blockLightSize);
+
                 if (MixinPluginShared.IS_IRIS_LOAD) {
                     IrisHandle irisHandle = IrisHandle.INSTANCE;
                     if (irisHandle == null || !irisHandle.underShaderPack() || irisHandle.underShadowPass()) return;
@@ -256,12 +259,25 @@ public enum LightManager {
             }
         }
 
+        LightCounter.resetNoUvLightCount();
+        LightCounter.setPlayerHeldItemLightCount(NO_UV_LIGHT_COUNT);
+
+        for (var light : ItemEntityLightSourceManager.getRenderLights()) {
+            light.uploadBuffer(BUFFER);
+            NO_UV_LIGHT_COUNT++;
+        }
+
+        LightCounter.setItemEntityLightCount(ItemEntityLightSourceManager.getRenderLights().size());
+
         for (ColorPointLight light: NO_UV_LIGHT){
             if (light.enable){
                 light.uploadBuffer(BUFFER);
                 NO_UV_LIGHT_COUNT++;
             }
         }
+
+        LightCounter.setFreeNoUVLightCount(NO_UV_LIGHT.size());
+
         BUFFER.flip();
     }
 

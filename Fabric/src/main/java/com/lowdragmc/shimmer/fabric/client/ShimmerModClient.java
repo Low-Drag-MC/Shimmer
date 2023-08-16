@@ -6,6 +6,8 @@ import com.lowdragmc.shimmer.ShimmerFields;
 import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
+import com.lowdragmc.shimmer.client.light.ItemEntityLightSourceManager;
+import com.lowdragmc.shimmer.client.light.LightCounter;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
@@ -18,7 +20,9 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
@@ -144,14 +148,23 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                                     }
                                     return Command.SINGLE_SUCCESS;
                                 }))
+                        .then(literal("coloredLightMonitor").executes(context -> {
+                            LightCounter.Render.enable = !LightCounter.Render.enable;
+                            context.getSource().sendFeedback(Component.literal("switch monitor to " +
+                                    (LightCounter.Render.enable ? "enable" : "disable")));
+                            return Command.SINGLE_SUCCESS;
+                        }))
                 ));
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
 
         KeyBindingHelper.registerKeyBinding(ShimmerFields.recordScreenColor);
 
+        ClientTickEvents.END_CLIENT_TICK.register(client -> ItemEntityLightSourceManager.onAllItemEntityTickEnd());
+
         //error inject place, need render before crosshair
         //HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> Eyedropper.update(guiGraphics));
+        HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> LightCounter.Render.update(guiGraphics));
     }
 
     @Override

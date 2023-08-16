@@ -6,6 +6,8 @@ import com.lowdragmc.shimmer.ShimmerFields;
 import com.lowdragmc.shimmer.client.ShimmerRenderTypes;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.HsbColorWidget;
+import com.lowdragmc.shimmer.client.light.ItemEntityLightSourceManager;
+import com.lowdragmc.shimmer.client.light.LightCounter;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.model.ShimmerMetadataSection;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
@@ -22,6 +24,7 @@ import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterShadersEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -77,8 +80,18 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
 
     @SubscribeEvent
     public void registerOverlay(RegisterGuiOverlaysEvent event) {
-        event.registerBelowAll("screen_color_pick_overly", (forgeGui, poseStack, partialTick, screenWidth, screenHeight) -> {
-            Eyedropper.update(poseStack);
+        event.registerBelowAll("screen_color_pick_overly", (forgeGui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
+            Eyedropper.update(guiGraphics);
         });
+        event.registerBelowAll("screen_shimmer_light_counter",(forgeGui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
+            LightCounter.Render.update(guiGraphics);
+        });
+    }
+
+    @SubscribeEvent
+    public void onClientTickPost(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            ItemEntityLightSourceManager.onAllItemEntityTickEnd();
+        }
     }
 }

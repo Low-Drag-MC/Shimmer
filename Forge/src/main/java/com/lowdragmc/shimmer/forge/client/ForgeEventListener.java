@@ -4,6 +4,7 @@ import com.lowdragmc.shimmer.ShimmerConstants;
 import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
+import com.lowdragmc.shimmer.client.light.LightCounter;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
@@ -135,6 +136,13 @@ public class ForgeEventListener {
                             } else {
                                 context.getSource().sendFailure(Component.literal("renderDoc not enable"));
                             }
+                            return Command.SINGLE_SUCCESS;
+                        }))
+                .then(Commands.literal("coloredLightMonitor")
+                        .executes(context -> {
+                            LightCounter.Render.enable = !LightCounter.Render.enable;
+                            context.getSource().sendSystemMessage(Component.literal("switch monitor to " +
+                                    (LightCounter.Render.enable ? "enable" : "disable")));
                             return Command.SINGLE_SUCCESS;
                         }))
         );
