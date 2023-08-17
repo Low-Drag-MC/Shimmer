@@ -193,6 +193,10 @@ public enum LightManager {
                 envUBO.bufferSubData(4,new int[]{NO_UV_LIGHT_COUNT});
                 envUBO.bufferSubData(16, new float[]{camX, camY, camZ});
 
+                if (blockLightSize != 0) {
+                    ColoredLightTracer.refreshData(lightUBO, UV_LIGHT.size() + blockLightSize, NO_UV_LIGHT_COUNT);
+                }
+
                 LightCounter.setFreeUVLightCount(UV_LIGHT.size());
                 LightCounter.setBlockLightCount(blockLightSize);
 

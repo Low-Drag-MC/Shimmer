@@ -1,11 +1,11 @@
 package com.lowdragmc.shimmer.fabric.client;
 
 import com.lowdragmc.shimmer.Configuration;
-
 import com.lowdragmc.shimmer.ShimmerFields;
 import com.lowdragmc.shimmer.Utils;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.AuxiliaryScreen;
 import com.lowdragmc.shimmer.client.auxiliaryScreen.Eyedropper;
+import com.lowdragmc.shimmer.client.light.ColoredLightTracer;
 import com.lowdragmc.shimmer.client.light.ItemEntityLightSourceManager;
 import com.lowdragmc.shimmer.client.light.LightCounter;
 import com.lowdragmc.shimmer.client.light.LightManager;
@@ -18,11 +18,13 @@ import com.lowdragmc.shimmer.platform.Services;
 import com.lowdragmc.shimmer.renderdoc.RenderDoc;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
@@ -154,6 +156,12 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                                     (LightCounter.Render.enable ? "enable" : "disable")));
                             return Command.SINGLE_SUCCESS;
                         }))
+                        .then(literal("coloredLightTracer")
+                                .then(argument("updateFrequency", IntegerArgumentType.integer(-1, 100))
+                                        .executes(context -> {
+                                            ColoredLightTracer.updateFrequent = context.getArgument("updateFrequency", Integer.class);
+                                            return Command.SINGLE_SUCCESS;
+                                        })))
                 ));
 
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(this);
@@ -165,6 +173,11 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
         //error inject place, need render before crosshair
         //HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> Eyedropper.update(guiGraphics));
         HudRenderCallback.EVENT.register((guiGraphics, tickDelta) -> LightCounter.Render.update(guiGraphics));
+
+        WorldRenderEvents.LAST.register(context -> ColoredLightTracer
+                .render(context.profiler(), context.camera(), context.matrixStack()));
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> ColoredLightTracer.tryRefreshNeedUpdate());
     }
 
     @Override
