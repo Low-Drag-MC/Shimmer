@@ -81,7 +81,7 @@ public class ShimmerModClient implements ClientModInitializer, SimpleSynchronous
                         .then(literal("colored_light")
                                 .then(argument("switch_state", BoolArgumentType.bool()).executes(
                                         context -> {
-                                            FabricShimmerConfig.CONFIG.BLOCK_BLOOM.set(context.getArgument("switch_state", Boolean.class));
+                                            FabricShimmerConfig.CONFIG.ENABLED_COLORED_LIGHT.set(context.getArgument("switch_state", Boolean.class));
                                             return Command.SINGLE_SUCCESS;
                                         }
                                 )))
