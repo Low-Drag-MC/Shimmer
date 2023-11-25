@@ -15,6 +15,7 @@
     "ResourceLocationMixin",
     "ShaderInstanceAccessor",
     "ShaderInstanceMixin",
+    "flywheel.LevelRenderMixin",
     "iris.ExtendedShaderMixin",
     "iris.GlFrameBufferMixin",
     "iris.GlResourceAccessor",
@@ -43,5 +44,5 @@
   },
   "mixins": [
     "iris.ProgramSetMixin"
-    ]
+  ]
 }
