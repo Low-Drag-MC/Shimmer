@@ -49,8 +49,8 @@ dependencies {
     forgeRuntimeLibrary("icyllis.modernui:ModernUI-Core:$modernui_core_version")
     modCompileOnly("icyllis.modernui:ModernUI-Forge:${minecraft_version}-${modernui_version}")
 
-    modImplementation("maven.modrinth:rubidium:0.7.0a")
-    modImplementation("maven.modrinth:oculus:1.20-1.6.4")
+    modImplementation("maven.modrinth:embeddium:0.2.10+mc1.20.1")
+    modImplementation("maven.modrinth:oculus:1.20.1-1.6.9")
 
 }
 
