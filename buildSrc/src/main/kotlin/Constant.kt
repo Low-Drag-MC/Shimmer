@@ -22,8 +22,8 @@ const val modernui_core_version = "3.7.1"
 const val modernui_version = "3.7.1.3"
 
 //Project
-const val version_major = 0.1
-const val version_patch = 22
+const val version_major = 0.2
+const val version_patch = 0
 const val semantics_version = "$minecraft_version-$version_major.$version_patch"
 const val maven_path = "snapshots"
 const val maven_group = "com.lowdragmc.shimmer"
