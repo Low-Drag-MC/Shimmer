@@ -5,6 +5,7 @@ import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
 import com.lowdragmc.shimmer.comp.iris.IrisHandle;
 import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
+import com.lowdragmc.shimmer.forge.core.mixins.rubidium.ShaderStorageBufferAccessor;
 import net.coderbot.iris.gl.buffer.ShaderStorageBuffer;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
@@ -66,26 +67,8 @@ public class ForgeOculusHandle implements IrisHandle {
             int finalLightBufferIndex = lightBufferIndex;
             int finalEnvBufferIndex = envBufferIndex;
             RenderUtils.warpGLDebugLabel("initSSBO", () -> {
-                var lightBuffer = new ShaderSSBO();//TODO add check after oculus follows iris
-                //no need to call glShaderStorageBlockBinding here, as we set layout in shader explicitly
-                {
-                    var oldBuffer = suffers[finalLightBufferIndex];
-                    lightBuffer.createBufferData(oldBuffer.getSize(), GL46.GL_DYNAMIC_COPY);
-                    lightBuffer.bindIndex(oldBuffer.getIndex());
-                    oldBuffer.destroy();
-                    suffers[finalLightBufferIndex] = new ShaderStorageBuffer(lightBuffer.id, oldBuffer.getIndex(), oldBuffer.getSize());
-                }
-                var envBuffer = new ShaderSSBO();
-                {
-                    var oldBuffer = suffers[finalEnvBufferIndex];
-                    envBuffer.createBufferData(oldBuffer.getSize(), GL46.GL_DYNAMIC_COPY);
-                    envBuffer.bufferSubData(0,new int[8]);
-                    envBuffer.bindIndex(oldBuffer.getIndex());
-                    oldBuffer.destroy();
-                    suffers[finalEnvBufferIndex] = new ShaderStorageBuffer(envBuffer.id, oldBuffer.getIndex(), oldBuffer.getSize());
-                }
-                suffers[finalLightBufferIndex].bind();
-                suffers[finalEnvBufferIndex].bind();
+                var lightBuffer = replaceSSBO(suffers, finalLightBufferIndex);
+                var envBuffer = replaceSSBO(suffers, finalEnvBufferIndex);
                 ssbos = Pair.of(lightBuffer, envBuffer);
             });
         } else {
@@ -93,7 +76,21 @@ public class ForgeOculusHandle implements IrisHandle {
         }
     }
 
+    private static ShaderSSBO replaceSSBO(ShaderStorageBuffer[] suffers, int replaceIndex) {
+        var oldBuffer = suffers[replaceIndex];
+        //destroy origin
+        ((ShaderStorageBufferAccessor) oldBuffer).callDestroy();
+        //create ours
+        var buffer = new ShaderSSBO();
+        buffer.createBufferData(oldBuffer.getSize(), GL46.GL_DYNAMIC_COPY);
+        buffer.bindIndex(oldBuffer.getIndex());
+        //warp and bind
+        var irisSSBO = new ShaderStorageBuffer(buffer.id, ((ShaderStorageBufferAccessor) oldBuffer).getInfo());
+        suffers[replaceIndex] = irisSSBO;
+        irisSSBO.bind();
 
+        return buffer;
+    }
 
     @Override
     public void onSSBODestroyed() {

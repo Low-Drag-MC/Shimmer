@@ -32,7 +32,7 @@ public abstract class SodiumWorldRendererMixin {
         int left = LightManager.INSTANCE.leftBlockLightCount();
         FloatBuffer buffer = LightManager.INSTANCE.getBuffer();
         buffer.clear();
-        var chunkrenderListIterator = ((RenderSectionManagerAccessor) renderSectionManager).getRenderLists().sorted();
+        var chunkrenderListIterator = ((RenderSectionManagerAccessor) renderSectionManager).getRenderLists().iterator();
         while (chunkrenderListIterator.hasNext()) {
             if (left <= blockLightSize) break;
             var chunkRenderList = chunkrenderListIterator.next();
@@ -40,7 +40,7 @@ public abstract class SodiumWorldRendererMixin {
             var sectionIterator = chunkRenderList.sectionsWithGeometryIterator(false);
             if (sectionIterator == null) continue;
             while (sectionIterator.hasNext()) {
-                var section = region.getSection(ChunkRenderList.unpackIndex(sectionIterator.next()));
+                var section = region.getSection(sectionIterator.nextByteAsInt());
                 if (section == null) continue;
                 if (left <= blockLightSize) break;
                 if (section instanceof IRenderChunk shimmerRenderChunk) {

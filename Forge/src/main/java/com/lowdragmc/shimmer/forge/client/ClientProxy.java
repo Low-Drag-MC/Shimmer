@@ -14,7 +14,10 @@ import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
 import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
+import com.lowdragmc.shimmer.comp.iris.ShaderpackInjection;
+import com.lowdragmc.shimmer.comp.iris.ShaderpackInjections;
 import com.lowdragmc.shimmer.forge.CommonProxy;
+import com.lowdragmc.shimmer.forge.ShimmerMod;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -38,6 +41,7 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
     public ClientProxy() {
         LightManager.injectShaders();
         PostProcessing.injectShaders();
+        ShaderpackInjections.injectShaders();
     }
 
     @SubscribeEvent
@@ -86,12 +90,5 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
         event.registerBelowAll("screen_shimmer_light_counter",(forgeGui, guiGraphics, partialTick, screenWidth, screenHeight) -> {
             LightCounter.Render.update(guiGraphics);
         });
-    }
-
-    @SubscribeEvent
-    public void onClientTickPost(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            ItemEntityLightSourceManager.onAllItemEntityTickEnd();
-        }
     }
 }

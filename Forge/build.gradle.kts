@@ -44,13 +44,13 @@ dependencies {
     include(mixinExtras)
     forgeRuntimeLibrary(mixinExtras)
 
-//    modImplementation("com.jozufozu.flywheel:flywheel-forge-$minecraft_version:$flywheel_version")
+    modImplementation("com.jozufozu.flywheel:flywheel-forge-$minecraft_version:$forge_flywheel_version")
 
     forgeRuntimeLibrary("icyllis.modernui:ModernUI-Core:$modernui_core_version")
     modCompileOnly("icyllis.modernui:ModernUI-Forge:${minecraft_version}-${modernui_version}")
 
-    modImplementation("maven.modrinth:embeddium:0.2.10+mc1.20.1")
-    modImplementation("maven.modrinth:oculus:1.20.1-1.6.9")
+    modCompileOnly("maven.modrinth:embeddium:0.2.10+mc1.20.1")
+    modCompileOnly("maven.modrinth:oculus:1.20.1-1.6.9")
 
 }
 

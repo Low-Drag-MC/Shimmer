@@ -1,45 +1,47 @@
 {
-	"required": true,
-	"minVersion": "0.8",
-	"package": "com.lowdragmc.shimmer.fabric.core.mixins",
-	"compatibilityLevel": "JAVA_17",
-	"plugin": "com.lowdragmc.shimmer.fabric.core.mixins.ShimmerFabricMixinPlugin",
-	"client": ["BakedQuadMixin",
-		"FabricParticleEngineMixin",
-		"GuiMixin", "MinecraftMixin",
-		"MutableQuadViewImplMixin",
-		"ParticleEngineMixin",
-		"QuadViewImplMixin",
-		"ResourceLocationMixin",
-		"ShaderInstanceAccessor",
-		"ShaderInstanceMixin",
-		"sodium.BlockRendererMixin",
-		"sodium.ChunkBuilderMeshingTaskMixin",
-		"sodium.CompactChunkVertexMixin",
-		"sodium.FluidRendererMixin",
-		"sodium.RenderSectionManagerAccessor",
-		"sodium.RenderSectionMixin",
-		"sodium.ShaderChunkRendererMixin",
-		"sodium.ShaderLoaderMixin",
-		"sodium.SodiumWorldRendererMixin",
-		"iris.ExtendedShaderMixin",
-		"iris.GlFrameBufferMixin",
-		"iris.GlResourceAccessor",
-		"iris.HeldItemSupplierMixin",
-		"iris.IrisChunkProgramOverridesMixin",
-		"iris.NewWorldRenderingPipelineMixin",
-		"iris.RenderTargetsMixin",
-		"iris.ShaderPropertiesMixin",
-		"iris.ShaderStorageBufferAccessor",
-		"iris.ShaderStorageBufferHolderMixin",
-		"iris.StandardMacrosMixin"
-	],
-	"server": [
-	],
-	"injectors": {
-		"defaultRequire": 1
-	},
-	"mixins": [
-
-	]
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.lowdragmc.shimmer.fabric.core.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "plugin": "com.lowdragmc.shimmer.fabric.core.mixins.ShimmerFabricMixinPlugin",
+  "client": [
+    "BakedQuadMixin",
+    "FabricParticleEngineMixin",
+    "GuiMixin",
+    "MinecraftMixin",
+    "MutableQuadViewImplMixin",
+    "ParticleEngineMixin",
+    "QuadViewImplMixin",
+    "ResourceLocationMixin",
+    "ShaderInstanceAccessor",
+    "ShaderInstanceMixin",
+    "iris.ExtendedShaderMixin",
+    "iris.GlFrameBufferMixin",
+    "iris.GlResourceAccessor",
+    "iris.HeldItemSupplierMixin",
+    "iris.IrisChunkProgramOverridesMixin",
+    "iris.NewWorldRenderingPipelineMixin",
+    "iris.RenderTargetsMixin",
+    "iris.ShaderPropertiesMixin",
+    "iris.ShaderStorageBufferAccessor",
+    "iris.ShaderStorageBufferHolderMixin",
+    "iris.StandardMacrosMixin",
+    "sodium.BlockRendererMixin",
+    "sodium.ChunkBuilderMeshingTaskMixin",
+    "sodium.CompactChunkVertexMixin",
+    "sodium.FluidRendererMixin",
+    "sodium.RenderSectionManagerAccessor",
+    "sodium.RenderSectionMixin",
+    "sodium.ShaderChunkRendererMixin",
+    "sodium.ShaderLoaderMixin",
+    "sodium.SodiumWorldRendererMixin"
+  ],
+  "server": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "iris.ProgramSetMixin"
+    ]
 }

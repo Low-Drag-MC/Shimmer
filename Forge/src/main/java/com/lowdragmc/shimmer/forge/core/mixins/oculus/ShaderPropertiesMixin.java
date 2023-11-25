@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = ShaderProperties.class, remap = false)
-public class ShaderPropertiesMixin {
+public abstract class ShaderPropertiesMixin {
 
     @Inject(method = "<init>(Ljava/lang/String;Lnet/coderbot/iris/shaderpack/option/ShaderPackOptions;Ljava/lang/Iterable;)V",at = @At("TAIL"))
     private void shaderProperties(String contents, ShaderPackOptions shaderPackOptions, Iterable<StringPair> environmentDefines, CallbackInfo ci){

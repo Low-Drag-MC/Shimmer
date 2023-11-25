@@ -30,6 +30,7 @@ const val maven_group = "com.lowdragmc.shimmer"
 
 const val mixinExtras = "com.github.LlamaLad7:MixinExtras:0.1.1"
 
-const val flywheel_version = "0.6.7-8"// FIXME
+const val fabric_flywheel_version = "0.6.9-1"
+const val forge_flywheel_version = "0.6.10-7"
 
 val Project.archiveBaseName get() = "$mod_name-${project.name.lowercase()}"

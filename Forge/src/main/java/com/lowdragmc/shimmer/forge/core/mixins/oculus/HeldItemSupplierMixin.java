@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(targets = "net.coderbot.iris.uniforms.IdMapUniforms.HeldItemSupplier", remap = false)
-public class HeldItemSupplierMixin {
+public abstract class HeldItemSupplierMixin {
 
     @Shadow
     private int lightValue;
