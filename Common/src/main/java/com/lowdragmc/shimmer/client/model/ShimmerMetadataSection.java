@@ -10,27 +10,30 @@ import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 
 public record ShimmerMetadataSection(boolean bloom) {
     public static final String SECTION_NAME = ShimmerConstants.MOD_ID;
-    private static final Map<ResourceLocation, ShimmerMetadataSection> METADATA_CACHE = new HashMap<>();
+    private static final Map<ResourceLocation, ShimmerMetadataSection> METADATA_CACHE = new ConcurrentHashMap<>();
+    public static final ShimmerMetadataSection MISSING = new ShimmerMetadataSection(false);
+
+    public static void clearCache() {
+        METADATA_CACHE.clear();
+    }
 
     @Nullable
     public static ShimmerMetadataSection getMetadata(ResourceLocation res) {
         if (METADATA_CACHE.containsKey(res)) {
             return METADATA_CACHE.get(res);
         }
-        ShimmerMetadataSection ret;
+        ShimmerMetadataSection ret = MISSING;
         try {
-            var metadata = Minecraft.getInstance().getResourceManager().getResource(res)
-                    .orElseThrow().metadata();
-            ret = metadata.getSection(Serializer.INSTANCE).orElse(null);
-        }catch (IOException | NoSuchElementException e){
-            ret = null;
+            var resource = Minecraft.getInstance().getResourceManager().getResource(res);
+            if (resource.isPresent()) {
+                ret = resource.get().metadata().getSection(Serializer.INSTANCE).orElse(MISSING);
+            }
+        } catch (Throwable ignored){
         }
         METADATA_CACHE.put(res, ret);
         return ret;

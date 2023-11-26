@@ -72,6 +72,7 @@ public class ClientProxy extends CommonProxy implements ResourceManagerReloadLis
         PostProcessing.loadConfig();
         ShimmerMetadataSection.onResourceManagerReload();
         LightManager.onResourceManagerReload();
+        ShimmerMetadataSection.clearCache();
         for (PostProcessing postProcessing : PostProcessing.values()) {
             postProcessing.onResourceManagerReload(resourceManager);
         }

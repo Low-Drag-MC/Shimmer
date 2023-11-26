@@ -14,7 +14,7 @@ public class ShaderpackInjections {
         ShaderpackInjection.TERRAIN.registerTerrainVshInjection(contains("_   ___ _____ ___    _   _    _____  __"), s -> injectBefore(s, "if (mc_Entity.x == 10269 || mc_Entity.x == 10273 || mc_Entity.x == 10274)", bloomUV("mat = 4.0;")));
         // Complementary
         ShaderpackInjection.TERRAIN.registerTerrainVshInjection(contains("Complementary"), s -> injectAfter(s, "mat = int(mc_Entity.x + 0.5);", bloomUV("mat = 11000;")));
-        ShaderpackInjection.TERRAIN.registerTerrainFshInjection(contains("Complementary"), s -> injectBefore(s, "vec2 lmCoordM = lmCoord;", "if (mat == 11000) emission = 5.0;"));
+        ShaderpackInjection.TERRAIN.registerTerrainFshInjection(contains("Complementary"), s -> injectBefore(s, "vec2 lmCoordM = lmCoord;", "if (mat == 11000) emission = 4.0;"));
         // Super Duper Vanilla
         ShaderpackInjection.TERRAIN.registerTerrainVshInjection(contains("Super Duper Vanilla"), s -> injectAfter(s, "blockId = int(mc_Entity.x);", bloomUV("blockId = 11000;")));
         ShaderpackInjection.TERRAIN.registerTerrainFshInjection(contains("Super Duper Vanilla"), s -> injectBefore(s, "material.albedo.rgb = toLinear(material.albedo.rgb);", "if (blockId == 11000) {material.emissive = .5;material.smoothness = 0.9;}"));
