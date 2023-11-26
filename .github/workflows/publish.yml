@@ -20,10 +20,6 @@ on:
         description: "publish github release"
         type: boolean
         default: true
-      maven:
-        description: 'publish to the maven'
-        type: boolean
-        default: true
       modrinth:
         description: "publish modrinth"
         type: boolean
@@ -51,9 +47,6 @@ jobs:
   publish:
     needs: call-build-workflow
     runs-on: ubuntu-latest
-    env:
-      MAVEN_PASS: ${{ secrets.MAVEN_PASS }}
-      MAVEN_USER: ${{ secrets.MAVEN_USER }}
     permissions:
       contents: write
     strategy:
@@ -104,13 +97,6 @@ jobs:
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-generate-changelog: true
-
-      - name: Publish Maven
-        uses: gradle/gradle-build-action@v2.4.2
-        continue-on-error: true
-        if: (matrix.website == 'github_release' && inputs.github-release) && ((matrix.loader == 'Forge' && inputs.forge) || (matrix.loader == 'Fabric' && inputs.fabric))
-        with:
-          arguments: publish
 
       - name: Publish Modrinth Release
         uses: Kir-Antipov/mc-publish@v3.3
