@@ -40,6 +40,7 @@ public record ShimmerMetadataSection(boolean bloom) {
     }
 
     public static boolean isBloom(TextureAtlasSprite sprite) {
+        if (sprite == null) return false;
         @SuppressWarnings("resource")
         ShimmerMetadataSection ret = getMetadata(spriteToAbsolute(sprite.contents().name()));
         return ret != null && ret.bloom;

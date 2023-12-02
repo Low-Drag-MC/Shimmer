@@ -27,3 +27,4 @@ artifacts
 
 #architectury
 .architectury-transformer
+*.DS_Store
