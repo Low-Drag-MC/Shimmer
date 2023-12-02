@@ -53,6 +53,9 @@ jobs:
     needs: call-build-workflow
     runs-on: ubuntu-latest
     if: inputs.maven-repository
+    env:
+      MAVEN_PASS: ${{ secrets.MAVEN_PASS }}
+      MAVEN_USER: ${{ secrets.MAVEN_USER }}
     steps:
       - name: Download shimmer artifact
         uses: actions/download-artifact@v3
