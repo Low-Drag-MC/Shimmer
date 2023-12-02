@@ -45,22 +45,25 @@ on:
 
 jobs:
   call-build-workflow:
-    runs-on: ubuntu-latest
-    env:
-      MAVEN_PASS: ${{ secrets.MAVEN_PASS }}
-      MAVEN_USER: ${{ secrets.MAVEN_USER }}
     permissions:
       contents: read
+    uses: "./.github/workflows/build.yml"
+
+  upload-maven:
+    needs: call-build-workflow
+    runs-on: ubuntu-latest
+    if: inputs.maven-repository
     steps:
-      - uses: actions/checkout@v3
-      - name: call-build_workflow
-        uses: "./.github/workflows/build.yml"
+      - name: Download shimmer artifact
+        uses: actions/download-artifact@v3
+        continue-on-error: true
+        with:
+          name: Shimmer
       - name: Publish to Maven
-        if: inputs.maven-repository
         uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: publish
-        
+    
   publish:
     needs: call-build-workflow
     runs-on: ubuntu-latest
