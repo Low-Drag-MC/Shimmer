@@ -57,6 +57,7 @@ jobs:
       MAVEN_PASS: ${{ secrets.MAVEN_PASS }}
       MAVEN_USER: ${{ secrets.MAVEN_USER }}
     steps:
+      - uses: actions/checkout@v3
       - name: Download shimmer artifact
         uses: actions/download-artifact@v3
         continue-on-error: true
