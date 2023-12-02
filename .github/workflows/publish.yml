@@ -16,6 +16,11 @@ on:
         description: "change log"
         required: true
         type: string
+      maven-repository:
+        description: "maven repository"
+        required: true
+        type: bollean
+        default: true
       github-release:
         description: "publish github release"
         type: boolean
@@ -40,10 +45,21 @@ on:
 
 jobs:
   call-build-workflow:
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_PASS: ${{ secrets.MAVEN_PASS }}
+      MAVEN_USER: ${{ secrets.MAVEN_USER }}
     permissions:
       contents: read
-    uses: "./.github/workflows/build.yml"
-
+    steps:
+      - name: call-build_workflow
+        uses: "./.github/workflows/build.yml"
+      - name: Publish to Maven
+        if: inputs.maven-repository
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: publish
+        
   publish:
     needs: call-build-workflow
     runs-on: ubuntu-latest
