@@ -9,7 +9,9 @@ both configurable json and java api support<br>
 customize what you like
 </blockquote>
 
-Join our [![discord](https://shields.io/badge/Discord-Join%20Us-blue?logo=Discord&style=flat)](https://discord.gg/CQywkfwPrC) for communication, issue feedback  
+Join our [![discord](https://shields.io/badge/Discord-Join%20Us-blue?logo=Discord&style=flat)](https://discord.gg/CQywkfwPrC)
+![qq group](https://shields.io/badge/QQ-755790169-red?logo=tencentqq&style=flat)
+for communication, issue feedback  
 
 <h3 align="center">
 <a href="https://modrinth.com/mod/shimmer!" target="_blank">Modrinth Homepage</a> |
