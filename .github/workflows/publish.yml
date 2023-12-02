@@ -19,7 +19,7 @@ on:
       maven-repository:
         description: "maven repository"
         required: true
-        type: bollean
+        type: boolean
         default: true
       github-release:
         description: "publish github release"
