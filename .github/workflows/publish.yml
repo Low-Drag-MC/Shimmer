@@ -52,6 +52,7 @@ jobs:
     permissions:
       contents: read
     steps:
+      - uses: actions/checkout@v3
       - name: call-build_workflow
         uses: "./.github/workflows/build.yml"
       - name: Publish to Maven
