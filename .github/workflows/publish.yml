@@ -16,6 +16,11 @@ on:
         description: "change log"
         required: true
         type: string
+      maven-repository:
+        description: "maven repository"
+        required: true
+        type: boolean
+        default: true
       github-release:
         description: "publish github release"
         type: boolean
@@ -44,6 +49,34 @@ jobs:
       contents: read
     uses: "./.github/workflows/build.yml"
 
+  upload-maven:
+    needs: call-build-workflow
+    runs-on: ubuntu-latest
+    if: inputs.maven-repository
+    env:
+      MAVEN_PASS: ${{ secrets.MAVEN_PASS }}
+      MAVEN_USER: ${{ secrets.MAVEN_USER }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download shimmer artifact
+        uses: actions/download-artifact@v3
+        continue-on-error: true
+        with:
+          name: Shimmer
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Grant execute permission for gradle
+        run: chmod +x gradlew
+      - name: Publish to Maven
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: publish
+    
   publish:
     needs: call-build-workflow
     runs-on: ubuntu-latest
