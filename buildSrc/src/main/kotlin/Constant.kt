@@ -11,8 +11,8 @@ const val parchment_version = "1.20.1:2023.07.30"
 const val enabled_platforms = "fabric,forge"
 
 //Fabric
-const val fabric_loader_version = "0.14.21"
-const val fabric_api_version = "0.86.1+$minecraft_version"
+const val fabric_loader_version = "0.15.0"
+const val fabric_api_version = "0.91.0+$minecraft_version"
 const val cloth_config_version = "11.1.106"
 const val mod_menu_version = "7.1.0"
 
