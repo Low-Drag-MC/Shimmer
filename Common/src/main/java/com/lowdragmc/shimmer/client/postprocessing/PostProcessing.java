@@ -174,6 +174,23 @@ public class PostProcessing implements ResourceManagerReloadListener {
         return s;
     }
 
+    public static String embeddiumBloomMRTFSHInjection(String s) {
+        s = new StringBuffer(s).insert(s.lastIndexOf("in vec4 v_Color;"), """
+                        in float isBloom;
+                        """).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), """
+                        out vec4 bloomColor;
+                        """).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf('}'), """
+                    if (isBloom > 255.) {
+                        bloomColor = fragColor * smoothstep(u_FogEnd,u_FogStart,v_FragDistance);
+                    } else {
+                        bloomColor = vec4(0.);
+                    }
+                """).toString();
+        return s;
+    }
+
     public CopyDepthColorTarget getPostTarget(boolean hookColorAttachment) {
         if (hookColorAttachment) {
             if (postTargetWithColor == null) {

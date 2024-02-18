@@ -23,10 +23,10 @@ public abstract class ShaderLoaderMixin {
     private static String transformShader(String shader, ShaderType type, ResourceLocation name) {
         if (name.getPath().contains("block_layer_opaque")) {
             if (type == ShaderType.FRAGMENT) {
-                shader = PostProcessing.RbBloomMRTFSHInjection(shader);
+                shader = PostProcessing.embeddiumBloomMRTFSHInjection(shader);
             }
             if (type == ShaderType.VERTEX) {
-                shader = LightManager.RbVVSHInjection(shader);
+                shader = LightManager.embeddiumVVSHInjection(shader);
             }
         }
         return shader;

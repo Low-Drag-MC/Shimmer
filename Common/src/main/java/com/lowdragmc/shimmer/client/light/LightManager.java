@@ -127,6 +127,22 @@ public enum LightManager {
         return s;
     }
 
+    public static String embeddiumVVSHInjection(String s) {
+        s = new StringBuffer(s).insert(s.lastIndexOf("out vec2 v_TexCoord;"), """
+                 out float isBloom;
+                 """).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), getLightShader()).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf('}'), Services.PLATFORM.useLightMap() ? """
+                    v_Color = color_light_uv(position, v_Color, ivec2(_vert_tex_light_coord) * 16 ).rgba;
+                """ : """
+                    v_Color = color_light(position, v_Color * 16).rgba;
+                """).toString();
+        s = new StringBuffer(s).insert(s.lastIndexOf("}"), """
+                isBloom = ((_material_params >> 4u) & 0x01u) > 0u ? 256.0 : 0.0;
+                """).toString();
+        return s;
+    }
+
     public void bindRbProgram(int programID) {
         lightUBO.bindToShader(programID, "Lights");
         envUBO.bindToShader(programID, "Env");
