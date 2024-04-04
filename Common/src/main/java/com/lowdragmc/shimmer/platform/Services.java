@@ -15,11 +15,16 @@ public class Services {
     private static IPlatformHelper load() {
         String loaderName = ClientBrandRetriever.getClientModName().toLowerCase().trim();
         var classLocation = switch (loaderName) {
-            case "forge" -> "com.lowdragmc.shimmer.forge.platform.ForgePlatformHelper";
+            case "neoforge" -> "com.lowdragmc.shimmer.neoforge.platform.NeoForgePlatformHelper";
+            case "forge" -> {
+                ShimmerConstants.LOGGER.warn("forge detected, just works under neoforge");
+                ShimmerConstants.LOGGER.warn("behaviour may not be correct");
+                yield "com.lowdragmc.shimmer.fabric.platform.ForgePlatformHelper";
+            }
             case "fabric" -> "com.lowdragmc.shimmer.fabric.platform.FabricPlatformHelper";
             case "quilt" -> {
-                ShimmerConstants.LOGGER.warn("quilt detected, just work under fabric");
-                ShimmerConstants.LOGGER.warn("behaviour may ne be correct");
+                ShimmerConstants.LOGGER.warn("quilt detected, just works under fabric");
+                ShimmerConstants.LOGGER.warn("behaviour may not be correct");
                 yield "com.lowdragmc.shimmer.fabric.platform.FabricPlatformHelper";
             }
             //https://github.com/sp614x/optifine/issues/1631

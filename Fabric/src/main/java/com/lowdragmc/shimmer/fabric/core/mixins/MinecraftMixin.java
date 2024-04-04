@@ -25,7 +25,7 @@ public class MinecraftMixin {
      * @param screen
      * @param ci
      */
-    @Inject(method = "clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V",
+    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;)V",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/Minecraft;updateScreenAndTick(Lnet/minecraft/client/gui/screens/Screen;)V",
                     shift = At.Shift.AFTER))

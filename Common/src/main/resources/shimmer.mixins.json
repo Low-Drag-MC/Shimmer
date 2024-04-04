@@ -20,7 +20,7 @@
 		"PostPassMixin",
 		"ProgramMixin",
 		"RebuildTaskMixin",
-		"RenderChunkMixin",
+      "RenderSectionMixin",
 		"RenderSystemMixin",
 		"RenderTargetMixin",
 		"ShaderInstanceGlslProcessorMixin",

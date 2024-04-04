@@ -33,8 +33,8 @@ on:
         description: "publish curseforge"
         type: boolean
         default: true
-      forge:
-        description: "forge"
+      neoforge:
+        description: "neoforge"
         type: boolean
         default: true
       fabric:
@@ -84,7 +84,7 @@ jobs:
       contents: write
     strategy:
       matrix:
-        loader: [ Forge, Fabric ]
+        loader: [ NeoForge, Fabric ]
         website: [ modrinth, curseforge, github_release ]
     name: ${{ matrix.website }} (${{ matrix.loader }})
 
@@ -117,7 +117,7 @@ jobs:
       - name: Publish Github Release
         uses: Kir-Antipov/mc-publish@v3.3
         continue-on-error: true
-        if: (matrix.website == 'github_release' && inputs.github-release) && ((matrix.loader == 'Forge' && inputs.forge) || (matrix.loader == 'Fabric' && inputs.fabric))
+        if: (matrix.website == 'github_release' && inputs.github-release) && ((matrix.loader == 'NeoForge' && inputs.neoforge) || (matrix.loader == 'Fabric' && inputs.fabric))
         with:
           files: |
             ${{ matrix.loader }}/build/libs/!(*-@(dev|sources|javadoc)).jar
@@ -134,7 +134,7 @@ jobs:
       - name: Publish Modrinth Release
         uses: Kir-Antipov/mc-publish@v3.3
         continue-on-error: true
-        if : (matrix.website == 'modrinth' && inputs.modrinth) && ((matrix.loader == 'Forge' && inputs.forge) || (matrix.loader == 'Fabric' && inputs.fabric))
+        if : (matrix.website == 'modrinth' && inputs.modrinth) && ((matrix.loader == 'NeoForge' && inputs.neoforge) || (matrix.loader == 'Fabric' && inputs.fabric))
         with:
           files: |
             ${{ matrix.loader }}/build/libs/!(*-@(dev|sources|javadoc)).jar
@@ -151,7 +151,7 @@ jobs:
       - name: Publish Curseforge Release
         uses: Kir-Antipov/mc-publish@v3.3
         continue-on-error: true
-        if: (matrix.website == 'curseforge' && inputs.curseforge) && ((matrix.loader == 'Forge' && inputs.forge) || (matrix.loader == 'Fabric' && inputs.fabric))
+        if: (matrix.website == 'curseforge' && inputs.curseforge) && ((matrix.loader == 'NeoForge' && inputs.neoforge) || (matrix.loader == 'Fabric' && inputs.fabric))
         with:
           files: |
             ${{ matrix.loader }}/build/libs/!(*-@(dev|sources|javadoc)).jar

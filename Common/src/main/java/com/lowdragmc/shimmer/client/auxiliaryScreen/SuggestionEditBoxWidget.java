@@ -66,9 +66,7 @@ public class SuggestionEditBoxWidget extends EditBox {
 	/**
 	 * update is complete and call callbacks
 	 */
-	@Override
 	public void tick() {
-		super.tick();
 		var last = isComplete;
 		//check complete change
 		if (ResourceLocation.isValidResourceLocation(this.getValue())) {
@@ -94,9 +92,9 @@ public class SuggestionEditBoxWidget extends EditBox {
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+	public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 		//render current by super
-		super.render(guiGraphics, mouseX, mouseY, partialTick);
+		super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
 
 		//check if suggestion need render
 		if (suggestions != null && suggestions.contains(this.getValue())) return;

@@ -1,7 +1,7 @@
 package com.lowdragmc.shimmer.fabric.core.mixins.sodium;
 
 import com.lowdragmc.shimmer.client.light.ColorPointLight;
-import com.lowdragmc.shimmer.core.IRenderChunk;
+import com.lowdragmc.shimmer.core.IRenderSection;
 import me.jellysquid.mods.sodium.client.render.chunk.RenderSection;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -15,7 +15,7 @@ import java.util.List;
  * @implNote TODO
  */
 @Mixin(RenderSection.class)
-public abstract class RenderSectionMixin implements IRenderChunk {
+public abstract class RenderSectionMixin implements IRenderSection {
     @Unique
     List<ColorPointLight> shimmerLights = Collections.emptyList();
 

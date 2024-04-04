@@ -4,10 +4,11 @@ import com.lowdragmc.shimmer.client.light.ColorPointLight;
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 import com.lowdragmc.shimmer.client.shader.ReloadShaderManager;
-import com.lowdragmc.shimmer.core.IRenderChunk;
+import com.lowdragmc.shimmer.core.IRenderSection;
 import com.lowdragmc.shimmer.platform.Services;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
 import org.joml.Matrix4f;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.Camera;
@@ -41,7 +42,7 @@ public abstract class LevelRendererMixin {
 
     @Shadow @Nullable private ClientLevel level;
 
-    @Shadow @Final private ObjectArrayList<LevelRenderer.RenderChunkInfo> renderChunksInFrustum;
+    @Shadow @Final private ObjectArrayList<SectionRenderDispatcher.RenderSection> visibleSections;
 
     @Inject(method = "renderLevel",
             at = @At(
@@ -52,7 +53,7 @@ public abstract class LevelRendererMixin {
         PostProcessing.getBlockBloom().renderBlockPost();
     }
 
-    @Inject(method = "renderChunkLayer",
+    @Inject(method = "renderSectionLayer",
             at = @At(value = "HEAD"))
     private void preRenderChunkLayer(RenderType pRenderType,
                                         PoseStack pPoseStack, double pCamX,
@@ -64,7 +65,7 @@ public abstract class LevelRendererMixin {
         }
     }
 
-    @Inject(method = "renderChunkLayer",
+    @Inject(method = "renderSectionLayer",
             at = @At(value = "RETURN"))
     private void postRenderChunkLayer(RenderType pRenderType,
                                         PoseStack pPoseStack, double pCamX,
@@ -95,12 +96,12 @@ public abstract class LevelRendererMixin {
         int left = LightManager.INSTANCE.leftBlockLightCount();
         FloatBuffer buffer = LightManager.INSTANCE.getBuffer();
         buffer.clear();
-        for (LevelRenderer.RenderChunkInfo chunkInfo : renderChunksInFrustum) {
+        for (SectionRenderDispatcher.RenderSection section : visibleSections) {
             if (left <= blockLightSize) {
                 break;
             }
-            if (chunkInfo.chunk instanceof IRenderChunk) {
-                for (ColorPointLight shimmerLight : ((IRenderChunk) chunkInfo.chunk).getShimmerLights()) {
+            if (section instanceof IRenderSection) {
+                for (ColorPointLight shimmerLight : ((IRenderSection) section).getShimmerLights()) {
                     if (left <= blockLightSize) {
                         break;
                     }

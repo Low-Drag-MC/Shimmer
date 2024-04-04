@@ -1,10 +1,9 @@
 package com.lowdragmc.shimmer.fabric.core.mixins.sodium;
 
 import com.lowdragmc.shimmer.client.light.LightManager;
-import com.lowdragmc.shimmer.core.IRenderChunk;
+import com.lowdragmc.shimmer.core.IRenderSection;
 import me.jellysquid.mods.sodium.client.render.SodiumWorldRenderer;
 import me.jellysquid.mods.sodium.client.render.chunk.RenderSectionManager;
-import me.jellysquid.mods.sodium.client.render.chunk.lists.ChunkRenderList;
 import me.jellysquid.mods.sodium.client.render.viewport.Viewport;
 import net.minecraft.client.Camera;
 import net.minecraft.world.phys.Vec3;
@@ -44,7 +43,7 @@ public abstract class SodiumWorldRendererMixin {
                 var section = region.getSection(sectionIterator.nextByteAsInt());
                 if (section == null) continue;
                 if (left <= blockLightSize) break;
-                if (section instanceof IRenderChunk shimmerRenderChunk) {
+                if (section instanceof IRenderSection shimmerRenderChunk) {
                     for (var shimmerLight : shimmerRenderChunk.getShimmerLights()) {
                         if (left <= blockLightSize) break;
                         shimmerLight.uploadBuffer(buffer);

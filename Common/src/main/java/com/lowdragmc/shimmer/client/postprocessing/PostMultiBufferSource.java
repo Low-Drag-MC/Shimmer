@@ -3,9 +3,9 @@ package com.lowdragmc.shimmer.client.postprocessing;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.Util;
-import net.minecraft.client.renderer.ChunkBufferBuilderPack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SectionBufferBuilderPack;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.resources.model.ModelBakery;
 
@@ -15,7 +15,7 @@ import net.minecraft.client.resources.model.ModelBakery;
  * @implNote PostMultiBufferSource, for proper rendering pipeline
  */
 public class PostMultiBufferSource extends MultiBufferSource.BufferSource {
-    private final static ChunkBufferBuilderPack fixedBufferPack = new ChunkBufferBuilderPack();
+    private final static SectionBufferBuilderPack fixedBufferPack = new SectionBufferBuilderPack();
     public final static PostMultiBufferSource BUFFER_SOURCE = new PostMultiBufferSource();
 
     private static void put(Object2ObjectLinkedOpenHashMap<RenderType, BufferBuilder> pMapBuilders, RenderType pRenderType) {
@@ -34,7 +34,6 @@ public class PostMultiBufferSource extends MultiBufferSource.BufferSource {
             put(map, Sheets.shulkerBoxSheet());
             put(map, Sheets.signSheet());
             put(map, Sheets.chestSheet());
-            put(map, RenderType.translucentNoCrumbling());
             put(map, RenderType.armorGlint());
             put(map, RenderType.armorEntityGlint());
             put(map, RenderType.glint());

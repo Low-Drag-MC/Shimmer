@@ -161,9 +161,9 @@ public enum Eyedropper {
 
 			int rgba = nativeImage.getPixelRGBA(window.getWidth() / 2, window.getHeight() / 2);
 			//fill [red green blue]
-			currentColor[0] = FastColor.ABGR32.red(rgba);
-			currentColor[1] = FastColor.ABGR32.green(rgba);
-			currentColor[2] = FastColor.ABGR32.blue(rgba);
+			currentColor[0] = FastColor.ABGR32.red(rgba) / 255f;
+			currentColor[1] = FastColor.ABGR32.green(rgba) / 255f;
+			currentColor[2] = FastColor.ABGR32.blue(rgba) / 255f;
 
 			if (Math.abs(closeCount - openCount) >= 5) {
 				throw new RuntimeException();

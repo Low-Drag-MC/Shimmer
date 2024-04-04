@@ -26,7 +26,7 @@ public interface MixinPluginShared {
 				//under forge's TransformingClassLoader
 				try {
 					//try not to load the class
-					var fmlLoaderClass = Class.forName("net.minecraftforge.fml.loading.FMLLoader");
+					var fmlLoaderClass = Class.forName("net.neoforged.fml.loading.FMLLoader");
 					var getGameLayerMethod = fmlLoaderClass.getMethod("getGameLayer");
 					var gameLayer = getGameLayerMethod.invoke(null);
 					var configurationMethod = gameLayer.getClass().getMethod("configuration");
