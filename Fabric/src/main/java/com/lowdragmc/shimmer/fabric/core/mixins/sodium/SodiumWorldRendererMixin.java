@@ -2,6 +2,8 @@ package com.lowdragmc.shimmer.fabric.core.mixins.sodium;
 
 import com.lowdragmc.shimmer.client.light.LightManager;
 import com.lowdragmc.shimmer.core.IRenderChunk;
+import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
+import com.lowdragmc.shimmer.fabric.compat.vs.VSShipLightCollector;
 import me.jellysquid.mods.sodium.client.render.SodiumWorldRenderer;
 import me.jellysquid.mods.sodium.client.render.chunk.RenderSectionManager;
 import me.jellysquid.mods.sodium.client.render.chunk.lists.ChunkRenderList;
@@ -19,7 +21,8 @@ import java.nio.FloatBuffer;
 /**
  * @author KilaBash
  * @date 2022/05/31
- * @implNote TODO
+ * @implNote Collects Shimmer colored lights from Sodium render sections
+ *           and uploads them to the light UBO. Includes VS2 ship light support.
  */
 @Mixin(SodiumWorldRenderer.class)
 public abstract class SodiumWorldRendererMixin {
@@ -33,6 +36,8 @@ public abstract class SodiumWorldRendererMixin {
         int left = LightManager.INSTANCE.leftBlockLightCount();
         FloatBuffer buffer = LightManager.INSTANCE.getBuffer();
         buffer.clear();
+
+        // --- Collect lights from main-world terrain render lists ---
         var chunkrenderListIterator = ((RenderSectionManagerAccessor) renderSectionManager).getRenderLists().iterator();
         while (chunkrenderListIterator.hasNext()) {
             if (left <= blockLightSize) break;
@@ -53,6 +58,13 @@ public abstract class SodiumWorldRendererMixin {
                 }
             }
         }
+
+        // --- Collect lights from VS2 ship render lists (positions transformed to world-space) ---
+        if (MixinPluginShared.IS_VS2_LOAD) {
+            blockLightSize += VSShipLightCollector.collectShipLights(
+                    renderSectionManager, buffer, left - blockLightSize);
+        }
+
         LightManager.INSTANCE.renderLevelPre(blockLightSize, (float)position.x,(float) position.y, (float)position.z);
     }
 

@@ -49,6 +49,11 @@ dependencies {
 
     modImplementation("maven.modrinth:modmenu:$mod_menu_version")
 
+    // Valkyrien Skies 2 (compile-only for ship lighting compat)
+    modCompileOnly("maven.modrinth:valkyrien-skies:$vs2_fabric_version")
+    compileOnly("org.valkyrienskies.core:api:$vs_core_version")
+    compileOnly("org.valkyrienskies.core:util:$vs_core_version")
+
 }
 
 tasks.processResources {

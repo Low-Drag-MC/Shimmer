@@ -33,4 +33,11 @@ const val mixinExtras = "com.github.LlamaLad7:MixinExtras:0.1.1"
 const val fabric_flywheel_version = "0.6.9-1"
 const val forge_flywheel_version = "0.6.10-7"
 
+// Valkyrien Skies 2 (compile-only, for ship lighting compat)
+// Modrinth Maven requires platform-prefixed version strings
+// Valkyrien Skies 2 (1.20.1) ships platform-specific artifacts on Modrinth Maven.
+const val vs2_forge_version = "1.20.1-forge-2.4.10"
+const val vs2_fabric_version = "1.20.1-fabric-2.4.10"
+const val vs_core_version = "1.1.0+1d4a7373e9"
+
 val Project.archiveBaseName get() = "$mod_name-${project.name.lowercase()}"

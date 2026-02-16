@@ -29,7 +29,17 @@ subprojects {
         flatDir {
             dir("libs")
         }
-        maven("https://jitpack.io")
+        // Restrict JitPack to GitHub-style coordinates.
+        // JitPack can return HTTP 400 for some valid Maven coordinates
+        // (notably versions containing '+'), which breaks resolution even when
+        // the artifact exists in later repositories.
+        maven {
+            name = "JitPack"
+            url = uri("https://jitpack.io")
+            content {
+                includeGroupByRegex("com\\.github\\..*")
+            }
+        }
         maven {
             url = uri("https://maven.parchmentmc.org/")
             content {
@@ -62,6 +72,18 @@ subprojects {
             content {
                 includeGroup("com.jozufozu.flywheel")
             }
+        }
+        // Flywheel 0.6.10-7 (used for 1.20.1) is hosted on ModMaven.
+        maven {
+            name = "ModMaven"
+            url = uri("https://modmaven.dev")
+            content {
+                includeGroup("com.jozufozu.flywheel")
+            }
+        }
+        maven {
+            name = "Valkyrien Skies"
+            url = uri("https://maven.valkyrienskies.org")
         }
     }
 
