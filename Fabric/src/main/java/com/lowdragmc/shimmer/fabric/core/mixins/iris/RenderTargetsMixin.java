@@ -2,7 +2,7 @@ package com.lowdragmc.shimmer.fabric.core.mixins.iris;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.lowdragmc.shimmer.fabric.compact.iris.IrisFrameBufferWrapper;
-import net.coderbot.iris.rendertarget.RenderTargets;
+import net.irisshaders.iris.targets.RenderTargets;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 

@@ -19,10 +19,23 @@ subprojects {
         silentMojangMappingsLicense()
         this.runConfigs.forEach { setting ->
             setting.property("mixin.debug=true")
-            setting.property("mixin.debug.export=true")
             setting.property("mixin.dumpTargetOnFailure=true")
-            setting.property("mixin.checks.interfaces=true")
             setting.property("mixin.hotSwap=true")
+            //`mixin.checks.interfaces` is deliberately absent. It walks the full interface table of every
+            //target, and Embeddium 0.3.16+ declares Fabric Rendering API interfaces on WorldSlice that it
+            //never ships on Forge, so the walk NPEs and kills the game on world load. Production never sets
+            //the flag, so it only ever broke this dev runtime.
+            //`mixin.debug.export` is opt-in via `-PmixinExport`: it decompiles every transformed class, and
+            //its profiler sections race with the worker threads that transform classes during a resource
+            //reload, which intermittently aborts the reload ("Attempted to pop debug.export...").
+            if (project.hasProperty("mixinExport")) {
+                setting.property("mixin.debug.export=true")
+            }
+        }
+        //`-PquickPlayWorld=<save folder>` boots straight into that world, so a render change can be
+        //checked without clicking through the menus every time
+        (project.findProperty("quickPlayWorld") as String?)?.let { world ->
+            this.runConfigs.findByName("client")?.programArgs("--quickPlaySingleplayer", world)
         }
     }
     repositories {
@@ -57,10 +70,25 @@ subprojects {
             }
         }
         maven {
-            name = "tterrag maven"
-            url = uri("https://maven.tterrag.com/")
+            name = "Create maven"
+            url = uri("https://maven.createmod.net")
             content {
-                includeGroup("com.jozufozu.flywheel")
+                includeGroup("dev.engine-room.flywheel")
+            }
+        }
+        maven {
+            name = "BlameJared maven"
+            url = uri("https://maven.blamejared.com")
+            content {
+                includeGroup("org.embeddedt")
+            }
+        }
+        maven {
+            name = "shedaniel maven"
+            url = uri("https://maven.shedaniel.me/")
+            content {
+                includeGroup("me.shedaniel.cloth")
+                includeGroup("me.shedaniel.cloth.api")
             }
         }
     }
@@ -71,7 +99,8 @@ subprojects {
             officialMojangMappings()
             parchment("org.parchmentmc.data:parchment-$parchment_version@zip")
         })
-        "implementation"(mixinExtras)
+        //provided at runtime by fabric-loader / by the bundled forge artifact, so compile-only here
+        "compileOnly"(mixinExtras)
         "annotationProcessor"(mixinExtras)
         "implementation"("org.jetbrains:annotations:24.0.1")
     }

@@ -24,9 +24,9 @@
   ],
   "mixins": [
     "oculus.ProgramSetMixin",
+    "oculus.ShaderStorageBufferAccessor",
     "rubidium.CompactChunkVertexMixin",
     "rubidium.ModelQuadUtilMixin",
-    "rubidium.ShaderStorageBufferAccessor",
     "rubidium.VanillaLikeChunkVertexMixin"
   ],
   "injectors": {

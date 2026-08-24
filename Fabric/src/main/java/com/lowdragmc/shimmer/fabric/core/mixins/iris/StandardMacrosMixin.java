@@ -1,8 +1,8 @@
 package com.lowdragmc.shimmer.fabric.core.mixins.iris;
 
 import com.lowdragmc.shimmer.ShimmerConstants;
-import net.coderbot.iris.gl.shader.StandardMacros;
-import net.coderbot.iris.shaderpack.StringPair;
+import net.irisshaders.iris.gl.shader.StandardMacros;
+import net.irisshaders.iris.helpers.StringPair;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +22,7 @@ public abstract class StandardMacrosMixin {
 
     @Inject(method = "createStandardEnvironmentDefines",
             at = @At(value = "INVOKE", ordinal = 1,
-                    target = "Lnet/coderbot/iris/gl/shader/StandardMacros;define(Ljava/util/List;Ljava/lang/String;)V"),
+                    target = "Lnet/irisshaders/iris/gl/shader/StandardMacros;define(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
     private static void injectMacro(CallbackInfoReturnable<Iterable<StringPair>> cir, ArrayList<StringPair> list) {

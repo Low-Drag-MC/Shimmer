@@ -1,4 +1,4 @@
-package com.lowdragmc.shimmer.forge.core.mixins.rubidium;
+package com.lowdragmc.shimmer.forge.core.mixins.oculus;
 
 import net.irisshaders.iris.gl.buffer.ShaderStorageBuffer;
 import net.irisshaders.iris.gl.buffer.ShaderStorageInfo;

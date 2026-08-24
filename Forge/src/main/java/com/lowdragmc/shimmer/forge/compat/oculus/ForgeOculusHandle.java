@@ -5,7 +5,7 @@ import com.lowdragmc.shimmer.client.shader.RenderUtils;
 import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
 import com.lowdragmc.shimmer.comp.iris.IrisHandle;
 import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
-import com.lowdragmc.shimmer.forge.core.mixins.rubidium.ShaderStorageBufferAccessor;
+import com.lowdragmc.shimmer.forge.core.mixins.oculus.ShaderStorageBufferAccessor;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.irisshaders.iris.gl.buffer.ShaderStorageBuffer;
 import net.minecraft.client.Minecraft;

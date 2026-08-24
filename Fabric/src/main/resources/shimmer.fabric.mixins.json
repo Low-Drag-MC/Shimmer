@@ -21,7 +21,7 @@
     "iris.GlResourceAccessor",
     "iris.HeldItemSupplierMixin",
     "iris.IrisChunkProgramOverridesMixin",
-    "iris.NewWorldRenderingPipelineMixin",
+    "iris.IrisRenderingPipelineMixin",
     "iris.RenderTargetsMixin",
     "iris.ShaderPropertiesMixin",
     "iris.ShaderStorageBufferAccessor",
@@ -31,11 +31,13 @@
     "sodium.ChunkBuilderMeshingTaskMixin",
     "sodium.CompactChunkVertexMixin",
     "sodium.FluidRendererMixin",
+    "sodium.ModelQuadUtilMixin",
     "sodium.RenderSectionManagerAccessor",
     "sodium.RenderSectionMixin",
     "sodium.ShaderChunkRendererMixin",
     "sodium.ShaderLoaderMixin",
-    "sodium.SodiumWorldRendererMixin"
+    "sodium.SodiumWorldRendererMixin",
+    "sodium.VanillaLikeChunkVertexMixin"
   ],
   "server": [
   ],

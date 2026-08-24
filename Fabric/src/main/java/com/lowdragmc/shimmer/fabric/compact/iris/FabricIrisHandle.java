@@ -6,7 +6,7 @@ import com.lowdragmc.shimmer.client.shader.ShaderSSBO;
 import com.lowdragmc.shimmer.comp.iris.IrisHandle;
 import com.lowdragmc.shimmer.core.mixins.MixinPluginShared;
 import com.lowdragmc.shimmer.fabric.core.mixins.iris.ShaderStorageBufferAccessor;
-import net.coderbot.iris.gl.buffer.ShaderStorageBuffer;
+import net.irisshaders.iris.gl.buffer.ShaderStorageBuffer;
 import net.irisshaders.iris.api.v0.IrisApi;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;

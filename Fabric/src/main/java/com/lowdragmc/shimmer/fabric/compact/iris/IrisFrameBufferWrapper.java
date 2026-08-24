@@ -1,6 +1,6 @@
 package com.lowdragmc.shimmer.fabric.compact.iris;
 
-import net.coderbot.iris.gl.framebuffer.GlFramebuffer;
+import net.irisshaders.iris.gl.framebuffer.GlFramebuffer;
 import org.apache.http.util.Asserts;
 import org.lwjgl.opengl.GL30C;
 

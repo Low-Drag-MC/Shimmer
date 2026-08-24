@@ -1,7 +1,7 @@
 package com.lowdragmc.shimmer.fabric.compact.iris;
 
 import com.lowdragmc.shimmer.fabric.core.mixins.iris.GlResourceAccessor;
-import net.coderbot.iris.gl.framebuffer.GlFramebuffer;
+import net.irisshaders.iris.gl.framebuffer.GlFramebuffer;
 import net.minecraft.client.Minecraft;
 
 public class GBufferMainRenderTarget {

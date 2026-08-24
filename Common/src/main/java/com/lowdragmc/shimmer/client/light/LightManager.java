@@ -111,31 +111,19 @@ public enum LightManager {
         return lightShader;
     }
 
-    public static String RbVVSHInjection(String s) {
-        s = new StringBuffer(s).insert(s.lastIndexOf("out vec2 v_TexCoord;"), """
-                 out float isBloom;
-                 """).toString();
-        s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), getLightShader()).toString();
-        s = new StringBuffer(s).insert(s.lastIndexOf('}'), Services.PLATFORM.useLightMap() ? """
-                    v_ColorModulator = color_light_uv(position, vec4(v_ColorModulator, 1.0), ivec2(_vert_light) * 16 ).rgb;
-                """ : """
-                    v_ColorModulator = color_light(position, vec4(v_ColorModulator,1.0)  * 16).rgb;
-                """).toString();
-        s = new StringBuffer(s).insert(s.lastIndexOf("}"), """
-                isBloom = ((_vert_material >> 4u) & 0x01u) > 0u ? 256.0 : 0.0;
-                """).toString();
-        return s;
-    }
-
     public static String embeddiumVVSHInjection(String s) {
         s = new StringBuffer(s).insert(s.lastIndexOf("out vec2 v_TexCoord;"), """
                  out float isBloom;
                  """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf("void main()"), getLightShader()).toString();
+        //Embeddium's `_vert_tex_light_coord` is already an ivec2 on the vanilla 0..255 lightmap scale - see
+        //`_sample_lightmap` dividing it by 256. Sodium's `_vert_light` was 0..15, which is where the `* 16`
+        //came from; carrying it over pushes uv.x past the `uv.x < 255` guard in color_light_uv, so every
+        //chunk light silently took the "no uv light" branch and terrain never got tinted.
         s = new StringBuffer(s).insert(s.lastIndexOf('}'), Services.PLATFORM.useLightMap() ? """
-                    v_Color = color_light_uv(position, v_Color, ivec2(_vert_tex_light_coord) * 16 ).rgba;
+                    v_Color = color_light_uv(position, v_Color, _vert_tex_light_coord).rgba;
                 """ : """
-                    v_Color = color_light(position, v_Color * 16).rgba;
+                    v_Color = color_light(position, v_Color).rgba;
                 """).toString();
         s = new StringBuffer(s).insert(s.lastIndexOf("}"), """
                 isBloom = ((_material_params >> 4u) & 0x01u) > 0u ? 256.0 : 0.0;

@@ -45,6 +45,18 @@ public interface MixinPluginShared {
 		return false;
 	}
 
+	private static boolean detectEmbeddium() {
+		//Embeddium keeps Sodium's package names, so the plugin class alone can't tell the two apart - the
+		//`org.embeddedt` API is what identifies the fork.
+		boolean sodiumFamily = isClassFound("me.jellysquid.mods.sodium.mixin.SodiumMixinPlugin");
+		boolean embeddium = isClassFound("org.embeddedt.embeddium.api.BlockRendererRegistry");
+		if (sodiumFamily && !embeddium) {
+			ShimmerConstants.LOGGER.warn("detect a Sodium fork that isn't Embeddium; shimmer's terrain integration " +
+					"(chunk bloom and colored light on blocks/fluids) is written against Embeddium and stays off");
+		}
+		return sodiumFamily && embeddium;
+	}
+
 	private static boolean doUnderOptifine(boolean underOptifine) {
 		if (underOptifine) {
 			ShimmerConstants.LOGGER.error("detect shimmer is running under optifine, all the functions are disabled, consider just remove shimmer");
@@ -55,10 +67,19 @@ public interface MixinPluginShared {
 	boolean IS_OPT_LOAD = doUnderOptifine(isClassFound("optifine.OptiFineTranformationService") || checkOptifine());
 	boolean IS_DASH_LOADER = isClassFound("dev.quantumfusion.dashloader.mixin.MixinPlugin");
 
-	boolean IS_SODIUM_LOAD = isClassFound("me.jellysquid.mods.sodium.mixin.SodiumMixinPlugin");
-	boolean IS_RUBIDIUM_LOAD = IS_SODIUM_LOAD;
+	/**
+	 * Our terrain mixins are written against Embeddium's renderer, which has drifted far enough from
+	 * upstream Sodium 0.5.x (different chunk vertex encoders, no {@code ModelQuadUtil#mergeBakedLight})
+	 * that applying them to plain Sodium would fail. Covers Embeddium on both Forge and Fabric.
+	 */
+	boolean IS_EMBEDDIUM_LOAD = detectEmbeddium();
 
-	boolean IS_IRIS_LOAD = isClassFound("net.coderbot.iris.compat.sodium.mixin.IrisSodiumCompatMixinPlugin");
+	/**
+	 * Iris 1.7 / Oculus 1.7 moved everything from {@code net.coderbot.iris} to {@code net.irisshaders.iris}.
+	 * Our iris/oculus mixins are written against the new package, so an older Iris must read as absent -
+	 * otherwise they would be applied against classes that no longer exist and take the game down with them.
+	 */
+	boolean IS_IRIS_LOAD = isClassFound("net.irisshaders.iris.compat.sodium.mixin.IrisSodiumCompatMixinPlugin");
 	boolean IS_OCULUS_LOAD = IS_IRIS_LOAD;
 
 }

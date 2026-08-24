@@ -7,10 +7,6 @@ architectury {
     forge()
 }
 
-dependencies {
-    forge("net.minecraftforge:forge:$forge_version")
-}
-
 loom {
     accessWidenerPath.set(project(":Common").loom.accessWidenerPath)
 
@@ -41,16 +37,28 @@ dependencies {
     common(project(path = ":Common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":Common", configuration = "transformProductionForge")) { isTransitive = false }
 
-    include(mixinExtras)
+    // `mixinextras-forge` is a GAMELIBRARY shell whose real classes sit in a jar-in-jar, which FML only
+    // unpacks for a shipped jar - in dev it would leave MixinExtras off the classpath and take our mixin
+    // config plugin (and Embeddium's @Local sugar) down with it. So: ship the shell, run the plain classes.
+    include(mixinExtrasForge)
     forgeRuntimeLibrary(mixinExtras)
 
-    modImplementation("com.jozufozu.flywheel:flywheel-forge-$minecraft_version:$forge_flywheel_version")
+    modImplementation(forge_flywheel)
 
     forgeRuntimeLibrary("icyllis.modernui:ModernUI-Core:$modernui_core_version")
     modCompileOnly("icyllis.modernui:ModernUI-Forge:${minecraft_version}-${modernui_version}")
 
-    modImplementation("maven.modrinth:embeddium:0.3.4+mc1.20.1")
-    modImplementation("maven.modrinth:oculus:1.20.1-1.7.0")
+    modImplementation("maven.modrinth:embeddium:$embeddium_forge_version")
+
+    // Oculus is opt-in for the dev runtime (`-PwithOculus`): Embeddium 0.3.16+ declares WorldSlice as
+    // implementing Fabric Rendering API interfaces it doesn't ship, and Oculus mixes into classes that make
+    // ModLauncher walk that hierarchy, which takes the game down before it reaches the world. Compiling
+    // against it is fine either way, so the oculus mixins still get built.
+    if (project.hasProperty("withOculus")) {
+        modImplementation("maven.modrinth:oculus:$oculus_version")
+    } else {
+        modCompileOnly("maven.modrinth:oculus:$oculus_version")
+    }
 
 }
 

@@ -2,7 +2,7 @@ package com.lowdragmc.shimmer.fabric.core.mixins.iris;
 
 import com.lowdragmc.shimmer.fabric.compact.iris.IGLFrameBuffer;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import net.coderbot.iris.gl.framebuffer.GlFramebuffer;
+import net.irisshaders.iris.gl.framebuffer.GlFramebuffer;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

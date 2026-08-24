@@ -1,3 +1,6 @@
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+
 plugins {
     id("com.github.johnrengelman.shadow")
 }
@@ -9,6 +12,23 @@ architectury {
 
 loom {
     accessWidenerPath.set(project(":Common").loom.accessWidenerPath)
+}
+
+// Iris hard-depends on `sodium`, and Embeddium satisfies that by shipping a stub jar-in-jar. Loom doesn't
+// unpack nested jars for mods on the dev classpath, so fabric loader never sees that stub and refuses to
+// start. Rebuilding the same stub here keeps the dev runtime matching what users actually get; it exists
+// only on the run classpath and is never part of the published jar.
+// Written during configuration rather than by a task because loom resolves the run classpath while it sets
+// Minecraft up, which happens before any task would have run.
+val sodiumStubJar: File = layout.buildDirectory.file("devlibs/sodium-stub.jar").get().asFile.apply {
+    if (!exists() || length() == 0L) {
+        parentFile.mkdirs()
+        ZipOutputStream(outputStream()).use { zip ->
+            zip.putNextEntry(ZipEntry("fabric.mod.json"))
+            zip.write("""{"schemaVersion":1,"id":"sodium","version":"0.5.11","name":"Sodium","description":"Embeddium-provided stub for mod compatibility"}""".toByteArray())
+            zip.closeEntry()
+        }
+    }
 }
 
 val common by configurations.creating
@@ -28,20 +48,32 @@ dependencies {
     common(project(path = ":Common", configuration = "namedElements")) { isTransitive = false }
     shadowCommon(project(path = ":Common", configuration = "transformProductionFabric")) { isTransitive = false }
 
-    include(mixinExtras)
+    //nothing bundles MixinExtras here - fabric-loader 0.16+ already ships it, and that's our declared floor
+
     modApi("me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version")
     include("me.shedaniel.cloth:cloth-config-fabric:$cloth_config_version")
 
-    // Sodium
-    modImplementation("maven.modrinth:sodium:mc1.20.1-0.5.3") {
-        exclude(group = "net.fabricmc.fabric-api")
+    // Flywheel's fabric build declares `breaks: embeddium: "*"`, so fabric loader refuses to start with both
+    // and the dev runtime has to pick one. Embeddium is the default; `-PfabricRuntime=flywheel` swaps in
+    // Sodium + Flywheel instead, which is enough to exercise flywheel.LevelRenderMixin (it targets vanilla
+    // LevelRenderer, not Flywheel) - the terrain mixins skip themselves when Embeddium is absent.
+    if (project.findProperty("fabricRuntime") == "flywheel") {
+        modImplementation("maven.modrinth:sodium:$sodium_version") {
+            exclude(group = "net.fabricmc.fabric-api")
+        }
+        modImplementation(fabric_flywheel)
+    } else {
+        // Embeddium: drop-in replacement for Sodium
+        modImplementation(embeddium_fabric) {
+            exclude(group = "net.fabricmc.fabric-api")
+        }
+        //plain runtime entry, not modLocalRuntime: there's nothing in it to remap
+        "localRuntime"(files(sodiumStubJar))
     }
 
-    modImplementation("maven.modrinth:iris:1.6.10+1.20.1") {
+    modImplementation("maven.modrinth:iris:$iris_version") {
         exclude(group = "net.fabricmc.fabric-api")
     }
-
-    modImplementation("com.jozufozu.flywheel:flywheel-fabric-$minecraft_version:$fabric_flywheel_version")
 
     implementation("org.anarres:jcpp:1.4.14") {isTransitive = false}// for iris
     implementation("io.github.douira:glsl-transformer:2.0.0-pre13") // for iris
