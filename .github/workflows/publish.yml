@@ -57,26 +57,19 @@ jobs:
       MAVEN_PASS: ${{ secrets.MAVEN_PASS }}
       MAVEN_USER: ${{ secrets.MAVEN_USER }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Download shimmer artifact
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-        with:
-          name: Shimmer
+      - uses: actions/checkout@v7
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v1
-      - name: Grant execute permission for gradle
-        run: chmod +x gradlew
+        uses: gradle/actions/wrapper-validation@v5
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
       - name: Publish to Maven
-        uses: gradle/gradle-build-action@v2.4.2
-        with:
-          arguments: publish
-    
+        run: ./gradlew publish --stacktrace
+
   publish:
     needs: call-build-workflow
     runs-on: ubuntu-latest
@@ -90,77 +83,78 @@ jobs:
 
     steps:
       - name: Download shimmer artifact
-        uses: actions/download-artifact@v3
-        continue-on-error: true
+        uses: actions/download-artifact@v8
         with:
           name: Shimmer
 
       - name: Checking and setting the environment
         id: shimmer_env
-        continue-on-error: true
         run: |
-          export loader=${{ matrix.loader }}
-          export name=$(ls ${loader}/build/libs/ | grep shadow -v | grep sources -v | awk -F.jar '{print $1}')
-          export mod_name=$(echo $name | awk -F- '{print $1}')
-          export loader_name=$(echo $name | awk -F- '{print $2}')
-          export mc_version=$(echo $name | awk -F- '{print $3}')
-          export mod_version=$(echo $name | awk -F- '{print $4}')
-          export full_version=$(echo ${mc_version}-${mod_version})
-          echo "name=$name" >> $GITHUB_OUTPUT
-          echo "mod_name=$mod_name" >> $GITHUB_OUTPUT
-          echo "loader_name=$loader_name" >> $GITHUB_OUTPUT
-          echo "mc_version=$mc_version" >> $GITHUB_OUTPUT
-          echo "mod_version=$mod_version" >> $GITHUB_OUTPUT
-          echo "full_version=$full_version" >> $GITHUB_OUTPUT
-          rm ${loader}/build/libs/*shadow.jar
+          set -euo pipefail
+          libs="${{ matrix.loader }}/build/libs"
+          # everything except the dev / dev-shadow / sources / javadoc jars is the release jar
+          jars=$(find "$libs" -maxdepth 1 -name '*.jar' \
+                   ! -name '*-dev.jar' ! -name '*-dev-shadow.jar' \
+                   ! -name '*-sources.jar' ! -name '*-javadoc.jar')
+          if [ "$(printf '%s\n' "$jars" | grep -c .)" -ne 1 ]; then
+            echo "::error::expected exactly one release jar in $libs, found:"
+            ls -la "$libs"
+            exit 1
+          fi
+          name=$(basename "$jars" .jar)
+          {
+            echo "name=$name"
+            echo "mod_name=$(echo "$name" | awk -F- '{print $1}')"
+            echo "loader_name=$(echo "$name" | awk -F- '{print $2}')"
+            echo "mc_version=$(echo "$name" | awk -F- '{print $3}')"
+            echo "mod_version=$(echo "$name" | awk -F- '{print $4}')"
+            echo "full_version=$(echo "$name" | awk -F- '{print $3"-"$4}')"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Publish Github Release
-        uses: Kir-Antipov/mc-publish@v3.3
-        continue-on-error: true
+        uses: Kir-Antipov/mc-publish@v3
         if: (matrix.website == 'github_release' && inputs.github-release) && ((matrix.loader == 'Forge' && inputs.forge) || (matrix.loader == 'Fabric' && inputs.fabric))
         with:
           files: |
-            ${{ matrix.loader }}/build/libs/!(*-@(dev|sources|javadoc)).jar
-            ${{ matrix.loader }}/build/libs/*-@(dev|sources|javadocs).jar
+            ${{ matrix.loader }}/build/libs/!(*-@(dev|dev-shadow|sources|javadoc)).jar
+            ${{ matrix.loader }}/build/libs/*-@(sources|javadoc).jar
           name : ${{ steps.shimmer_env.outputs.name }}
           version : ${{ steps.shimmer_env.outputs.full_version }}
           version-type: ${{ inputs.release-type }}
           changelog: ${{ inputs.changelog }}
-          java : Java 18
+          java : Java 17
 
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-generate-changelog: true
 
       - name: Publish Modrinth Release
-        uses: Kir-Antipov/mc-publish@v3.3
-        continue-on-error: true
+        uses: Kir-Antipov/mc-publish@v3
         if : (matrix.website == 'modrinth' && inputs.modrinth) && ((matrix.loader == 'Forge' && inputs.forge) || (matrix.loader == 'Fabric' && inputs.fabric))
         with:
           files: |
-            ${{ matrix.loader }}/build/libs/!(*-@(dev|sources|javadoc)).jar
-            ${{ matrix.loader }}/build/libs/*-@(dev|sources|javadocs).jar
+            ${{ matrix.loader }}/build/libs/!(*-@(dev|dev-shadow|sources|javadoc)).jar
+            ${{ matrix.loader }}/build/libs/*-@(sources|javadoc).jar
           name: ${{ steps.shimmer_env.outputs.name }}
           version: ${{ steps.shimmer_env.outputs.full_version }}
           version-type: ${{ inputs.release-type }}
           changelog: ${{ inputs.changelog }}
-          java: Java 18
+          java: Java 17
 
           modrinth-id: uBKACKpl
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
       - name: Publish Curseforge Release
-        uses: Kir-Antipov/mc-publish@v3.3
-        continue-on-error: true
+        uses: Kir-Antipov/mc-publish@v3
         if: (matrix.website == 'curseforge' && inputs.curseforge) && ((matrix.loader == 'Forge' && inputs.forge) || (matrix.loader == 'Fabric' && inputs.fabric))
         with:
           files: |
-            ${{ matrix.loader }}/build/libs/!(*-@(dev|sources|javadoc)).jar
-            ${{ matrix.loader }}/build/libs/*-@(dev|sources|javadocs).jar
+            ${{ matrix.loader }}/build/libs/!(*-@(dev|dev-shadow|sources|javadoc)).jar
+            ${{ matrix.loader }}/build/libs/*-@(sources|javadoc).jar
           name: ${{ steps.shimmer_env.outputs.name }}
           version: ${{ steps.shimmer_env.outputs.full_version }}
           version-type: ${{ inputs.release-type }}
           changelog: ${{ inputs.changelog }}
-          java: Java 18
+          java: Java 17
 
           curseforge-id: 627824
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
